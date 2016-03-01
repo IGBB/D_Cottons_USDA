@@ -1,0 +1,2 @@
+*.bam filter=fat -crlf
+*.gz filter=fat -crlf
