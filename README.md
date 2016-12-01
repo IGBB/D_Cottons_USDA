@@ -1,6 +1,8 @@
 # D_Cottons_USDA
 Gossypium D Subgenomes - USDA, MSU, ISU Collaboration
 
+## “Thirteen genome sequences representing the entire subgenus Houzingenia (_Gossypium_): insights into evolution of the New World diploid cottons”
+
 Project Lead: Corrinne E. Grover - Iowa State University
 
 Collaborators:
@@ -12,3 +14,56 @@ Collaborators:
 * Dinum Perera - Mississippi State University
 * Jonathan F. Wendel - Iowa State University
 * William S. Sanders - Mississippi State University / The Jackson Laboratory
+
+
+**Summary**: write the summary for the paper here.
+
+**Background literature** (crude summary): The American diploid D-genome cottons (subgenus *Houzingenia*) comprise a monophyletic subgenus which includes 13-14 species (see references in Ulloa 2013) distributed from Southwest Mexico to Arizona, with additional disjunct distributions in Peru and Galapagos. Among these species are *G. raimondii* (D5), the model diploid progenitor to allopolyploid cotton, and *G. harknessii* (D2-2), an important species for cytoplasmic male sterility in cotton (are there others? -- forgetting). Research using various markers have indicated several instances of hybridization, both within the subgenus and, in one remarkable case (*G. gossypioides*), between a member of *Houzingenia* and another, geographically isolated subgenus from Africa. (*G. gossypioides* is also multiply introgressed) 
+
+Descriptions of the subgenus have largely centered around phylogenetics and/or describing the relationships among species. This includes cpDNA restriction sites, nuclear genes (few), ITS, SSR/EST-SSR markers, RAPDS. Many of these agree on certain relationships (e.g., D3d + D3k, D1 + D8, D2-1 + D2-2 + D10, D4 + D7 + D9 + D11), with some deviation in these, and conflict in the branching order among these groups. (Note: there are other studies where these conflict -- and the trees are totally crazy). TEs have been described a bit (Zhao 1998, some in Hawkins 2006), and aside from a crazy microsat/SSR study, not much is known about genetic distance. Some resources exist in Genbank (cpDNA, one mito genome).
+
+Modern sequencing techniques make it easy to produce a substantial amount of genomic sequencing suitable for addressing basic questions in a more thorough manner. Here we use modest coverage Illumina sequencing to present an in-depth view of the subgenus *Houzingenia*. Genome and plastome assemblies are presented and available for use in genome evolutionary research, as well as cotton-specific questions. Comparative molecular evolutionary dynamics of the genic fraction are conducted, revealing the pace and pattern of evolution/substitution in this subgenus. In addition, the intergenic regions are evaluated for the first time to characterize the amount of divergence outside of genes, and due to indels or SNP.
+
+To improve our understanding of the relationships among the D-genome species, as well as provide insight into the introgressed nature of some species, we conduct phylogenetic analyses on (100s, 1000s?) of nuclear genes for which orthology could be strictly identified.  Conflict among genes (indicative of possible hybrid past) is quantified. Traits are characterized and mapped to the phylogeny (TE amount, genome size, NUMTs others) to determine the evolution of these over time.
+
+## Tasks
+
+1. Genome assemblies
+  1. gather assembly stats
+  2. summarize assembly methods
+  3. redo any assemblies?
+  4. run MAKER on assemblies for *de novo* gene predictions/content evaluations?
+2. Chloroplast assemblies
+  1. gather assembly stats
+  2. summarize assembly methods
+  3. annotate cpDNA (DOGMA, CpGAVAS, or ?)
+3. Intergenic space alignments/synteny
+  1. blast or dot plot to find syntenic regions? MAUVE?
+  2. for aligned intergenic regions with >10 species, 
+    1. determine nt diversity/SNP differences (A genome outgroup)
+    2. characterize number/length of indels (A genome outgroup)
+    3. summarize for all species 
+3. Gene content
+  1. summarize MAKER output
+  2. create gene families via OrthoFinder
+  3. summarize gene family differences
+  4. GO annotation of gene families (?)
+4. Phylogeny
+  1. align reads against D5 reference (done?)
+  2. bam2consensus to get genes for phylogeny
+  3. filter alignments (https://github.com/Wendellab/phylogenetics/blob/master/process_alignments or similar)
+  4. Phylogenetics
+    1. Ka/Ks
+    1. Raxml (+ Astral coalescence?) for ML
+    2. MrBayes (+ BUCKy concordance) for Bayesian
+5. TE characterization
+  1. Cluster via RepeatExplorer
+  2. Annotate with cotton-enriched RepeatMasker database
+  2. Hierarchical clustering of repeats to assess similarity among species
+  3. Map character to tree and assess gain/loss (fastANC or similar) overall, and on a per character basis (however many subdivisions)
+6. NUMT/NUPT characterization
+  1. Use RepeatExplorer clusters
+  2. Annotate against existing organellar sequences for cotton
+  3. Determine extent of occupation, differences
+  3. Map against phylogeny (if interesting)
+  
