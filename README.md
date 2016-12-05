@@ -26,7 +26,7 @@ Modern sequencing techniques make it easy to produce a substantial amount of gen
 
 To improve our understanding of the relationships among the D-genome species, as well as provide insight into the introgressed nature of some species, we conduct phylogenetic analyses on (100s, 1000s?) of nuclear genes for which orthology could be strictly identified.  Conflict among genes (indicative of possible hybrid past) is quantified. Traits are characterized and mapped to the phylogeny (TE amount, genome size, NUMTs others) to determine the evolution of these over time.
 
-** Methods ** (very rough)
+**Methods** (very rough)
 
 All data was trimmed and filtered with Trimmomatic (v0.32) using the following criteria: remove all bases following a sequence adapter, remove leading and trailing bases with a quality score below 28, remove all bases after average quality over an eight base window falls below 28, remove all bases after a single base quality falls below 10, and filter reads with a length shorter than 85. 
 
