@@ -26,6 +26,16 @@ Modern sequencing techniques make it easy to produce a substantial amount of gen
 
 To improve our understanding of the relationships among the D-genome species, as well as provide insight into the introgressed nature of some species, we conduct phylogenetic analyses on (100s, 1000s?) of nuclear genes for which orthology could be strictly identified.  Conflict among genes (indicative of possible hybrid past) is quantified. Traits are characterized and mapped to the phylogeny (TE amount, genome size, NUMTs others) to determine the evolution of these over time.
 
+** Methods ** (very rough)
+
+All data was trimmed and filtered with Trimmomatic (v0.32) using the following criteria: remove all bases following a sequence adapter, remove leading and trailing bases with a quality score below 28, remove all bases after average quality over an eight base window falls below 28, remove all bases after a single base quality falls below 10, and filter reads with a length shorter than 85. 
+
+The trimmed data was aligned to the CottonGen.org D5 JGI reference using BWA v0.7.10. For each species, the alignments were merged and processed with BamBam v1.3 to produce consensus sequences.
+
+For each species, the trimmed data was assembled using ABySS v2.0.1, stepping through every 5th k-mer from 40 through 100. The best assemblies (highest N50) for each species was then annotated with MAKER v2.31.6. Evidence for the predicted genes came from the NCBI D5 EST database, the CottonGen.org D5 predicted proteins, and the ab initio gene predictors Genemark v4.30, SNAP v2013-11-29, and Augustus v3.0.3. SNAP and Augustus models will be trained using BUSCO v2.0.
+
+RepeatExplorer was used to discover and compare transposable elements between all species. The trimmed reads cut at 85 bases and sampled at 1% of the genome size for each species. A cotton-specific repeat database was used to classify the clusters.
+
 ## Tasks
 
 1. Genome assemblies
