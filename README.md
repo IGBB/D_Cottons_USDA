@@ -39,17 +39,18 @@ RepeatExplorer was used to discover and compare transposable elements between al
 ## Tasks
 
 1. Genome assemblies
+  1. reassembly underway (by Tony, 12/06/2016)
   1. gather assembly stats
-  2. summarize assembly methods
-  3. redo any assemblies?
-  4. run MAKER on assemblies for *de novo* gene predictions/content evaluations?
-2. Chloroplast assemblies
+  2. assembly methods summarized (see above)
+  4. run MAKER on assemblies for *de novo* gene predictions/content evaluations
+2. Chloroplast assemblies (on hold, not a priority)
   1. gather assembly stats
   2. summarize assembly methods
   3. annotate cpDNA (DOGMA, CpGAVAS, or ?)
 3. Intergenic space alignments/synteny
-  1. blast or dot plot to find syntenic regions? MAUVE?
-  2. for aligned intergenic regions with >10 species, 
+  1. map contigs to D5 genome
+  2. extract regions where all (>10? >8?) species are represented
+  2. for aligned intergenic regions 
     1. determine nt diversity/SNP differences (A genome outgroup)
     2. characterize number/length of indels (A genome outgroup)
     3. summarize for all species 
@@ -59,7 +60,7 @@ RepeatExplorer was used to discover and compare transposable elements between al
   3. summarize gene family differences
   4. GO annotation of gene families (?)
 4. Phylogeny
-  1. align reads against D5 reference (done?)
+  1. align reads against D5 reference (Tony has this underway, 12/06/2016)
   2. bam2consensus to get genes for phylogeny
   3. filter alignments (https://github.com/Wendellab/phylogenetics/blob/master/process_alignments or similar)
   4. Phylogenetics
@@ -68,7 +69,7 @@ RepeatExplorer was used to discover and compare transposable elements between al
     2. MrBayes (+ BUCKy concordance) for Bayesian
 5. TE characterization
   1. Cluster via RepeatExplorer
-  2. Annotate with cotton-enriched RepeatMasker database
+  2. Annotate with newest cotton-enriched RepeatMasker database (created 09/2016)
   2. Hierarchical clustering of repeats to assess similarity among species
   3. Map character to tree and assess gain/loss (fastANC or similar) overall, and on a per character basis (however many subdivisions)
 6. NUMT/NUPT characterization
