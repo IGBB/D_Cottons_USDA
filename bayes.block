@@ -1,0 +1,8 @@
+begin mrbayes;
+        lset nst=6 rates=gamma;
+        mcmcp nruns=4 ngen=10000000 printfreq=10000 samplefreq=500 nchains=4 savebrlens=yes
+        filename=FILENAME relburnin=yes burninfrac=0.25;
+        mcmc;
+        sumt;
+        sump;
+end;
