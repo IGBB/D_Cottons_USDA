@@ -1,0 +1,65 @@
+#!/usr/bin/bash
+# Corrinne Grover, December 2016
+
+# if less than two arguments supplied, display usage
+        if [  $# -le 0 ]
+        then
+                echo "This script removes sequences from an aligned fasta file that have more than 80% gaps, and then removes remaining alignment positions that have gaps."
+                echo "This script requires Python and PyCogent (http://pycogent.org/)"
+                # note Pycogent is stupid and cannot take passed variable names as arguments for LoadSeqs. Lame.
+                echo -e "\nUsage:\n$0 infile \n"
+                exit 1
+        fi
+
+# user supplied -h or --help; display usage
+        if [[ ( $# == "--help") ||  $# == "-h" ]]
+        then
+                echo "This script removes sequences from an aligned fasta file that have more than 80% gaps, and then removes remaining alignment positions that have gaps."
+                echo "This script requires Python and PyCogent (http://pycogent.org/)"
+                echo -e "\nUsage:\n$0 infile \n"
+                exit 0
+        fi
+
+module load python/2.7.12
+
+sed 's/-/_/g' $1 | sed 's/N/-/g' | sed 's/[.]all[.]bam//g' | sed 's/[.][G][a-z][a-z][a-z][a-z][12]//g' | sed 's/4_12/4_12C/' | sed 's/A2_1011/A2_101/' | sed 's/D3_/D3/' > temp.fasta
+
+python - << END
+
+import sys
+from cogent import LoadSeqs, DNA
+
+aln = LoadSeqs('temp.fasta', moltype=DNA, format='fasta')
+prune_aln = aln.takeSeqs(['A2_44','A2_4', 'A2_BGI'], negate=True)
+filtered_aln = prune_aln.omitGapSeqs(0.50)
+filtered_gaps = filtered_aln.omitGapPositions(0.2)
+filtered_gaps.writeToFile('temp2.fasta')
+
+#sys.exit()
+END
+
+sed 's/-/N/g' temp2.fasta > ${1%.fasta}.Nfil.fasta
+rm temp.fasta
+rm temp2.fasta
+
+outgroups=`grep ">[AF]" ${1%.fasta}.Nfil.fasta | wc -l`
+
+D1=`grep ">D1_" | wc -l`
+D2=`grep ">D2_" | wc -l`
+D3d=`grep ">D3D" | wc -l`
+D3k=`grep ">D3K" | wc -l`
+D4=`grep ">D4" | wc -l`
+D5=`grep ">D5" | wc -l`
+D6=`grep ">D6" | wc -l`
+D7=`grep ">D7" | wc -l`
+D8=`grep ">D8" | wc -l`
+D9=`grep ">D9" | wc -l`
+D10=`grep ">D1[10]" | wc -l`
+
+
+mkdir missing_others
+
+if [ $outgroups  -lt 1 ] || [ $D1 -lt 1 ] || [ $D2 -lt 2 ] ||  [ $D3d -lt 1 ] || [ $D3k -lt 1 ] || [ $D4 -lt 1 ] || [ $D5 -lt 1 ] || [ $D6 -lt 1 ] || [ $D7 -lt 1 ] || [ $D8 -lt 1 ] || [ $D9 -lt 1 ] || [ $D10 -lt 2 ] ||
+then
+  mv ${1%.fasta}.Nfil.fasta filtered
+fi
