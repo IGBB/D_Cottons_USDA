@@ -62,9 +62,14 @@ if [ $outgroups  -lt 1 ] || [ $D1 -lt 1 ] || [ $D2 -lt 2 ] ||  [ $D3d -lt 1 ] ||
 then
   mv ${1%.fasta}.Nfil.fasta filtered
 else
+  clustalw2 -infile=${1%.fasta}.Nfil.fasta -convert -type=nucleotide -output=phylip -outfile=${1%.fasta}.phy
+  mv ${1%.fasta}.phy raxml
   clustalw2 -infile=${1%.fasta}.Nfil.fasta -convert -type=nucleotide -output=nexus -outfile=${1%.fasta}.Nfil.nxs 
   echo >> ${1%.fasta}.Nfil.nxs 
-  cat ${1%.fasta}.Nfil.nxs bayes.block
-  sed "s/FILENAME/${1%.fasta}/"
+  cat ${1%.fasta}.Nfil.nxs bayes.block | sed "s/FILENAME/${1%.fasta}/" > ${1%.fasta}.nxs
+  mv ${1%.fasta}.nxs bayes
+  rm ${1%.fasta}.Nfil.nxs
+  mv ${1%.fasta}.Nfil.fasta fasta
 fi
+
 
