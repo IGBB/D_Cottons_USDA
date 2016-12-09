@@ -21,6 +21,7 @@
         fi
 
 module load python/2.7.12
+module load clustalw/2.1
 
 sed 's/-/_/g' $1 | sed 's/N/-/g' | sed 's/[.]all[.]bam//g' | sed 's/[.][G][a-z][a-z][a-z][a-z][12]//g' | sed 's/4_12/4_12C/' | sed 's/A2_1011/A2_101/' | sed 's/D3_/D3/' > temp.fasta
 
@@ -60,4 +61,10 @@ D10=`grep ">D1[10]" | wc -l`
 if [ $outgroups  -lt 1 ] || [ $D1 -lt 1 ] || [ $D2 -lt 2 ] ||  [ $D3d -lt 1 ] || [ $D3k -lt 1 ] || [ $D4 -lt 1 ] || [ $D5 -lt 1 ] || [ $D6 -lt 1 ] || [ $D7 -lt 1 ] || [ $D8 -lt 1 ] || [ $D9 -lt 1 ] || [ $D10 -lt 2 ] ||
 then
   mv ${1%.fasta}.Nfil.fasta filtered
+else
+  clustalw2 -infile=${1%.fasta}.Nfil.fasta -convert -type=nucleotide -output=nexus -outfile=${1%.fasta}.Nfil.nxs 
+  echo >> ${1%.fasta}.Nfil.nxs 
+  cat ${1%.fasta}.Nfil.nxs bayes.block
+  sed "s/FILENAME/${1%.fasta}/"
 fi
+
