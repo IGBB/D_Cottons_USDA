@@ -58,7 +58,7 @@ D9=`grep ">D9" ${1%.fasta}.Nfil.fasta | wc -l`
 D10=`grep ">D1[10]" ${1%.fasta}.Nfil.fasta | wc -l`
 
 
-if [ $outgroups  -lt 1 ] || [ $D1 -lt 1 ] || [ $D2 -lt 2 ] ||  [ $D3d -lt 1 ] || [ $D3k -lt 1 ] || [ $D4 -lt 1 ] || [ $D5 -lt 1 ] || [ $D6 -lt 1 ] || [ $D7 -lt 1 ] || [ $D8 -lt 1 ] || [ $D9 -lt 1 ] || [ $D10 -lt 2 ] ||
+if [ $outgroups  -lt 1 ] || [ $D1 -lt 1 ] || [ $D2 -lt 2 ] ||  [ $D3d -lt 1 ] || [ $D3k -lt 1 ] || [ $D4 -lt 1 ] || [ $D5 -lt 1 ] || [ $D6 -lt 1 ] || [ $D7 -lt 1 ] || [ $D8 -lt 1 ] || [ $D9 -lt 1 ] || [ $D10 -lt 2 ]
 then
   mv ${1%.fasta}.Nfil.fasta filtered
 else
