@@ -23,7 +23,7 @@
 module load python/2.7.12
 module load clustalw/2.1
 
-sed 's/-/_/g' $1 | sed 's/N/-/g' | sed 's/[.]all[.]bam//g' | sed 's/[.][G][a-z][a-z][a-z][a-z][12]//g' | sed 's/4_12/4_12C/' | sed 's/A2_1011/A2_101/' | sed 's/D3_/D3/' > temp.fasta
+sed 's/-/_/g' $1 | sed 's/[/]work[/]maa146[/]shane[.]gossypiumD[/][/]analysis[/][/]d[.]align[/]//g' | sed 's/N/-/g' | sed 's/[.]all[.]bam//g' | sed 's/[.][G][a-z][a-z][a-z][a-z][12]//g' | sed 's/4_12/4_12C/' | sed 's/A2_1011/A2_101/' | sed 's/D3_/D3/' > temp.fasta
 
 python - << END
 
@@ -45,17 +45,17 @@ rm temp2.fasta
 
 outgroups=`grep ">[AF]" ${1%.fasta}.Nfil.fasta | wc -l`
 
-D1=`grep ">D1_" | wc -l`
-D2=`grep ">D2_" | wc -l`
-D3d=`grep ">D3D" | wc -l`
-D3k=`grep ">D3K" | wc -l`
-D4=`grep ">D4" | wc -l`
-D5=`grep ">D5" | wc -l`
-D6=`grep ">D6" | wc -l`
-D7=`grep ">D7" | wc -l`
-D8=`grep ">D8" | wc -l`
-D9=`grep ">D9" | wc -l`
-D10=`grep ">D1[10]" | wc -l`
+D1=`grep ">D1_" ${1%.fasta}.Nfil.fasta | wc -l`
+D2=`grep ">D2_" ${1%.fasta}.Nfil.fasta | wc -l`
+D3d=`grep ">D3D" ${1%.fasta}.Nfil.fasta | wc -l`
+D3k=`grep ">D3K" ${1%.fasta}.Nfil.fasta | wc -l`
+D4=`grep ">D4" ${1%.fasta}.Nfil.fasta | wc -l`
+D5=`grep ">D5" ${1%.fasta}.Nfil.fasta | wc -l`
+D6=`grep ">D6" ${1%.fasta}.Nfil.fasta | wc -l`
+D7=`grep ">D7" ${1%.fasta}.Nfil.fasta | wc -l`
+D8=`grep ">D8" ${1%.fasta}.Nfil.fasta | wc -l`
+D9=`grep ">D9" ${1%.fasta}.Nfil.fasta | wc -l`
+D10=`grep ">D1[10]" ${1%.fasta}.Nfil.fasta | wc -l`
 
 
 if [ $outgroups  -lt 1 ] || [ $D1 -lt 1 ] || [ $D2 -lt 2 ] ||  [ $D3d -lt 1 ] || [ $D3k -lt 1 ] || [ $D4 -lt 1 ] || [ $D5 -lt 1 ] || [ $D6 -lt 1 ] || [ $D7 -lt 1 ] || [ $D8 -lt 1 ] || [ $D9 -lt 1 ] || [ $D10 -lt 2 ] ||
