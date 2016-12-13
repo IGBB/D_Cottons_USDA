@@ -32,8 +32,8 @@ from cogent import LoadSeqs, DNA
 
 aln = LoadSeqs('temp.fasta', moltype=DNA, format='fasta')
 prune_aln = aln.takeSeqs(['A2_44','A2_4', 'A2_BGI'], negate=True)
-filtered_aln = prune_aln.omitGapSeqs(0.50)
-filtered_gaps = filtered_aln.omitGapPositions(0.2)
+filtered_aln = prune_aln.omitGapSeqs(0.10)
+filtered_gaps = filtered_aln.omitGapPositions(0.1)
 filtered_gaps.writeToFile('temp2.fasta')
 
 #sys.exit()
