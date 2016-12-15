@@ -18,11 +18,11 @@
 #PBS  -o FILENAME_raxOUTPUT
 #PBS  -e FILENAME_raxERRORS
 
-#PBS -lnodes=1:ppn=16:compute,walltime=12:00:00
+#PBS -lnodes=1:ppn=16:compute,walltime=4:00:00
 
 # Change to directory from which qsub command was issued
    cd $PBS_O_WORKDIR
 
 module load LAS/raxml/8.2.9
 
-raxmlHPC-PTHREADS-AVX -b 743558 -f a -k -m GTRGAMMA -o F1 -p 25632 -T 16 -s FILENAME.phy -x 451842 -n FILENAME.GTRGAMMA.raxml -N 10000
+raxmlHPC-PTHREADS-AVX -f a -k -m GTRGAMMA -o F1_1 -p 25632 -T 16 -s FILENAME.phy -x 451842 -n FILENAME.GTRGAMMA.raxml -N 10000
