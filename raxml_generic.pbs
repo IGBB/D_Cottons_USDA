@@ -9,6 +9,13 @@
 #         Use qdel jobname to delete one of your jobs
 #         jobnames are of the form 1234.condo
 
+######## DO NOT qsub THIS FILE, IT WILL SUBMIT 17000 JOBS 
+# Run the following to submit 100 jobs and wait 30s:
+#  for i in $(seq 1 100 17000); do
+#      qsub -t $i-$[ $i + 99 ] myscript
+#      sleep 30
+#  done
+
 ###########################################
 # Output goes to file BATCH_OUTPUT.
 # Error output goes to file BATCH_ERRORS.
@@ -19,10 +26,13 @@
 #PBS  -e FILENAME_raxERRORS
 
 #PBS -lnodes=1:ppn=16:compute,walltime=4:00:00
+#PBS -t 1-17000
 
 # Change to directory from which qsub command was issued
    cd $PBS_O_WORKDIR
 
+FILENAME=$(find_cmd | sed -n ${PBS_ARRAYID}p )
+
 module load LAS/raxml/8.2.9
 
-raxmlHPC-PTHREADS-AVX -f a -k -m GTRGAMMA -o F1_1 -p 25632 -T 16 -s FILENAME.phy -x 451842 -n FILENAME.GTRGAMMA.raxml -N 10000
+raxmlHPC-PTHREADS-AVX -f a -k -m GTRGAMMA -o F1_1 -p 25632 -T 16 -s ${FILENAME}.phy -x 451842 -n ${FILENAME}.GTRGAMMA.raxml -N 10000
