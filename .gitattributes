@@ -1,2 +1,1 @@
-*.bam filter=fat -crlf
-*.gz filter=fat -crlf
+* annex.largefiles=(largerthan=100kb)

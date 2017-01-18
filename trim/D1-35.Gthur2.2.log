@@ -1,0 +1,25 @@
+TrimmomaticPE: Started with arguments: -threads 20 -phred64 /work/maa146/shane.gossypiumD//raw/D1-35.Gthur2/FCC5FV6ACXX_L1_wHAIPI011241-24_1.fq.gz /work/maa146/shane.gossypiumD//raw/D1-35.Gthur2/FCC5FV6ACXX_L1_wHAIPI011241-24_2.fq.gz /work/maa146/shane.gossypiumD//trim/D1-35.Gthur2.2.PE.R1.fq.gz /work/maa146/shane.gossypiumD//trim/D1-35.Gthur2.2.SE.R1.fq.gz /work/maa146/shane.gossypiumD//trim/D1-35.Gthur2.2.PE.R2.fq.gz /work/maa146/shane.gossypiumD//trim/D1-35.Gthur2.2.SE.R2.fq.gz ILLUMINACLIP:/usr/local/igbb/trimmomatic/adapters/all.fa:2:30:15 LEADING:28 TRAILING:28 SLIDINGWINDOW:8:28 SLIDINGWINDOW:1:10 MINLEN:85 TOPHRED33
+Using PrefixPair: 'AGATGTGTATAAGAGACAG' and 'AGATGTGTATAAGAGACAG'
+Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
+Using Long Clipping Sequence: 'GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG'
+Using Long Clipping Sequence: 'TTTTTTTTTTAATGATACGGCGACCACCGAGATCTACAC'
+Using Long Clipping Sequence: 'TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG'
+Using Long Clipping Sequence: 'TTTTTTTTTTCAAGCAGAAGACGGCATACGA'
+Using Long Clipping Sequence: 'CTGTCTCTTATACACATCTGACGCTGCCGACGA'
+Using Long Clipping Sequence: 'AGATCGGAAGAGCTCGTATGCCGTCTTCTGCTTG'
+Using Long Clipping Sequence: 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC'
+Using Long Clipping Sequence: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT'
+Using Long Clipping Sequence: 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
+Using Long Clipping Sequence: 'AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTA'
+Using Long Clipping Sequence: 'AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTAGATCTCGGTGGTCGCCGTATCATT'
+Using Long Clipping Sequence: 'AGATCGGAAGAGCGGTTCAGCAGGAATGCCGAG'
+Skipping duplicate Clipping Sequence: 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC'
+Using Long Clipping Sequence: 'AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT'
+Using Long Clipping Sequence: 'AGATCGGAAGAGCGGTTCAGCAGGAATGCCGAGACCGATCTCGTATGCCGTCTTCTGCTTG'
+Using Long Clipping Sequence: 'CAAGCAGAAGACGGCATACGAGATCGGTCTCGGCATTCCTGCTGAACCGCTCTTCCGATCT'
+Skipping duplicate Clipping Sequence: 'AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTA'
+Using Long Clipping Sequence: 'CTGTCTCTTATACACATCTCCGAGCCCACGAGAC'
+Using Long Clipping Sequence: 'AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT'
+ILLUMINACLIP: Using 2 prefix pairs, 17 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Input Read Pairs: 31195897 Both Surviving: 20731150 (66.45%) Forward Only Surviving: 3260271 (10.45%) Reverse Only Surviving: 2175017 (6.97%) Dropped: 5029459 (16.12%)
+TrimmomaticPE: Completed successfully
