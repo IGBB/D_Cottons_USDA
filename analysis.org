@@ -115,11 +115,15 @@ wget -O - "http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&r
 | A2_4      |        1698 | SRR847945  | SRR847945  |
 | A2_34     |        1698 | SRR847922  | SRR847922  |
 | D5_ref    |         880 | SRX027740  | SRR067821  |
+| D5_2      |         880 | SRR847961  | SRR847961  |
+| D5_4      |         880 | SRR847974  | SRR847974  |
+| D5_31     |         880 | SRR847980  | SRR847980  |
+| D5_53     |         880 | SRR847981  | SRR847981  |
 | F1-1      |        1311 | SRX204849  | SRR617704  |
 #+TBLFM: $4='(org-sbe SRAdb (acc $$3))
 
 #+HEADER: :shebang #!/bin/bash :tangle sra/download.sh :mkdirp yes
-#+BEGIN_SRC sh :var libs=sra_ref
+#+BEGIN_SRC sh :var libs=sra_ref[12:15,]
   PATH=$PATH:/usr/local/igbb/sratoolkit.2.4.5-2/bin/:/home/maa146/.aspera/connect/bin/
   KEY=/home/maa146/.aspera/connect/etc/asperaweb_id_dsa.openssh
 
@@ -134,7 +138,6 @@ wget -O - "http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&r
       echo $(date) ${lib[3]} Started
       ascp -i $KEY -pQTk1 -l 800m dbtest@sra-download.ncbi.nlm.nih.gov:data/sracloud/srapub/${lib[3]} ./
       #fastq-dump --gzip --outdir raw --split-files --split-spot ${lib[3]}
-      mv ${lib[3]}{,.mv}
       echo $(date) ${lib[3]} Finished
   done <<<"$libs"
 
@@ -143,7 +146,7 @@ wget -O - "http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&r
   while read -a lib; do 
       echo $(date) ${lib[3]} Started
       mkdir raw/${lib[0]}
-      fastq-dump --gzip --outdir raw/${lib[0]} --split-files --split-spot sra/${lib[3]}.sra
+      fastq-dump --gzip --outdir raw/${lib[0]} --split-files --split-spot sra/${lib[3]}
       echo $(date) ${lib[3]} Finished
   done <<<"$libs"
 
@@ -932,9 +935,9 @@ cd analysis/phylo/bam2consensus/high_cov
 bams=$(cut -f 4 <<<"$libs" |
     sort -u | grep -v -e AD1-DNWC1324.Ghirs1 -e A1-73  -e D2-2-7.Ghark1 -e A2-JCVI |
     sed 's#D10-8#minlen60/D10-8#' |
-    xargs printf "$DIR/analysis//d.align/%s.all.bam " )
+    xargs printf "$DIR/analysis/d.align/%s.all.bam " )
 
-seq -w 0 37 |  parallel -j5 mkdir {} ';' cd {} ';' bam2consensus -g $DIR/db/D5.CDS_range.gff.{}.gff -m 20 $bams
+seq -w 0 37 |  parallel -j20 mkdir {} ';' cd {} ';' bam2consensus -g $DIR/db/D5.CDS_range.gff.{}.gff -m 20 $bams
 
 
 #+END_SRC
@@ -1040,7 +1043,37 @@ cat <<<"$libs" | uniq -w 11
 | D7-157.HFJ7YBGXX.1 | D7-157      |              934 |          9.34 |          109883 |
 #+TBLFM: $4=$3*0.01::$5=ceil($4*1000000/85)
 
+#+BEGIN_SRC sh :var libs=sample_tbl :var DIR=(file-name-directory buffer-file-name)
+while read -a lib; do
+    echo ${lib[0]}
+    zcat $DIR/trim/${lib[0]}.PE.R1.fq.gz | head -1
+done <<< "$libs" | paste - - | tr ':' '\t'
 
+#+END_SRC
+
+#+RESULTS:
+| Sample             | Machine  | Flowcell        | Lane |
+|--------------------+----------+-----------------+------|
+| D10-8.Gturn1.9     | NS500367 | H04JDAFXX       |    1 |
+| D11-1.Gschw1.7     |          | FCH9RUVADXX     |    2 |
+| D1-2.Gthur1.7      | M01019   | 000000000-AAJFR |    1 |
+| D1-35.Gthur2.5     |          | FCH9RUVADXX     |    2 |
+| D2-1-6.Garmo1.5    |          | FCH9RUVADXX     |    2 |
+| D3-D-27.Gdavi1.1   |          | FCC57CHACXX     |    5 |
+| D3-K-57.Gklot1.6   |          | FCC57AFACXX     |    2 |
+| D4-12.Garid1.2     |          | FCC57AFACXX     |    2 |
+| D5-6.Graim2.1      | SN677    | HABYUADXX       |    1 |
+| D5-8.Graim1.7      | SN677    | HABTTADXX       |    1 |
+| D6-5.Ggoss2.2      |          | FCC57AFACXX     |    2 |
+| D6-7.Ggoss1.3      | SN677    | HABYUADXX       |    1 |
+| D7-4.Globa1.1      |          | FCC57CHACXX     |    5 |
+| D8-8.Gtril2.1      |          | FCD2EUDACXX     |    1 |
+| D8-9.Gtril1.1      | SN677    | HABTTADXX       |    1 |
+| D9-4.Glaxu1.1      |          | FCC57CHACXX     |    5 |
+| D2-2.HFJ7YBGXX.1   | NS500367 | HFJ7YBGXX       |    1 |
+| D3K-56.HFJ7YBGXX.1 | NS500367 | HFJ7YBGXX       |    1 |
+| D4-185.HFJ7YBGXX.1 | NS500367 | HFJ7YBGXX       |    1 |
+| D7-157.HFJ7YBGXX.1 | NS500367 | HFJ7YBGXX       |    1 |
 
  
 #+HEADER: :shebang #!/bin/bash :tangle analysis/clustering/sample.pbs :mkdirp yes
