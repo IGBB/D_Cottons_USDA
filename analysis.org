@@ -1511,6 +1511,412 @@ qsub -v line="$line" analysis/assemble/abyss.pbs
 | D7-157       |   60 | 3220839 | 242828 |  40244 | 500 | 1413 | 3730 |  7696 |   4940 |  55235 | 529.9e6 |
 
 
+* Annotation
+#+BEGIN_COMMENT
+-- Maker Annotation --
+Expects a genome, with optional ESTs and proteins
+Replace $num_part with the number of parts that the genome is divided into
+ * can be seen in results of evaluation when splitting the genome
+#+END_COMMENT
+
+#+COMMENT: train augustus with G. raimondii genes
+#+HEADER: :shebang #!/bin/bash :tangle analysis/annotation/g_raimondii_model/train.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N train_augustus -l walltime=48:00:00 -l nodes=1:ppn=20 -q q200p48h -r n -m a -V
+#+BEGIN_SRC sh :var DIR=(file-name-directory buffer-file-name) :var autoaug_species="gossypium_raimondii"
+  swsetup()
+  {
+    eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`
+  }
+  swsetup augustus
+  cd $DIR/analysis/annotation/g_raimondii_model
+  ln -s /usr/local/igbb/augustus/bin bin
+  ln -s /usr/local/igbb/augustus/bin src
+  ln -s /usr/local/igbb/augustus/scripts/ scripts
+  cp -r /usr/local/igbb/augustus/config ./
+  export AUGUSTUS_CONFIG_PATH=$DIR/analysis/annotation/g_raimondii_model/config
+  scripts/autoAug.pl --genome=G.raimondii_JGI_221_v2.0.assembly.fasta --species=$autoaug_species --threads=16 --trainingset=G.raimondii_JGI_221_v2.1.transcripts_exons.gff3 --singleCPU -v --useexisting
+#+END_SRC
+
+#+NAME: G. raimondii assembly stats
+|    n | n:500 | L50 | min |     N80 |     N50 |    N20 |  E-size |     max |     sum | name                                    |
+|------+-------+-----+-----+---------+---------+--------+---------+---------+---------+-----------------------------------------|
+| 1033 |  1033 |   6 | 696 | 54.88e6 | 61.19e6 | 61.7e6 | 57.28e6 | 69.57e6 | 748.1e6 | G.raimondii_JGI_221_v2.0.assembly.fasta |
+
+#+NAME:completed
+| Species | Path | Number of Parts |
+|---------+------+-----------------|
+
+#+NAME:genome_paths
+| Species | Path                                         | Part Size | Number of Pieces | esize |
+|---------+----------------------------------------------+-----------+------------------+-------|
+| D1-35   | analysis/assemble/D1-35/70/70-scaffolds.fa   |       945 |              100 |  9074 |
+| D10-8   | analysis/assemble/D10-8/40/40-scaffolds.fa   |       285 |              100 |  1066 |
+| D11-1   | analysis/assemble/D11-1/70/70-scaffolds.fa   |       921 |               99 | 10495 |
+| D2-1-6  | analysis/assemble/D2-1-6/70/70-scaffolds.fa  |       957 |              100 |  3891 |
+| D2-2    | analysis/assemble/D2-2/65/65-scaffolds.fa    |      1260 |              100 |  5724 |
+| D3-D-27 | analysis/assemble/D3-D-27/70/70-scaffolds.fa |       927 |              100 | 10350 |
+| D3-K-57 | analysis/assemble/D3-K-57/70/70-scaffolds.fa |      1095 |              100 |  7051 |
+| D3K-56  | analysis/assemble/D3K-56/60/60-scaffolds.fa  |      1327 |              100 |  5467 |
+| D4-12   | analysis/assemble/D4-12/70/70-scaffolds.fa   |      1060 |              100 |  5255 |
+| D4-185  | analysis/assemble/D4-185/60/60-scaffolds.fa  |      1366 |              100 |  4778 |
+| D5-6    | analysis/assemble/D5-6/40/40-scaffolds.fa    |       790 |              100 |  1587 |
+| D5-8    | analysis/assemble/D5-8/40/40-scaffolds.fa    |       878 |              100 |  2718 |
+| D6-5    | analysis/assemble/D6-5/70/70-scaffolds.fa    |      1039 |              100 |  7621 |
+| D6-7    | analysis/assemble/D6-7/55/55-scaffolds.fa    |      1035 |              100 |  1918 |
+| D7-157  | analysis/assemble/D7-157/60/60-scaffolds.fa  |      1360 |              100 |  4940 |
+| D7-4    | analysis/assemble/D7-4/50/50-scaffolds.fa    |       973 |              100 |  3267 |
+| D8-8    | analysis/assemble/D8-8/70/70-scaffolds.fa    |       840 |              100 |  9368 |
+| D8-9    | analysis/assemble/D8-9/40/40-scaffolds.fa    |       411 |              100 |  1765 |
+| D9-4    | analysis/assemble/D9-4/70/70-scaffolds.fa    |       992 |              100 |  5530 |
+
+#+NAME:not_filtered
+| Species | Path | Number of Parts |   |
+|---------+------+-----------------+---|
+
+#+NAME:minimum_length
+| 1000 |
+
+#+COMMENT: get assemblies from Tony
+#+HEADER: :shebang #!/bin/bash
+#+BEGIN_SRC sh :var genomes=not_filtered :var DIR=(file-name-directory buffer-file-name)
+  while read -a lib; do 
+    OUT_PATH=$(dirname ${lib[1]})
+    mkdir -p $DIR/$OUT_PATH
+    cp /work/maa146/shane.gossypiumD/${lib[1]} $OUT_PATH
+  done <<< "$genomes";
+#+END_SRC
+
+#+COMMENT: rename sequences in genome and filter at minimum length
+#+HEADER: :shebang #!/bin/bash :tangle filter.sh :mkdirp yes
+#+BEGIN_SRC sh :var genomes=not_filtered :var minimum_length=minimum_length :var DIR=(file-name-directory buffer-file-name)
+  PERL5PATH=$PERL5PATH:~maa146/bin/lib
+  while read -a lib; do 
+    echo $lib
+    OUT_PATH=$(dirname ${lib[1]})
+    awk 'BEGIN {count=1} /^>/ {print ">SEQ_"count; count++} !/^>/ {print}' $DIR/${lib[1]} > $OUT_PATH/${lib[0]}.renamed.fa
+    /home/maa146/bin/fasta_filter.pl $OUT_PATH/${lib[0]}.renamed.fa -length=$minimum_length > $OUT_PATH/${lib[0]}.filtered.fa
+    rm $OUT_PATH/${lib[0]}.renamed.fa
+    ls -lh $OUT_PATH
+  done <<< "$genomes";
+#+END_SRC
+
+#+COMMENT: BUSCO setup
+#+BEGIN_SRC sh :var DIR=(file-name-directory buffer-file-name)
+  mkdir -p $DIR/analysis/annotation/busco/augustus_setup
+  cp -r /usr/local/igbb/augustus/config $DIR/analysis/annotation/busco/augustus_setup/config
+  ln -s /usr/local/igbb/augustus/bin $DIR/analysis/annotation/busco/augustus_setup/bin
+  ln -s /usr/local/igbb/augustus/bin $DIR/analysis/annotation/busco/augustus_setup/src
+  ln -s /usr/local/igbb/augustus/scripts $DIR/analysis/annotation/busco/augustus_setup/scripts  
+ 
+  # Doesn't work on shadow
+  
+  # mkdir $DIR/analysis/annotation/busco/db
+  # cd $DIR/analysis/annotation/busco/db
+  # wget http://busco.ezlab.org/datasets/embryophyta_odb9.tar.gz
+  # tar xf embryophyta_odb9.tar.gz
+  # rm embryophyta_odb9.tar.gz
+#+END_SRC
+
+#+RESULTS:
+
+#+COMMENT: run BUSCO on filtered genome
+#+HEADER: :shebang #!/bin/bash :tangle analysis/annotation/busco/run.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N busco -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh :var DIR=(file-name-directory buffer-file-name) :var genomes=genome_paths
+  swsetup()
+  {
+    eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`
+  }
+  swsetup python
+  swsetup blast
+  swsetup augustus
+  
+  PATH=$PATH:$DIR/analysis/annotation/busco/augustus_setup/scripts/:/usr/local/igbb/busco_v2/hmmer3.1b2/
+  export AUGUSTUS_CONFIG_PATH=$DIR/analysis/annotation/busco/augustus_setup/config
+  
+  read -a lib < <(sed "${PBS_ARRAYID}q;d" <<< "$genomes")
+  IN_PATH=$DIR/$(dirname ${lib[1]})
+  cd $DIR/analysis/annotation/busco
+  /usr/local/igbb/busco_v2/BUSCO.py -i $IN_PATH/${lib[0]}.filtered.fa -l $DIR/analysis/annotation/busco/db/embryophyta_odb9/ -m genome --long -c 20 -o ${lib[0]} -r -t tmp_${lib[0]}
+  mkdir -p augustus_setup/config/species/${lib[0]}/
+  #cp run_${lib[0]}/augustus_output/retraining_parameters/* augustus_setup/config/species/${lib[0]}/
+  #for file in $(ls -1); do name=$(sed -e 's/BUSCO_D4-12_947729041/D4-12/' <<< "$file"); cp $file $name; done
+#+END_SRC
+
+#+COMMENT: copy BUSCO augustus parameters to config folder
+#+HEADER: :shebang #!/bin/bash :mkdirp yes
+#+BEGIN_SRC sh :var DIR=(file-name-directory buffer-file-name) :results output verbatim
+  for file in $(find analysis/annotation/busco/run_D*/augustus_output/retraining_parameters -type f); do
+    BUSCO_PATH=$(dirname $file)
+    species=${BUSCO_PATH##*_}
+    for augustus_output in $(ls -1 $DIR/analysis/annotation/busco/run_$species/augustus_output/retraining_parameters/); do bn=$(basename $augustus_output); new_name=$(echo $bn | sed -e 's/BUSCO_//;s/_[0-9]*_/_/'); cp $DIR/analysis/annotation/busco/run_$species/augustus_output/retraining_parameters/$augustus_output $DIR/analysis/annotation/busco/augustus_setup/config/species/$species/$new_name; done
+  done;
+  find $DIR/analysis/annotation/busco/augustus_setup/config/species/D* -name "BUSCO*" | cut -f12 -d'/' | uniq
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+D10-8
+D11-1
+D1-35
+D2-1-6
+D2-2
+D3-D-27
+D3K-56
+D3-K-57
+D4-12
+D4-185
+D5-6
+D6-5
+D6-7
+D7-157
+D7-4
+D8-8
+D8-9
+D9-4
+#+end_example
+
+
+#+COMMENT: busco stats
+#+HEADER: :shebang #!/bin/bash :mkdirp yes
+#+BEGIN_SRC sh :var DIR=(file-name-directory buffer-file-name) :var genomes=genome_paths
+echo "Name esize Complete Complete(single) Complete(duplicate) Fragmented Missing number"
+for file in $(find analysis/annotation/busco/ -name 'short_summary*'); do
+  BUSCO_PATH=$(dirname $file)
+  species=${BUSCO_PATH##*_}
+  for augustus_output in $(ls -1 $DIR/analysis/annotation/busco/run_$species/augustus_output/retraining_parameters/); do bn=$(basename $augustus_output); new_name=$(echo $bn | sed -e 's/BUSCO_//;s/_[0-9]*_/_/'); cp $DIR/analysis/annotation/busco/run_$species/augustus_output/retraining_parameters/$augustus_output $DIR/analysis/annotation/busco/augustus_setup/config/species/$species/$new_name; done
+  esize=$(grep $species <<< "$genomes" | awk '{print $NF}')
+  printf "%s %d " "$species" "$esize" && tail -n 6 $file | sed -e 's#^.*run_##;s#/.*##;s#^[\t]*##;s#\t.*##' | sed '/^\s*$/d' | paste - - - - - - - 
+done;
+#+END_SRC
+
+#+RESULTS:
+| Name      | esize | Complete | Complete(single) | Complete(duplicate) | Fragmented | Missing | number |
+| D4-185    |  4778 |      942 |              883 |                  59 |        231 |     267 |   1440 |
+| D8-9      |  1765 |      734 |              686 |                  48 |        277 |     429 |   1440 |
+| D4-12     |  5255 |     1137 |             1046 |                  91 |        134 |     169 |   1440 |
+| D2-1-6    |  3891 |      994 |              920 |                  74 |        196 |     250 |   1440 |
+| raimondii |     0 |     1381 |             1250 |                 131 |         11 |      48 |   1440 |
+| D8-8      |  9368 |     1235 |             1122 |                 113 |         98 |     107 |   1440 |
+| D1-35     |  9074 |     1250 |             1120 |                 130 |         88 |     102 |   1440 |
+| D7-157    |  4940 |     1007 |              935 |                  72 |        205 |     228 |   1440 |
+| D3K-56    |  5467 |      998 |              925 |                  73 |        224 |     218 |   1440 |
+
+#+COMMENT: graph busco and assembly stats
+#+COMMENT: run this in R, not in emacs, after exporting the table above
+#+BEGIN_SRC R
+data <- read.table('busco.assembly.stats', header = T)
+library(ggplot2)
+p <- ggplot(data, aes(y=Complete/number, x=Missing/number))+geom_point(aes(size=esize), alpha=0.3)+scale_x_reverse(labels=scales::percent)+theme_bw()+geom_text(aes(label=Name), size=3,hjust="center", vjust="center")+labs(y="Complete BUSCOS", x="Missing BUSCOs")+scale_y_continuous(labels=scales::percent)
+ggsave('busco.assembly.png', p, width=8, height=5)
+#+END_SRC 
+
+#+COMMENT: BUSCO to SNAP
+#+HEADER: :shebang #!/bin/bash :tangle analysis/annotation/busco/busco_to_snap.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N busco_to_snap -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh :var DIR=(file-name-directory buffer-file-name) :var genomes=genome_paths :results output verbatim
+  swsetup()
+  {
+    eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`
+  }
+  swsetup snap
+  cd $DIR/analysis/annotation/busco
+  for file in $(find . -name 'short_summary*' | grep -v raimondii); do
+    BUSCO_PATH=$(dirname $file)
+    species=${BUSCO_PATH##*_}
+    GENOME=$(grep $species <<< "$genomes" | awk '{print $2}')
+    cd $BUSCO_PATH
+    mkdir -p snap
+    cat augustus_output/gffs/* > $species.combined.gff
+    perl /usr/local/igbb/busco_v2/scripts/gff3_to_zff.pl < $species.combined.gff > snap/$species.ann
+    cd snap
+    grep '^>' $species.ann | tr -d '>' > $species.seqs2keep
+    perl /usr/local/igbb/busco_v2/scripts/fasta_sort.pl $species.seqs2keep < $GENOME > $species.dna
+    fathom $species.ann $species.dna -gene-stats > gene-stats.log 2>&1
+    fathom $species.ann $species.dna -validate > validate.log 2>&1
+    fathom $species.ann $species.dna -categorize 1000 > categorize.log 2>&1
+    fathom uni.ann uni.dna -export 1000 -plus > uni-plus.log 2>&1
+    mkdir -p params
+    cd params
+    forge ../export.ann ../export.dna > ../forge.log 2>&1
+    cd ..
+    hmm-assembler.pl $species params/ > $species.hmm
+    cd $DIR/analysis/annotation/busco
+  done;
+  find $DIR/analysis/annotation/busco -name '*.hmm' | grep -v embryophyta_odb9
+#+END_SRC
+
+#+RESULTS:
+: /work/thrash/shane.gossypiumD//analysis/annotation/busco/run_D4-185/snap/D4-185.hmm
+: /work/thrash/shane.gossypiumD//analysis/annotation/busco/run_D8-9/snap/D8-9.hmm
+: /work/thrash/shane.gossypiumD//analysis/annotation/busco/run_D4-12/snap/D4-12.hmm
+: /work/thrash/shane.gossypiumD//analysis/annotation/busco/run_D2-1-6/snap/D2-1-6.hmm
+: /work/thrash/shane.gossypiumD//analysis/annotation/busco/run_D8-8/snap/D8-8.hmm
+: /work/thrash/shane.gossypiumD//analysis/annotation/busco/run_D7-157/snap/D7-157.hmm
+: /work/thrash/shane.gossypiumD//analysis/annotation/busco/run_D3K-56/snap/D3K-56.hmm
+
+#+COMMENT: Genemark
+#+HEADER: :shebang #!/bin/bash :tangle analysis/annotation/genemark/genemark.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N genemark -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh :var genomes=genome_paths :var DIR=(file-name-directory buffer-file-name) :var min_contig=minimum_length
+  export PERL5LIB=$PERL5LIB:/usr/local/igbb/genemark-es-et_4.30/lib/perl5/ 
+  read -a lib < <(sed "${PBS_ARRAYID}q;d" <<< "$genomes")
+  IN_PATH=$DIR/$(dirname ${lib[1]})
+  mkdir -p $DIR/analysis/annotation/genemark/${lib[0]}
+  cd $DIR/analysis/annotation/genemark/${lib[0]}
+  /usr/local/igbb/genemark-es-et_4.30/gmes_petap.pl --ES --cores 20 --min_contig $min_contig --sequence $IN_PATH/${lib[0]}.filtered.fa
+#+END_SRC
+
+#+COMMENT: Split a genome into pieces for annotation by MAKER
+#+HEADER: :shebang #!/bin/bash :tangle analysis/annotation/split_genomes/split.sh :mkdirp yes
+#+BEGIN_SRC sh :var genomes=genome_paths :var DIR=(file-name-directory buffer-file-name) :results output verbatim
+  while read -a lib; do
+    GENOME=$DIR/$(dirname ${lib[1]})/${lib[0]}.filtered.fa
+    reads_in_filter=$(grep -c '>' $GENOME)
+    ((part_size=reads_in_filter/99))
+    mkdir -p $DIR/analysis/annotation/split_genomes/${lib[0]}
+    cd $DIR/analysis/annotation/split_genomes/${lib[0]}
+    /home/maa146/bin/fasta-splitter.pl --part-size $part_size --measure count $GENOME
+    num_parts=$(ls -1 $DIR/analysis/annotation/split_genomes/${lib[0]} | wc -l)
+    printf "|%s|%s|%d|%d|\n" "${lib[0]}" "${lib[1]}" "$part_size" "$num_parts" >&2
+  done <<< "$genomes";  
+#+END_SRC
+
+#+COMMENT: Set up MAKER for a genome
+#+HEADER: :shebang #!/bin/bash
+#+BEGIN_SRC sh :var genomes=genome_paths :var DIR=(file-name-directory buffer-file-name)
+  swsetup () 
+  { 
+    eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`
+  }
+  swsetup maker
+  
+  while read -a lib; do
+    GENOME=$DIR/$(dirname ${lib[1]})/${lib[0]}.filtered.fa
+    SNAP_HMM=$DIR/analysis/annotation/busco/run_${lib[0]}/snap/${lib[0]}.hmm
+    GENEMARK=$DIR/analysis/annotation/genemark/${lib[0]}/output/gmhmm.mod
+    PROTEINS=$DIR/analysis/annotation/db/G.raimondii_JGI_221_v2.1.proteins.fasta
+    ALT_ESTs=$DIR/analysis/annotation/db/G.raimondii.ESTs.fa
+    AUGUSTUS_CONFIG_PATH=$DIR/analysis/annotation/busco/augustus_setup/config
+  
+    echo $GENOME
+    mkdir -p $DIR/analysis/annotation/maker/${lib[0]}/annotation_parts
+    cd $DIR/analysis/annotation/maker/${lib[0]}
+    pwd
+    maker -CTL
+    sed -i -e "s|snaphmm= #SNAP|snaphmm=$BUSCO #SNAP|g" maker_opts.ctl 
+    sed -i -e "s|gmhmm= #GeneMark|gmhmm=$GENEMARK #GeneMark|g" maker_opts.ctl
+    sed -i -e "s|gmhmme3= #location|gmhmme3=\/usr\/local\/igbb\/genemark-es-et_4.30\/gmhmme3 #location|g" maker_exe.ctl
+    sed -i -e "s|probuild= #location|probuild=\/usr\/local\/igbb\/genemark-es-et_4.30\/probuild #location|g" maker_exe.ctl
+    sed -i -e "s|protein=  #protein|protein=$PROTEINS #protein|g" maker_opts.ctl
+    sed -i -e "s|augustus_species=|augustus_species=${lib[0]} --AUGUSTUS_CONFIG_PATH=$AUGUSTUS_CONFIG_PATH|g" maker_opts.ctl
+    sed -i -e "s|snaphmm= #SNAP|snaphmm=$SNAP_HMM #SNAP|g" maker_opts.ctl
+    sed -i -e "s|altest= #EST|altest=$ALT_ESTs #EST|g" maker_opts.ctl
+  done <<< "$genomes";
+#+END_SRC
+
+#+COMMENT: run maker, must run qsub -v line=<int> analysis/annotation/maker/run.pbs
+#+COMMENT: where <int> is the line number of the genome you wish to annotate
+#+HEADER: :shebang #!/bin/bash :tangle analysis/annotation/maker/run.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N maker -l walltime=48:00:00 -l nodes=1:ppn=20 -q q200p48h -r n -m a -V
+#+BEGIN_SRC sh :var genomes=genome_paths :var DIR=(file-name-directory buffer-file-name)
+      swsetup () 
+  { 
+    eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`
+  }
+  swsetup maker 
+  if [ -z "$line" ]; then exit; fi
+  read -a line_lib < <(sed "${line}q;d" <<< "$genomes")
+  echo ${line_lib[0]}
+  cd $DIR/analysis/annotation/maker/${line_lib[0]}
+  read -a lib < <(sed -n -e "${PBS_ARRAYID}p" <<<"$(ls $DIR/analysis/annotation/split_genomes/${line_lib[0]} -1)")
+  maker -fix_nucleotides -g $DIR/analysis/annotation/split_genomes/${line_lib[0]}/$lib -c 20 &> maker.${PBS_ARRAYID}.log
+  cd ${line_lib[0]}".filtered.part-"$(printf "%03d" ${PBS_ARRAYID})".maker.output"
+  file_name=${line_lib[0]}".filtered.part-"$(printf "%03d" ${PBS_ARRAYID})"_master_datastore_index.log"
+  archive_name=${line_lib[0]}".filtered.part-"$(printf "%03d" ${PBS_ARRAYID})".maker.output.tar"
+  gff3_merge -d $file_name
+  fasta_merge -d $file_name
+  mv *.all* ../annotation_parts
+  cd ../annotation_parts
+	awk '1;/##FASTA/{exit}' $gff_name"gff" | head -n -1 > $gff_name"no_fasta.gff"
+	cd ../
+  tar cf $archive_name ${line_lib[0]}".filtered.part-"$(printf "%03d" ${PBS_ARRAYID})".maker.output" --remove-files
+#+END_SRC
+
+#+COMMENT: merge maker output into annotations; either run in emacs (changing line)
+#+COMMENT: or tangle and run with ./merge.pbs <int>
+#+HEADER: :shebang #!/bin/bash :tangle analysis/annotation/maker/merge.pbs :mkdirp yes
+#+BEGIN_SRC sh :var genomes=genome_paths :var DIR=(file-name-directory buffer-file-name) :results output verbatim
+swsetup()
+  {
+    eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`
+  }
+swsetup maker
+mkdir -p $DIR/analysis/annotation/annotations
+
+line=$1
+read -a lib < <(sed "${line}q;d" <<< "$genomes")
+echo $lib
+cd $DIR/analysis/annotation/maker/${lib[0]}
+rm maker_annotations.log
+for file in $(ls -d *part-*/)
+do
+	file_name_base=$(echo $file | rev | cut -f3- -d'.' | rev)
+	file_name=$file_name_base"_master_datastore_index.log"
+	awk -v OFS='\t' -v PWD="$file" '{print $1,PWD $2,$3}' $file/$file_name 
+done > maker_annotations.log
+gff3_merge -d maker_annotations.log
+fasta_merge -d maker_annotations.log
+awk '1;/##FASTA/{exit}' maker_annotations.log.all.gff | head -n -1 > $DIR/analysis/annotation/annotations/${lib[0]}.gff
+#+END_SRC
+
+#+RESULTS:
+: D10-8
+
+#+COMMENT: AED graph for maker annotations
+#+HEADER: :tangle analysis/annotation/annotations/aed.R :mkdirp yes
+#+BEGIN_SRC R
+args = commandArgs(trailingOnly=TRUE)
+data <- read.table(args[1])
+name <- args[2]
+library(ggplot2)
+ggplot(data, aes(V1))+stat_ecdf(geom="line")
+ggsave(paste(name,".aed.png", sep=""))
+#+END_SRC
+
+#+COMMENT: generate AED graphs
+#+HEADER: :shebang #!/bin/bash
+#+BEGIN_SRC sh :var genomes=genome_paths :var DIR=(file-name-directory buffer-file-name)
+  swsetup()
+  {
+    eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`
+  }
+  swsetup r-3.2.1
+  cd $DIR/analysis/annotation/annotations/
+  for file in $(ls -1 D*.gff); do
+    echo $file;
+    grep AED $file > aed.gff
+    sed -e 's/.*_AED=//' -e 's/;.*//' aed.gff > aed.stats
+    Rscript --vanilla aed.R aed.stats ${file%.*}
+    rm aed.gff
+    rm aed.stats
+  done;
+#+END_SRC
+
+#+RESULTS:
+| D10-8.gff   |
+| D11-1.gff   |
+| D1-35.gff   |
+| D2-1-6.gff  |
+| D2-2.gff    |
+| D3-D-27.gff |
+| D3K-56.gff  |
+| D3-K-57.gff |
+| D4-12.gff   |
+| D4-185.gff  |
+| D5-6.gff    |
+
 
 * Assembly (OLD)
 Each species was assembled using ABySS (v1.9.0) with every kmer inclusively
