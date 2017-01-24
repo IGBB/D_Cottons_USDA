@@ -1,4 +1,4 @@
-TrimmomaticPE: Started with arguments: -threads 20 -phred33 /work/maa146/shane.gossypiumD//raw/A2-BGI/SRR1216980_1.fastq.gz /work/maa146/shane.gossypiumD//raw/A2-BGI/SRR1216980_1.fastq.gz /work/maa146/shane.gossypiumD//trim/A2-BGI.PE.R1.fq.gz /work/maa146/shane.gossypiumD//trim/A2-BGI.SE.R1.fq.gz /work/maa146/shane.gossypiumD//trim/A2-BGI.PE.R2.fq.gz /work/maa146/shane.gossypiumD//trim/A2-BGI.SE.R2.fq.gz ILLUMINACLIP:/usr/local/igbb/trimmomatic/adapters/all.fa:2:30:15 LEADING:28 TRAILING:28 SLIDINGWINDOW:8:28 SLIDINGWINDOW:1:10 MINLEN:85 TOPHRED33
+TrimmomaticPE: Started with arguments: -threads 2 -phred33 /work/maa146/shane.gossypiumD/raw/A2-BGI/SRR1216980_1.fastq.gz /work/maa146/shane.gossypiumD/raw/A2-BGI/SRR1216980_2.fastq.gz /work/maa146/shane.gossypiumD/trim/A2-BGI.PE.R1.fq.gz /work/maa146/shane.gossypiumD/trim/A2-BGI.SE.R1.fq.gz /work/maa146/shane.gossypiumD/trim/A2-BGI.PE.R2.fq.gz /work/maa146/shane.gossypiumD/trim/A2-BGI.SE.R2.fq.gz ILLUMINACLIP:/usr/local/igbb/trimmomatic/adapters/all.fa:2:30:15 LEADING:28 TRAILING:28 SLIDINGWINDOW:8:28 SLIDINGWINDOW:1:10 MINLEN:85 TOPHRED33
 Using PrefixPair: 'AGATGTGTATAAGAGACAG' and 'AGATGTGTATAAGAGACAG'
 Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
 Using Long Clipping Sequence: 'GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG'
@@ -21,5 +21,5 @@ Skipping duplicate Clipping Sequence: 'AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTA'
 Using Long Clipping Sequence: 'CTGTCTCTTATACACATCTCCGAGCCCACGAGAC'
 Using Long Clipping Sequence: 'AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT'
 ILLUMINACLIP: Using 2 prefix pairs, 17 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
-Input Read Pairs: 84232465 Both Surviving: 83083395 (98.64%) Forward Only Surviving: 0 (0.00%) Reverse Only Surviving: 0 (0.00%) Dropped: 1149070 (1.36%)
+Input Read Pairs: 84232465 Both Surviving: 0 (0.00%) Forward Only Surviving: 0 (0.00%) Reverse Only Surviving: 27063065 (32.13%) Dropped: 57169400 (67.87%)
 TrimmomaticPE: Completed successfully

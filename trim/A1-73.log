@@ -1,4 +1,4 @@
-TrimmomaticPE: Started with arguments: -threads 20 -phred33 /work/maa146/shane.gossypiumD//raw/A1-73/SRR849166_1.fastq.gz /work/maa146/shane.gossypiumD//raw/A1-73/SRR849166_1.fastq.gz /work/maa146/shane.gossypiumD//trim/A1-73.PE.R1.fq.gz /work/maa146/shane.gossypiumD//trim/A1-73.SE.R1.fq.gz /work/maa146/shane.gossypiumD//trim/A1-73.PE.R2.fq.gz /work/maa146/shane.gossypiumD//trim/A1-73.SE.R2.fq.gz ILLUMINACLIP:/usr/local/igbb/trimmomatic/adapters/all.fa:2:30:15 LEADING:28 TRAILING:28 SLIDINGWINDOW:8:28 SLIDINGWINDOW:1:10 MINLEN:85 TOPHRED33
+TrimmomaticPE: Started with arguments: -threads 2 -phred33 /work/maa146/shane.gossypiumD/raw/A1-73/SRR849166_1.fastq.gz /work/maa146/shane.gossypiumD/raw/A1-73/SRR849166_2.fastq.gz /work/maa146/shane.gossypiumD/trim/A1-73.PE.R1.fq.gz /work/maa146/shane.gossypiumD/trim/A1-73.SE.R1.fq.gz /work/maa146/shane.gossypiumD/trim/A1-73.PE.R2.fq.gz /work/maa146/shane.gossypiumD/trim/A1-73.SE.R2.fq.gz ILLUMINACLIP:/usr/local/igbb/trimmomatic/adapters/all.fa:2:30:15 LEADING:28 TRAILING:28 SLIDINGWINDOW:8:28 SLIDINGWINDOW:1:10 MINLEN:85 TOPHRED33
 Using PrefixPair: 'AGATGTGTATAAGAGACAG' and 'AGATGTGTATAAGAGACAG'
 Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
 Using Long Clipping Sequence: 'GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG'
@@ -21,5 +21,5 @@ Skipping duplicate Clipping Sequence: 'AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTA'
 Using Long Clipping Sequence: 'CTGTCTCTTATACACATCTCCGAGCCCACGAGAC'
 Using Long Clipping Sequence: 'AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT'
 ILLUMINACLIP: Using 2 prefix pairs, 17 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
-Input Read Pairs: 2245275 Both Surviving: 23164 (1.03%) Forward Only Surviving: 0 (0.00%) Reverse Only Surviving: 0 (0.00%) Dropped: 2222111 (98.97%)
+Input Read Pairs: 2245275 Both Surviving: 8716 (0.39%) Forward Only Surviving: 14426 (0.64%) Reverse Only Surviving: 537975 (23.96%) Dropped: 1684158 (75.01%)
 TrimmomaticPE: Completed successfully
