@@ -1,4 +1,4 @@
-TrimmomaticPE: Started with arguments: -threads 20 -phred33 /work/maa146/shane.gossypiumD//raw/A2_1011/SRR847923_1.fastq.gz /work/maa146/shane.gossypiumD//raw/A2_1011/SRR847923_1.fastq.gz /work/maa146/shane.gossypiumD//trim/A2_1011.PE.R1.fq.gz /work/maa146/shane.gossypiumD//trim/A2_1011.SE.R1.fq.gz /work/maa146/shane.gossypiumD//trim/A2_1011.PE.R2.fq.gz /work/maa146/shane.gossypiumD//trim/A2_1011.SE.R2.fq.gz ILLUMINACLIP:/usr/local/igbb/trimmomatic/adapters/all.fa:2:30:15 LEADING:28 TRAILING:28 SLIDINGWINDOW:8:28 SLIDINGWINDOW:1:10 MINLEN:85 TOPHRED33
+TrimmomaticPE: Started with arguments: -threads 20 -phred33 /work/maa146/shane.gossypiumD//raw/A2_1011/SRR847923_1.fastq.gz /work/maa146/shane.gossypiumD//raw/A2_1011/SRR847923_2.fastq.gz /work/maa146/shane.gossypiumD//trim/A2_1011.PE.R1.fq.gz /work/maa146/shane.gossypiumD//trim/A2_1011.SE.R1.fq.gz /work/maa146/shane.gossypiumD//trim/A2_1011.PE.R2.fq.gz /work/maa146/shane.gossypiumD//trim/A2_1011.SE.R2.fq.gz ILLUMINACLIP:/usr/local/igbb/trimmomatic/adapters/all.fa:2:30:15 LEADING:28 TRAILING:28 SLIDINGWINDOW:8:28 SLIDINGWINDOW:1:10 MINLEN:85 TOPHRED33
 Using PrefixPair: 'AGATGTGTATAAGAGACAG' and 'AGATGTGTATAAGAGACAG'
 Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
 Using Long Clipping Sequence: 'GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG'
@@ -21,5 +21,5 @@ Skipping duplicate Clipping Sequence: 'AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTA'
 Using Long Clipping Sequence: 'CTGTCTCTTATACACATCTCCGAGCCCACGAGAC'
 Using Long Clipping Sequence: 'AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT'
 ILLUMINACLIP: Using 2 prefix pairs, 17 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
-Input Read Pairs: 412359904 Both Surviving: 292868284 (71.02%) Forward Only Surviving: 5 (0.00%) Reverse Only Surviving: 0 (0.00%) Dropped: 119491615 (28.98%)
+Input Read Pairs: 412359904 Both Surviving: 261784170 (63.48%) Forward Only Surviving: 29965346 (7.27%) Reverse Only Surviving: 51232603 (12.42%) Dropped: 69377785 (16.82%)
 TrimmomaticPE: Completed successfully

@@ -1,4 +1,4 @@
-TrimmomaticPE: Started with arguments: -threads 20 -phred33 /work/maa146/shane.gossypiumD//raw/A2-JCVI/SRR959522_1.fastq.gz /work/maa146/shane.gossypiumD//raw/A2-JCVI/SRR959522_1.fastq.gz /work/maa146/shane.gossypiumD//trim/A2-JCVI.PE.R1.fq.gz /work/maa146/shane.gossypiumD//trim/A2-JCVI.SE.R1.fq.gz /work/maa146/shane.gossypiumD//trim/A2-JCVI.PE.R2.fq.gz /work/maa146/shane.gossypiumD//trim/A2-JCVI.SE.R2.fq.gz ILLUMINACLIP:/usr/local/igbb/trimmomatic/adapters/all.fa:2:30:15 LEADING:28 TRAILING:28 SLIDINGWINDOW:8:28 SLIDINGWINDOW:1:10 MINLEN:85 TOPHRED33
+TrimmomaticPE: Started with arguments: -threads 2 -phred33 /work/maa146/shane.gossypiumD/raw/A2-JCVI/SRR959522_1.fastq.gz /work/maa146/shane.gossypiumD/raw/A2-JCVI/SRR959522_2.fastq.gz /work/maa146/shane.gossypiumD/trim/A2-JCVI.PE.R1.fq.gz /work/maa146/shane.gossypiumD/trim/A2-JCVI.SE.R1.fq.gz /work/maa146/shane.gossypiumD/trim/A2-JCVI.PE.R2.fq.gz /work/maa146/shane.gossypiumD/trim/A2-JCVI.SE.R2.fq.gz ILLUMINACLIP:/usr/local/igbb/trimmomatic/adapters/all.fa:2:30:15 LEADING:28 TRAILING:28 SLIDINGWINDOW:8:28 SLIDINGWINDOW:1:10 MINLEN:85 TOPHRED33
 Using PrefixPair: 'AGATGTGTATAAGAGACAG' and 'AGATGTGTATAAGAGACAG'
 Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
 Using Long Clipping Sequence: 'GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG'
@@ -21,5 +21,5 @@ Skipping duplicate Clipping Sequence: 'AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTA'
 Using Long Clipping Sequence: 'CTGTCTCTTATACACATCTCCGAGCCCACGAGAC'
 Using Long Clipping Sequence: 'AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT'
 ILLUMINACLIP: Using 2 prefix pairs, 17 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
-Input Read Pairs: 38965101 Both Surviving: 35545475 (91.22%) Forward Only Surviving: 9 (0.00%) Reverse Only Surviving: 0 (0.00%) Dropped: 3419617 (8.78%)
+Input Read Pairs: 38965101 Both Surviving: 32863812 (84.34%) Forward Only Surviving: 2678325 (6.87%) Reverse Only Surviving: 1638303 (4.20%) Dropped: 1784661 (4.58%)
 TrimmomaticPE: Completed successfully

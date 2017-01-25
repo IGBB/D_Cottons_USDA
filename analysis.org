@@ -115,15 +115,16 @@ wget -O - "http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&r
 | A2_4      |        1698 | SRR847945  | SRR847945  |
 | A2_34     |        1698 | SRR847922  | SRR847922  |
 | D5_ref    |         880 | SRX027740  | SRR067821  |
+| F1-1      |        1311 | SRX204849  | SRR617704  |
 | D5_2      |         880 | SRR847961  | SRR847961  |
 | D5_4      |         880 | SRR847974  | SRR847974  |
 | D5_31     |         880 | SRR847980  | SRR847980  |
 | D5_53     |         880 | SRR847981  | SRR847981  |
-| F1-1      |        1311 | SRX204849  | SRR617704  |
 #+TBLFM: $4='(org-sbe SRAdb (acc $$3))
 
 #+HEADER: :shebang #!/bin/bash :tangle sra/download.sh :mkdirp yes
-#+BEGIN_SRC sh :var libs=sra_ref[12:15,]
+#+HEADER: :prologue #PBS -N SRA -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh :var libs=sra_ref[1:12,]
   PATH=$PATH:/usr/local/igbb/sratoolkit.2.4.5-2/bin/:/home/maa146/.aspera/connect/bin/
   KEY=/home/maa146/.aspera/connect/etc/asperaweb_id_dsa.openssh
 
@@ -137,166 +138,169 @@ wget -O - "http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&r
       fi
       echo $(date) ${lib[3]} Started
       ascp -i $KEY -pQTk1 -l 800m dbtest@sra-download.ncbi.nlm.nih.gov:data/sracloud/srapub/${lib[3]} ./
-      #fastq-dump --gzip --outdir raw --split-files --split-spot ${lib[3]}
       echo $(date) ${lib[3]} Finished
   done <<<"$libs"
 
   popd
 
-  while read -a lib; do 
+  while read -a lib; do
       echo $(date) ${lib[3]} Started
       mkdir raw/${lib[0]}
-      fastq-dump --gzip --outdir raw/${lib[0]} --split-files --split-spot sra/${lib[3]}
+      sem -j $PBS_NUM_PPN fastq-dump --gzip --outdir raw/${lib[0]} --split-files --split-spot sra/${lib[3]}
       echo $(date) ${lib[3]} Finished
   done <<<"$libs"
+
+  sem --wait
 
 #+END_SRC
 
 #+NAME: raw_ref
-| Library               | Type   | Encoding |                   Forward Read |                   Reverse Read |
-|-----------------------+--------+----------+--------------------------------+--------------------------------|
-| <21>                  |        |          |                          <r30> |                          <r30> |
-| A1-97                 | DNA-PE |       33 | raw/A1-97/SRR617284_1.fastq.gz | raw/A1-97/SRR617284_1.fastq.gz |
-| A1-73                 | DNA-PE |       33 | raw/A1-73/SRR849166_1.fastq.gz | raw/A1-73/SRR849166_1.fastq.gz |
-| A1-155                | DNA-PE |       33 | raw/A1-155/SRR847953_1.fastq.gz | raw/A1-155/SRR847953_1.fastq.gz |
-| A2-BGI                | DNA-PE |       33 | raw/A2-BGI/SRR1216980_1.fastq.gz | raw/A2-BGI/SRR1216980_1.fastq.gz |
-| A2-JCVI               | DNA-PE |       33 | raw/A2-JCVI/SRR959522_1.fastq.gz | raw/A2-JCVI/SRR959522_1.fastq.gz |
-| A2_44                 | DNA-PE |       33 | raw/A2_44/SRR849219_1.fastq.gz | raw/A2_44/SRR849219_1.fastq.gz |
-| A2_1011               | DNA-PE |       33 | raw/A2_1011/SRR847923_1.fastq.gz | raw/A2_1011/SRR847923_1.fastq.gz |
-| A2_4                  | DNA-PE |       33 |  raw/A2_4/SRR847945_1.fastq.gz |  raw/A2_4/SRR847945_1.fastq.gz |
-| A2_34                 | DNA-PE |       33 | raw/A2_34/SRR847922_1.fastq.gz | raw/A2_34/SRR847922_1.fastq.gz |
-| D5_ref                | DNA-PE |       33 | raw/D5_ref/SRR067821_1.fastq.gz | raw/D5_ref/SRR067821_1.fastq.gz |
-| F1-1                  | DNA-PE |       33 |  raw/F1-1/SRR617704_1.fastq.gz |  raw/F1-1/SRR617704_1.fastq.gz |
+| Library | Type   | Encoding | Forward Read                     | Reverse Read                     |
+|---------+--------+----------+----------------------------------+----------------------------------|
+| A1-97   | DNA-PE |       33 | raw/A1-97/SRR617284_1.fastq.gz   | raw/A1-97/SRR617284_2.fastq.gz   |
+| A1-73   | DNA-PE |       33 | raw/A1-73/SRR849166_1.fastq.gz   | raw/A1-73/SRR849166_2.fastq.gz   |
+| A1-155  | DNA-PE |       33 | raw/A1-155/SRR847953_1.fastq.gz  | raw/A1-155/SRR847953_2.fastq.gz  |
+| A2-BGI  | DNA-PE |       33 | raw/A2-BGI/SRR1216980_1.fastq.gz | raw/A2-BGI/SRR1216980_2.fastq.gz |
+| A2-JCVI | DNA-PE |       33 | raw/A2-JCVI/SRR959522_1.fastq.gz | raw/A2-JCVI/SRR959522_2.fastq.gz |
+| A2_44   | DNA-PE |       33 | raw/A2_44/SRR849219_1.fastq.gz   | raw/A2_44/SRR849219_2.fastq.gz   |
+| A2_1011 | DNA-PE |       33 | raw/A2_1011/SRR847923_1.fastq.gz | raw/A2_1011/SRR847923_2.fastq.gz |
+| A2_4    | DNA-PE |       33 | raw/A2_4/SRR847945_1.fastq.gz    | raw/A2_4/SRR847945_2.fastq.gz    |
+| A2_34   | DNA-PE |       33 | raw/A2_34/SRR847922_1.fastq.gz   | raw/A2_34/SRR847922_2.fastq.gz   |
+| D5_ref  | DNA-PE |       33 | raw/D5_ref/SRR067821_1.fastq.gz  | raw/D5_ref/SRR067821_2.fastq.gz  |
+| F1-1    | DNA-PE |       33 | raw/F1-1/SRR617704_1.fastq.gz    | raw/F1-1/SRR617704_2.fastq.gz    |
+| D5_2    | DNA-PE |       33 | raw/D5_2/SRR847961_1.fastq.gz    | raw/D5_2/SRR847961_2.fastq.gz    |
+| D5_4    | DNA-PE |       33 | raw/D5_4/SRR847974_1.fastq.gz    | raw/D5_4/SRR847974_2.fastq.gz    |
+| D5_31   | DNA-PE |       33 | raw/D5_31/SRR847980_1.fastq.gz   | raw/D5_31/SRR847980_2.fastq.gz   |
+| D5_53   | DNA-PE |       33 | raw/D5_53/SRR847981_1.fastq.gz   | raw/D5_53/SRR847981_2.fastq.gz   |
             
 * Libraries
 #+NAME: raw_new
-| Library               | Type   | Encoding          |                   Forward Read |                   Reverse Read |
-|-----------------------+--------+-------------------+--------------------------------+--------------------------------|
-|                       |        | nil               |                          <r30> |                          <r30> |
+| Library               | Type   | Encoding          | Forward Read                                                    | Reverse Read                                                    |
+|-----------------------+--------+-------------------+-----------------------------------------------------------------+-----------------------------------------------------------------|
 | AD1-DNWC1324.Ghirs1.1 | DNA-PE | FCC6M4FACXX.5     | raw/AD1-DNWC1324.Ghirs1/FCC6M4FACXX_L5_wHAIPI015255-112_1.fq.gz | raw/AD1-DNWC1324.Ghirs1/FCC6M4FACXX_L5_wHAIPI015255-112_2.fq.gz |
 | AD1-DNWC1324.Ghirs1.2 | DNA-PE | FCC6M50ACXX.7     | raw/AD1-DNWC1324.Ghirs1/FCC6M50ACXX_L7_wHAIPI015255-112_1.fq.gz | raw/AD1-DNWC1324.Ghirs1/FCC6M50ACXX_L7_wHAIPI015255-112_2.fq.gz |
 | AD1-DNWC1324.Ghirs1.3 | DNA-PE | FCC6M50ACXX.8     | raw/AD1-DNWC1324.Ghirs1/FCC6M50ACXX_L8_wHAIPI015255-112_1.fq.gz | raw/AD1-DNWC1324.Ghirs1/FCC6M50ACXX_L8_wHAIPI015255-112_2.fq.gz |
-| AD1-DNWC1324.Ghirs1.4 | DNA-PE | HABUGADXX.1       | raw/AD1-DNWC1324.Ghirs1/GHIRS1-1_S0_L001_R1_001.fastq.gz | raw/AD1-DNWC1324.Ghirs1/GHIRS1-1_S0_L001_R2_001.fastq.gz |
-| AD1-DNWC1324.Ghirs1.5 | DNA-PE | HABUGADXX.2       | raw/AD1-DNWC1324.Ghirs1/GHIRS1-1_S0_L002_R1_001.fastq.gz | raw/AD1-DNWC1324.Ghirs1/GHIRS1-1_S0_L002_R2_001.fastq.gz |
-| D10-8.Gturn1.1        | DNA-PE | H14EGBGXX.1       | raw/D10-8.Gturn1/Gturn1-1_S2_L001_R1_001.fastq.gz | raw/D10-8.Gturn1/Gturn1-1_S2_L001_R2_001.fastq.gz |
-| D10-8.Gturn1.2        | DNA-PE | H14EGBGXX.2       | raw/D10-8.Gturn1/Gturn1-1_S2_L002_R1_001.fastq.gz | raw/D10-8.Gturn1/Gturn1-1_S2_L002_R2_001.fastq.gz |
-| D10-8.Gturn1.3        | DNA-PE | H14EGBGXX.3       | raw/D10-8.Gturn1/Gturn1-1_S2_L003_R1_001.fastq.gz | raw/D10-8.Gturn1/Gturn1-1_S2_L003_R2_001.fastq.gz |
-| D10-8.Gturn1.4        | DNA-PE | H14EGBGXX.4       | raw/D10-8.Gturn1/Gturn1-1_S2_L004_R1_001.fastq.gz | raw/D10-8.Gturn1/Gturn1-1_S2_L004_R2_001.fastq.gz |
-| D10-8.Gturn1.5        | DNA-PE | H14EGBGXX.1       | raw/D10-8.Gturn1/Gturn1-1_S4_L001_R1_001.fastq.gz | raw/D10-8.Gturn1/Gturn1-1_S4_L001_R2_001.fastq.gz |
-| D10-8.Gturn1.6        | DNA-PE | H14EGBGXX.2       | raw/D10-8.Gturn1/Gturn1-1_S4_L002_R1_001.fastq.gz | raw/D10-8.Gturn1/Gturn1-1_S4_L002_R2_001.fastq.gz |
-| D10-8.Gturn1.7        | DNA-PE | H14EGBGXX.3       | raw/D10-8.Gturn1/Gturn1-1_S4_L003_R1_001.fastq.gz | raw/D10-8.Gturn1/Gturn1-1_S4_L003_R2_001.fastq.gz |
-| D10-8.Gturn1.8        | DNA-PE | H14EGBGXX.4       | raw/D10-8.Gturn1/Gturn1-1_S4_L004_R1_001.fastq.gz | raw/D10-8.Gturn1/Gturn1-1_S4_L004_R2_001.fastq.gz |
-| D10-8.Gturn1.9        | DNA-PE | H04JDAFXX.1       | raw/D10-8.Gturn1/Gturn1-2-3_S0_L001_R1_001.fastq.gz | raw/D10-8.Gturn1/Gturn1-2-3_S0_L001_R2_001.fastq.gz |
-| D10-8.Gturn1.10       | DNA-PE | H04JDAFXX.2       | raw/D10-8.Gturn1/Gturn1-2-3_S0_L002_R1_001.fastq.gz | raw/D10-8.Gturn1/Gturn1-2-3_S0_L002_R2_001.fastq.gz |
-| D10-8.Gturn1.11       | DNA-PE | H04JDAFXX.3       | raw/D10-8.Gturn1/Gturn1-2-3_S0_L003_R1_001.fastq.gz | raw/D10-8.Gturn1/Gturn1-2-3_S0_L003_R2_001.fastq.gz |
-| D10-8.Gturn1.12       | DNA-PE | H04JDAFXX.4       | raw/D10-8.Gturn1/Gturn1-2-3_S0_L004_R1_001.fastq.gz | raw/D10-8.Gturn1/Gturn1-2-3_S0_L004_R2_001.fastq.gz |
-| D11-1.Gschw1.1        | DNA-PE | FCC57AFACXX.1     | raw/D11-1.Gschw1/FCC57AFACXX_L1_wHAIPI011240-21_1.fq.gz | raw/D11-1.Gschw1/FCC57AFACXX_L1_wHAIPI011240-21_2.fq.gz |
-| D11-1.Gschw1.2        | DNA-PE | FCC57AFACXX.2     | raw/D11-1.Gschw1/FCC57AFACXX_L2_wHAIPI011240-21_1.fq.gz | raw/D11-1.Gschw1/FCC57AFACXX_L2_wHAIPI011240-21_2.fq.gz |
-| D11-1.Gschw1.3        | DNA-PE | FCC5CNBACXX.4     | raw/D11-1.Gschw1/FCC5CNBACXX_L4_wHAIPI011240-21_1.fq.gz | raw/D11-1.Gschw1/FCC5CNBACXX_L4_wHAIPI011240-21_2.fq.gz |
-| D11-1.Gschw1.4        | DNA-PE | FCC5CNBACXX.5     | raw/D11-1.Gschw1/FCC5CNBACXX_L5_wHAIPI011240-21_1.fq.gz | raw/D11-1.Gschw1/FCC5CNBACXX_L5_wHAIPI011240-21_2.fq.gz |
-| D11-1.Gschw1.5        | DNA-PE | FCC6M50ACXX.7     | raw/D11-1.Gschw1/FCC6M50ACXX_L7_wHAIPI015265-113_1.fq.gz | raw/D11-1.Gschw1/FCC6M50ACXX_L7_wHAIPI015265-113_2.fq.gz |
-| D11-1.Gschw1.6        | DNA-PE | FCC6M50ACXX.8     | raw/D11-1.Gschw1/FCC6M50ACXX_L8_wHAIPI015265-113_1.fq.gz | raw/D11-1.Gschw1/FCC6M50ACXX_L8_wHAIPI015265-113_2.fq.gz |
-| D11-1.Gschw1.7        | DNA-PE | FCH9RUVADXX.2     | raw/D11-1.Gschw1/FCH9RUVADXX_L2_wHAIPI011240-21_1.fq.gz | raw/D11-1.Gschw1/FCH9RUVADXX_L2_wHAIPI011240-21_2.fq.gz |
-| D1-2.Gthur1.1         | DNA-PE | H14EGBGXX.1       | raw/D1-2.Gthur1/Gthur1-1_S1_L001_R1_001.fastq.gz | raw/D1-2.Gthur1/Gthur1-1_S1_L001_R2_001.fastq.gz |
-| D1-2.Gthur1.2         | DNA-PE | H14EGBGXX.2       | raw/D1-2.Gthur1/Gthur1-1_S1_L002_R1_001.fastq.gz | raw/D1-2.Gthur1/Gthur1-1_S1_L002_R2_001.fastq.gz |
-| D1-2.Gthur1.3         | DNA-PE | H14EGBGXX.3       | raw/D1-2.Gthur1/Gthur1-1_S1_L003_R1_001.fastq.gz | raw/D1-2.Gthur1/Gthur1-1_S1_L003_R2_001.fastq.gz |
-| D1-2.Gthur1.4         | DNA-PE | H14EGBGXX.4       | raw/D1-2.Gthur1/Gthur1-1_S1_L004_R1_001.fastq.gz | raw/D1-2.Gthur1/Gthur1-1_S1_L004_R2_001.fastq.gz |
-| D1-2.Gthur1.5         | DNA-PE | 000000000-AAJWC.1 | raw/D1-2.Gthur1/Gthur1-2-MSQ2_S1_L001_R1_001.fastq.gz | raw/D1-2.Gthur1/Gthur1-2-MSQ2_S1_L001_R2_001.fastq.gz |
-| D1-2.Gthur1.6         | DNA-PE | 000000000-A8MGR.1 | raw/D1-2.Gthur1/Gthur1-2_S1_L001_R1_001.fastq.gz | raw/D1-2.Gthur1/Gthur1-2_S1_L001_R2_001.fastq.gz |
-| D1-2.Gthur1.7         | DNA-PE | 000000000-AAJFR.1 | raw/D1-2.Gthur1/Gthur1-3-MSQ1_S1_L001_R1_001.fastq.gz | raw/D1-2.Gthur1/Gthur1-3-MSQ1_S1_L001_R2_001.fastq.gz |
-| D1-2.Gthur1.8         | DNA-PE | 000000000-A8P48.1 | raw/D1-2.Gthur1/Gthur1-3_S1_L001_R1_001.fastq.gz | raw/D1-2.Gthur1/Gthur1-3_S1_L001_R2_001.fastq.gz |
-| D1-35.Gthur2.1        | DNA-PE | FCC57CHACXX.5     | raw/D1-35.Gthur2/FCC57CHACXX_L5_wHAIPI011241-24_1.fq.gz | raw/D1-35.Gthur2/FCC57CHACXX_L5_wHAIPI011241-24_2.fq.gz |
-| D1-35.Gthur2.2        | DNA-PE | FCC5FV6ACXX.1     | raw/D1-35.Gthur2/FCC5FV6ACXX_L1_wHAIPI011241-24_1.fq.gz | raw/D1-35.Gthur2/FCC5FV6ACXX_L1_wHAIPI011241-24_2.fq.gz |
-| D1-35.Gthur2.3        | DNA-PE | FCC5FV6ACXX.2     | raw/D1-35.Gthur2/FCC5FV6ACXX_L2_wHAIPI011241-24_1.fq.gz | raw/D1-35.Gthur2/FCC5FV6ACXX_L2_wHAIPI011241-24_2.fq.gz |
-| D1-35.Gthur2.4        | DNA-PE | FCC5FV6ACXX.3     | raw/D1-35.Gthur2/FCC5FV6ACXX_L3_wHAIPI011241-24_1.fq.gz | raw/D1-35.Gthur2/FCC5FV6ACXX_L3_wHAIPI011241-24_2.fq.gz |
-| D1-35.Gthur2.5        | DNA-PE | FCH9RUVADXX.2     | raw/D1-35.Gthur2/FCH9RUVADXX_L2_wHAIPI011241-24_1.fq.gz | raw/D1-35.Gthur2/FCH9RUVADXX_L2_wHAIPI011241-24_2.fq.gz |
-| D2-1-6.Garmo1.1       | DNA-PE | FCC57CHACXX.5     | raw/D2-1-6.Garmo1/FCC57CHACXX_L5_wHAIPI011234-111_1.fq.gz | raw/D2-1-6.Garmo1/FCC57CHACXX_L5_wHAIPI011234-111_2.fq.gz |
-| D2-1-6.Garmo1.2       | DNA-PE | FCC5FV6ACXX.1     | raw/D2-1-6.Garmo1/FCC5FV6ACXX_L1_wHAIPI011234-111_1.fq.gz | raw/D2-1-6.Garmo1/FCC5FV6ACXX_L1_wHAIPI011234-111_2.fq.gz |
-| D2-1-6.Garmo1.3       | DNA-PE | FCC5FV6ACXX.2     | raw/D2-1-6.Garmo1/FCC5FV6ACXX_L2_wHAIPI011234-111_1.fq.gz | raw/D2-1-6.Garmo1/FCC5FV6ACXX_L2_wHAIPI011234-111_2.fq.gz |
-| D2-1-6.Garmo1.4       | DNA-PE | FCC5FV6ACXX.3     | raw/D2-1-6.Garmo1/FCC5FV6ACXX_L3_wHAIPI011234-111_1.fq.gz | raw/D2-1-6.Garmo1/FCC5FV6ACXX_L3_wHAIPI011234-111_2.fq.gz |
-| D2-1-6.Garmo1.5       | DNA-PE | FCH9RUVADXX.2     | raw/D2-1-6.Garmo1/FCH9RUVADXX_L2_wHAIPI011234-111_1.fq.gz | raw/D2-1-6.Garmo1/FCH9RUVADXX_L2_wHAIPI011234-111_2.fq.gz |
-| D2-2-7.Ghark1.1       | DNA-PE | H14EGBGXX.1       | raw/D2-2-7.Ghark1/Ghark1-1_S3_L001_R1_001.fastq.gz | raw/D2-2-7.Ghark1/Ghark1-1_S3_L001_R2_001.fastq.gz |
-| D2-2-7.Ghark1.2       | DNA-PE | H14EGBGXX.2       | raw/D2-2-7.Ghark1/Ghark1-1_S3_L002_R1_001.fastq.gz | raw/D2-2-7.Ghark1/Ghark1-1_S3_L002_R2_001.fastq.gz |
-| D2-2-7.Ghark1.3       | DNA-PE | H14EGBGXX.3       | raw/D2-2-7.Ghark1/Ghark1-1_S3_L003_R1_001.fastq.gz | raw/D2-2-7.Ghark1/Ghark1-1_S3_L003_R2_001.fastq.gz |
-| D2-2-7.Ghark1.4       | DNA-PE | H14EGBGXX.4       | raw/D2-2-7.Ghark1/Ghark1-1_S3_L004_R1_001.fastq.gz | raw/D2-2-7.Ghark1/Ghark1-1_S3_L004_R2_001.fastq.gz |
-| D2-2-7.Ghark1.5       | DNA-PE | H14EGBGXX.1       | raw/D2-2-7.Ghark1/Ghark1-1_S7_L001_R1_001.fastq.gz | raw/D2-2-7.Ghark1/Ghark1-1_S7_L001_R2_001.fastq.gz |
-| D2-2-7.Ghark1.6       | DNA-PE | H14EGBGXX.2       | raw/D2-2-7.Ghark1/Ghark1-1_S7_L002_R1_001.fastq.gz | raw/D2-2-7.Ghark1/Ghark1-1_S7_L002_R2_001.fastq.gz |
-| D2-2-7.Ghark1.7       | DNA-PE | H14EGBGXX.3       | raw/D2-2-7.Ghark1/Ghark1-1_S7_L003_R1_001.fastq.gz | raw/D2-2-7.Ghark1/Ghark1-1_S7_L003_R2_001.fastq.gz |
-| D2-2-7.Ghark1.8       | DNA-PE | H14EGBGXX.4       | raw/D2-2-7.Ghark1/Ghark1-1_S7_L004_R1_001.fastq.gz | raw/D2-2-7.Ghark1/Ghark1-1_S7_L004_R2_001.fastq.gz |
-| D3-D-27.Gdavi1.1      | DNA-PE | FCC57CHACXX.5     | raw/D3-D-27.Gdavi1/FCC57CHACXX-wHAIPI011235-112_L5_1.fq.gz | raw/D3-D-27.Gdavi1/FCC57CHACXX-wHAIPI011235-112_L5_2.fq.gz |
-| D3-D-27.Gdavi1.2      | DNA-PE | FCC5FV6ACXX.1     | raw/D3-D-27.Gdavi1/FCC5FV6ACXX-wHAIPI011235-112_L1_1.fq.gz | raw/D3-D-27.Gdavi1/FCC5FV6ACXX-wHAIPI011235-112_L1_2.fq.gz |
-| D3-D-27.Gdavi1.3      | DNA-PE | FCC5FV6ACXX.2     | raw/D3-D-27.Gdavi1/FCC5FV6ACXX-wHAIPI011235-112_L2_1.fq.gz | raw/D3-D-27.Gdavi1/FCC5FV6ACXX-wHAIPI011235-112_L2_2.fq.gz |
-| D3-D-27.Gdavi1.4      | DNA-PE | FCC5FV6ACXX.3     | raw/D3-D-27.Gdavi1/FCC5FV6ACXX-wHAIPI011235-112_L3_1.fq.gz | raw/D3-D-27.Gdavi1/FCC5FV6ACXX-wHAIPI011235-112_L3_2.fq.gz |
-| D3-K-57.Gklot1.5      | DNA-PE | FCC57AFACXX.1     | raw/D3-K-57.Gklot1/FCC57AFACXX-wHAIPI011237-100_L1_1.fq.gz | raw/D3-K-57.Gklot1/FCC57AFACXX-wHAIPI011237-100_L1_2.fq.gz |
-| D3-K-57.Gklot1.6      | DNA-PE | FCC57AFACXX.2     | raw/D3-K-57.Gklot1/FCC57AFACXX-wHAIPI011237-100_L2_1.fq.gz | raw/D3-K-57.Gklot1/FCC57AFACXX-wHAIPI011237-100_L2_2.fq.gz |
-| D3-K-57.Gklot1.7      | DNA-PE | FCC5CNBACXX.4     | raw/D3-K-57.Gklot1/FCC5CNBACXX-wHAIPI011237-100_L4_1.fq.gz | raw/D3-K-57.Gklot1/FCC5CNBACXX-wHAIPI011237-100_L4_2.fq.gz |
-| D3-K-57.Gklot1.8      | DNA-PE | FCC5CNBACXX.5     | raw/D3-K-57.Gklot1/FCC5CNBACXX-wHAIPI011237-100_L5_1.fq.gz | raw/D3-K-57.Gklot1/FCC5CNBACXX-wHAIPI011237-100_L5_2.fq.gz |
-| D4-12.Garid1.1        | DNA-PE | FCC57AFACXX.1     | raw/D4-12.Garid1/FCC57AFACXX-wHAIPI011233-110_L1_1.fq.gz | raw/D4-12.Garid1/FCC57AFACXX-wHAIPI011233-110_L1_2.fq.gz |
-| D4-12.Garid1.2        | DNA-PE | FCC57AFACXX.2     | raw/D4-12.Garid1/FCC57AFACXX-wHAIPI011233-110_L2_1.fq.gz | raw/D4-12.Garid1/FCC57AFACXX-wHAIPI011233-110_L2_2.fq.gz |
-| D4-12.Garid1.3        | DNA-PE | FCC5CNBACXX.4     | raw/D4-12.Garid1/FCC5CNBACXX-wHAIPI011233-110_L4_1.fq.gz | raw/D4-12.Garid1/FCC5CNBACXX-wHAIPI011233-110_L4_2.fq.gz |
-| D4-12.Garid1.4        | DNA-PE | FCC5CNBACXX.5     | raw/D4-12.Garid1/FCC5CNBACXX-wHAIPI011233-110_L5_1.fq.gz | raw/D4-12.Garid1/FCC5CNBACXX-wHAIPI011233-110_L5_2.fq.gz |
-| D5-6.Graim2.1         | DNA-PE | HABYUADXX.1       | raw/D5-6.Graim2/GRAIM2-1_S4_L001_R1_001.fastq.gz | raw/D5-6.Graim2/GRAIM2-1_S4_L001_R2_001.fastq.gz |
-| D5-6.Graim2.2         | DNA-PE | HABYUADXX.2       | raw/D5-6.Graim2/GRAIM2-1_S4_L002_R1_001.fastq.gz | raw/D5-6.Graim2/GRAIM2-1_S4_L002_R2_001.fastq.gz |
-| D5-6.Graim2.3         | DNA-PE | HABYUADXX.1       | raw/D5-6.Graim2/GRAIM2-2_S5_L001_R1_001.fastq.gz | raw/D5-6.Graim2/GRAIM2-2_S5_L001_R2_001.fastq.gz |
-| D5-6.Graim2.4         | DNA-PE | HABYUADXX.2       | raw/D5-6.Graim2/GRAIM2-2_S5_L002_R1_001.fastq.gz | raw/D5-6.Graim2/GRAIM2-2_S5_L002_R2_001.fastq.gz |
-| D5-6.Graim2.5         | DNA-PE | HABYUADXX.1       | raw/D5-6.Graim2/GRAIM2-3_S6_L001_R1_001.fastq.gz | raw/D5-6.Graim2/GRAIM2-3_S6_L001_R2_001.fastq.gz |
-| D5-6.Graim2.6         | DNA-PE | HABYUADXX.2       | raw/D5-6.Graim2/GRAIM2-3_S6_L002_R1_001.fastq.gz | raw/D5-6.Graim2/GRAIM2-3_S6_L002_R2_001.fastq.gz |
-| D5-8.Graim1.7         | DNA-PE | HABTTADXX.1       | raw/D5-8.Graim1/GRAIM1-1_S1_L001_R1_001.fastq.gz | raw/D5-8.Graim1/GRAIM1-1_S1_L001_R2_001.fastq.gz |
-| D5-8.Graim1.8         | DNA-PE | HABTTADXX.2       | raw/D5-8.Graim1/GRAIM1-1_S1_L002_R1_001.fastq.gz | raw/D5-8.Graim1/GRAIM1-1_S1_L002_R2_001.fastq.gz |
-| D6-5.Ggoss2.1         | DNA-PE | FCC57AFACXX.1     | raw/D6-5.Ggoss2/FCC57AFACXX-wHAIPI011236-113_L1_1.fq.gz | raw/D6-5.Ggoss2/FCC57AFACXX-wHAIPI011236-113_L1_2.fq.gz |
-| D6-5.Ggoss2.2         | DNA-PE | FCC57AFACXX.2     | raw/D6-5.Ggoss2/FCC57AFACXX-wHAIPI011236-113_L2_1.fq.gz | raw/D6-5.Ggoss2/FCC57AFACXX-wHAIPI011236-113_L2_2.fq.gz |
-| D6-5.Ggoss2.3         | DNA-PE | FCC5CNBACXX.4     | raw/D6-5.Ggoss2/FCC5CNBACXX-wHAIPI011236-113_L4_1.fq.gz | raw/D6-5.Ggoss2/FCC5CNBACXX-wHAIPI011236-113_L4_2.fq.gz |
-| D6-5.Ggoss2.4         | DNA-PE | FCC5CNBACXX.5     | raw/D6-5.Ggoss2/FCC5CNBACXX-wHAIPI011236-113_L5_1.fq.gz | raw/D6-5.Ggoss2/FCC5CNBACXX-wHAIPI011236-113_L5_2.fq.gz |
-| D6-7.Ggoss1.1         | DNA-PE | HABYUADXX.1       | raw/D6-7.Ggoss1/GGOSS1-1_S1_L001_R1_001.fastq.gz | raw/D6-7.Ggoss1/GGOSS1-1_S1_L001_R2_001.fastq.gz |
-| D6-7.Ggoss1.2         | DNA-PE | HABYUADXX.2       | raw/D6-7.Ggoss1/GGOSS1-1_S1_L002_R1_001.fastq.gz | raw/D6-7.Ggoss1/GGOSS1-1_S1_L002_R2_001.fastq.gz |
-| D6-7.Ggoss1.3         | DNA-PE | HABYUADXX.1       | raw/D6-7.Ggoss1/GGOSS1-2_S2_L001_R1_001.fastq.gz | raw/D6-7.Ggoss1/GGOSS1-2_S2_L001_R2_001.fastq.gz |
-| D6-7.Ggoss1.4         | DNA-PE | HABYUADXX.2       | raw/D6-7.Ggoss1/GGOSS1-2_S2_L002_R1_001.fastq.gz | raw/D6-7.Ggoss1/GGOSS1-2_S2_L002_R2_001.fastq.gz |
-| D6-7.Ggoss1.5         | DNA-PE | HABYUADXX.1       | raw/D6-7.Ggoss1/GGOSS1-3_S3_L001_R1_001.fastq.gz | raw/D6-7.Ggoss1/GGOSS1-3_S3_L001_R2_001.fastq.gz |
-| D6-7.Ggoss1.6         | DNA-PE | HABYUADXX.2       | raw/D6-7.Ggoss1/GGOSS1-3_S3_L002_R1_001.fastq.gz | raw/D6-7.Ggoss1/GGOSS1-3_S3_L002_R2_001.fastq.gz |
-| D7-4.Globa1.1         | DNA-PE | FCC57CHACXX.5     | raw/D7-4.Globa1/FCC57CHACXX-wHAIPI011239-19_L5_1.fq.gz | raw/D7-4.Globa1/FCC57CHACXX-wHAIPI011239-19_L5_2.fq.gz |
-| D7-4.Globa1.2         | DNA-PE | FCC5FV6ACXX.1     | raw/D7-4.Globa1/FCC5FV6ACXX-wHAIPI011239-19_L1_1.fq.gz | raw/D7-4.Globa1/FCC5FV6ACXX-wHAIPI011239-19_L1_2.fq.gz |
-| D7-4.Globa1.3         | DNA-PE | FCC5FV6ACXX.2     | raw/D7-4.Globa1/FCC5FV6ACXX-wHAIPI011239-19_L2_1.fq.gz | raw/D7-4.Globa1/FCC5FV6ACXX-wHAIPI011239-19_L2_2.fq.gz |
-| D7-4.Globa1.4         | DNA-PE | FCC5FV6ACXX.3     | raw/D7-4.Globa1/FCC5FV6ACXX-wHAIPI011239-19_L3_1.fq.gz | raw/D7-4.Globa1/FCC5FV6ACXX-wHAIPI011239-19_L3_2.fq.gz |
-| D8-8.Gtril2.1         | DNA-PE | FCD2EUDACXX.1     | raw/D8-8.Gtril2/FCD2EUDACXX_L1_wHAIPI015269-24_1.fq.gz | raw/D8-8.Gtril2/FCD2EUDACXX_L1_wHAIPI015269-24_2.fq.gz |
-| D8-9.Gtril1.1         | DNA-PE | HABTTADXX.1       | raw/D8-9.Gtril1/GTRIL1-1_S4_L001_R1_001.fastq.gz | raw/D8-9.Gtril1/GTRIL1-1_S4_L001_R2_001.fastq.gz |
-| D8-9.Gtril1.2         | DNA-PE | HABTTADXX.2       | raw/D8-9.Gtril1/GTRIL1-1_S4_L002_R1_001.fastq.gz | raw/D8-9.Gtril1/GTRIL1-1_S4_L002_R2_001.fastq.gz |
-| D9-4.Glaxu1.1         | DNA-PE | FCC57CHACXX.5     | raw/D9-4.Glaxu1/FCC57CHACXX_L5_wHAIPI011238-108_1.fq.gz | raw/D9-4.Glaxu1/FCC57CHACXX_L5_wHAIPI011238-108_2.fq.gz |
-| D9-4.Glaxu1.2         | DNA-PE | FCC5FV6ACXX.1     | raw/D9-4.Glaxu1/FCC5FV6ACXX_L1_wHAIPI011238-108_1.fq.gz | raw/D9-4.Glaxu1/FCC5FV6ACXX_L1_wHAIPI011238-108_2.fq.gz |
-| D9-4.Glaxu1.3         | DNA-PE | FCC5FV6ACXX.2     | raw/D9-4.Glaxu1/FCC5FV6ACXX_L2_wHAIPI011238-108_1.fq.gz | raw/D9-4.Glaxu1/FCC5FV6ACXX_L2_wHAIPI011238-108_2.fq.gz |
-| D9-4.Glaxu1.4         | DNA-PE | FCC5FV6ACXX.3     | raw/D9-4.Glaxu1/FCC5FV6ACXX_L3_wHAIPI011238-108_1.fq.gz | raw/D9-4.Glaxu1/FCC5FV6ACXX_L3_wHAIPI011238-108_2.fq.gz |
-| D9-4.Glaxu1.5         | DNA-PE | FCH9RUVADXX.2     | raw/D9-4.Glaxu1/FCH9RUVADXX_L2_wHAIPI011238-108_1.fq.gz | raw/D9-4.Glaxu1/FCH9RUVADXX_L2_wHAIPI011238-108_2.fq.gz |
-| D2-2.HFJ7YBGXX.1      | DNA-PE | HFJ7YBGXX.1       | raw/newDgenome/D2-2_S1_L001_R1_001.fastq.gz | raw/newDgenome/D2-2_S1_L001_R2_001.fastq.gz |
-| D2-2.HFJ7YBGXX.2      | DNA-PE | HFJ7YBGXX.2       | raw/newDgenome/D2-2_S1_L002_R1_001.fastq.gz | raw/newDgenome/D2-2_S1_L002_R2_001.fastq.gz |
-| D2-2.HFJ7YBGXX.3      | DNA-PE | HFJ7YBGXX.3       | raw/newDgenome/D2-2_S1_L003_R1_001.fastq.gz | raw/newDgenome/D2-2_S1_L003_R2_001.fastq.gz |
-| D2-2.HFJ7YBGXX.4      | DNA-PE | HFJ7YBGXX.4       | raw/newDgenome/D2-2_S1_L004_R1_001.fastq.gz | raw/newDgenome/D2-2_S1_L004_R2_001.fastq.gz |
-| D2-2.HHGLTBGXX.1      | DNA-PE | HHGLTBGXX.1       | raw/newDgenome/D2-2_S1_L005_R1_001.fastq.gz | raw/newDgenome/D2-2_S1_L005_R2_001.fastq.gz |
-| D2-2.HHGLTBGXX.2      | DNA-PE | HHGLTBGXX.2       | raw/newDgenome/D2-2_S1_L006_R1_001.fastq.gz | raw/newDgenome/D2-2_S1_L006_R2_001.fastq.gz |
-| D2-2.HHGLTBGXX.3      | DNA-PE | HHGLTBGXX.3       | raw/newDgenome/D2-2_S1_L007_R1_001.fastq.gz | raw/newDgenome/D2-2_S1_L007_R2_001.fastq.gz |
-| D2-2.HHGLTBGXX.4      | DNA-PE | HHGLTBGXX.4       | raw/newDgenome/D2-2_S1_L008_R1_001.fastq.gz | raw/newDgenome/D2-2_S1_L008_R2_001.fastq.gz |
-| D3K-56.HFJ7YBGXX.1    | DNA-PE | HFJ7YBGXX.1       | raw/newDgenome/D3K-56_S2_L001_R1_001.fastq.gz | raw/newDgenome/D3K-56_S2_L001_R2_001.fastq.gz |
-| D3K-56.HFJ7YBGXX.2    | DNA-PE | HFJ7YBGXX.2       | raw/newDgenome/D3K-56_S2_L002_R1_001.fastq.gz | raw/newDgenome/D3K-56_S2_L002_R2_001.fastq.gz |
-| D3K-56.HFJ7YBGXX.3    | DNA-PE | HFJ7YBGXX.3       | raw/newDgenome/D3K-56_S2_L003_R1_001.fastq.gz | raw/newDgenome/D3K-56_S2_L003_R2_001.fastq.gz |
-| D3K-56.HFJ7YBGXX.4    | DNA-PE | HFJ7YBGXX.4       | raw/newDgenome/D3K-56_S2_L004_R1_001.fastq.gz | raw/newDgenome/D3K-56_S2_L004_R2_001.fastq.gz |
-| D3K-56.HHGLTBGXX.1    | DNA-PE | HHGLTBGXX.1       | raw/newDgenome/D3K-56_S2_L005_R1_001.fastq.gz | raw/newDgenome/D3K-56_S2_L005_R2_001.fastq.gz |
-| D3K-56.HHGLTBGXX.2    | DNA-PE | HHGLTBGXX.2       | raw/newDgenome/D3K-56_S2_L006_R1_001.fastq.gz | raw/newDgenome/D3K-56_S2_L006_R2_001.fastq.gz |
-| D3K-56.HHGLTBGXX.3    | DNA-PE | HHGLTBGXX.3       | raw/newDgenome/D3K-56_S2_L007_R1_001.fastq.gz | raw/newDgenome/D3K-56_S2_L007_R2_001.fastq.gz |
-| D3K-56.HHGLTBGXX.4    | DNA-PE | HHGLTBGXX.4       | raw/newDgenome/D3K-56_S2_L008_R1_001.fastq.gz | raw/newDgenome/D3K-56_S2_L008_R2_001.fastq.gz |
-| D4-185.HFJ7YBGXX.1    | DNA-PE | HFJ7YBGXX.1       | raw/newDgenome/D4-185_S3_L001_R1_001.fastq.gz | raw/newDgenome/D4-185_S3_L001_R2_001.fastq.gz |
-| D4-185.HFJ7YBGXX.2    | DNA-PE | HFJ7YBGXX.2       | raw/newDgenome/D4-185_S3_L002_R1_001.fastq.gz | raw/newDgenome/D4-185_S3_L002_R2_001.fastq.gz |
-| D4-185.HFJ7YBGXX.3    | DNA-PE | HFJ7YBGXX.3       | raw/newDgenome/D4-185_S3_L003_R1_001.fastq.gz | raw/newDgenome/D4-185_S3_L003_R2_001.fastq.gz |
-| D4-185.HFJ7YBGXX.4    | DNA-PE | HFJ7YBGXX.4       | raw/newDgenome/D4-185_S3_L004_R1_001.fastq.gz | raw/newDgenome/D4-185_S3_L004_R2_001.fastq.gz |
-| D4-185.HHGLTBGXX.1    | DNA-PE | HHGLTBGXX.1       | raw/newDgenome/D4-185_S3_L005_R1_001.fastq.gz | raw/newDgenome/D4-185_S3_L005_R2_001.fastq.gz |
-| D4-185.HHGLTBGXX.2    | DNA-PE | HHGLTBGXX.2       | raw/newDgenome/D4-185_S3_L006_R1_001.fastq.gz | raw/newDgenome/D4-185_S3_L006_R2_001.fastq.gz |
-| D4-185.HHGLTBGXX.3    | DNA-PE | HHGLTBGXX.3       | raw/newDgenome/D4-185_S3_L007_R1_001.fastq.gz | raw/newDgenome/D4-185_S3_L007_R2_001.fastq.gz |
-| D4-185.HHGLTBGXX.4    | DNA-PE | HHGLTBGXX.4       | raw/newDgenome/D4-185_S3_L008_R1_001.fastq.gz | raw/newDgenome/D4-185_S3_L008_R2_001.fastq.gz |
-| D7-157.HFJ7YBGXX.1    | DNA-PE | HFJ7YBGXX.1       | raw/newDgenome/D7-157_S4_L001_R1_001.fastq.gz | raw/newDgenome/D7-157_S4_L001_R2_001.fastq.gz |
-| D7-157.HFJ7YBGXX.2    | DNA-PE | HFJ7YBGXX.2       | raw/newDgenome/D7-157_S4_L002_R1_001.fastq.gz | raw/newDgenome/D7-157_S4_L002_R2_001.fastq.gz |
-| D7-157.HFJ7YBGXX.3    | DNA-PE | HFJ7YBGXX.3       | raw/newDgenome/D7-157_S4_L003_R1_001.fastq.gz | raw/newDgenome/D7-157_S4_L003_R2_001.fastq.gz |
-| D7-157.HFJ7YBGXX.4    | DNA-PE | HFJ7YBGXX.4       | raw/newDgenome/D7-157_S4_L004_R1_001.fastq.gz | raw/newDgenome/D7-157_S4_L004_R2_001.fastq.gz |
-| D7-157.HHGLTBGXX.1    | DNA-PE | HHGLTBGXX.1       | raw/newDgenome/D7-157_S4_L005_R1_001.fastq.gz | raw/newDgenome/D7-157_S4_L005_R2_001.fastq.gz |
-| D7-157.HHGLTBGXX.2    | DNA-PE | HHGLTBGXX.2       | raw/newDgenome/D7-157_S4_L006_R1_001.fastq.gz | raw/newDgenome/D7-157_S4_L006_R2_001.fastq.gz |
-| D7-157.HHGLTBGXX.3    | DNA-PE | HHGLTBGXX.3       | raw/newDgenome/D7-157_S4_L007_R1_001.fastq.gz | raw/newDgenome/D7-157_S4_L007_R2_001.fastq.gz |
-| D7-157.HHGLTBGXX.4    | DNA-PE | HHGLTBGXX.4       | raw/newDgenome/D7-157_S4_L008_R1_001.fastq.gz | raw/newDgenome/D7-157_S4_L008_R2_001.fastq.gz |
+| AD1-DNWC1324.Ghirs1.4 | DNA-PE | HABUGADXX.1       | raw/AD1-DNWC1324.Ghirs1/GHIRS1-1_S0_L001_R1_001.fastq.gz        | raw/AD1-DNWC1324.Ghirs1/GHIRS1-1_S0_L001_R2_001.fastq.gz        |
+| AD1-DNWC1324.Ghirs1.5 | DNA-PE | HABUGADXX.2       | raw/AD1-DNWC1324.Ghirs1/GHIRS1-1_S0_L002_R1_001.fastq.gz        | raw/AD1-DNWC1324.Ghirs1/GHIRS1-1_S0_L002_R2_001.fastq.gz        |
+| D10-8.Gturn1.1        | DNA-PE | H14EGBGXX.1       | raw/D10-8.Gturn1/Gturn1-1_S2_L001_R1_001.fastq.gz               | raw/D10-8.Gturn1/Gturn1-1_S2_L001_R2_001.fastq.gz               |
+| D10-8.Gturn1.2        | DNA-PE | H14EGBGXX.2       | raw/D10-8.Gturn1/Gturn1-1_S2_L002_R1_001.fastq.gz               | raw/D10-8.Gturn1/Gturn1-1_S2_L002_R2_001.fastq.gz               |
+| D10-8.Gturn1.3        | DNA-PE | H14EGBGXX.3       | raw/D10-8.Gturn1/Gturn1-1_S2_L003_R1_001.fastq.gz               | raw/D10-8.Gturn1/Gturn1-1_S2_L003_R2_001.fastq.gz               |
+| D10-8.Gturn1.4        | DNA-PE | H14EGBGXX.4       | raw/D10-8.Gturn1/Gturn1-1_S2_L004_R1_001.fastq.gz               | raw/D10-8.Gturn1/Gturn1-1_S2_L004_R2_001.fastq.gz               |
+| D10-8.Gturn1.5        | DNA-PE | H14EGBGXX.1       | raw/D10-8.Gturn1/Gturn1-1_S4_L001_R1_001.fastq.gz               | raw/D10-8.Gturn1/Gturn1-1_S4_L001_R2_001.fastq.gz               |
+| D10-8.Gturn1.6        | DNA-PE | H14EGBGXX.2       | raw/D10-8.Gturn1/Gturn1-1_S4_L002_R1_001.fastq.gz               | raw/D10-8.Gturn1/Gturn1-1_S4_L002_R2_001.fastq.gz               |
+| D10-8.Gturn1.7        | DNA-PE | H14EGBGXX.3       | raw/D10-8.Gturn1/Gturn1-1_S4_L003_R1_001.fastq.gz               | raw/D10-8.Gturn1/Gturn1-1_S4_L003_R2_001.fastq.gz               |
+| D10-8.Gturn1.8        | DNA-PE | H14EGBGXX.4       | raw/D10-8.Gturn1/Gturn1-1_S4_L004_R1_001.fastq.gz               | raw/D10-8.Gturn1/Gturn1-1_S4_L004_R2_001.fastq.gz               |
+| D10-8.Gturn1.9        | DNA-PE | H04JDAFXX.1       | raw/D10-8.Gturn1/Gturn1-2-3_S0_L001_R1_001.fastq.gz             | raw/D10-8.Gturn1/Gturn1-2-3_S0_L001_R2_001.fastq.gz             |
+| D10-8.Gturn1.10       | DNA-PE | H04JDAFXX.2       | raw/D10-8.Gturn1/Gturn1-2-3_S0_L002_R1_001.fastq.gz             | raw/D10-8.Gturn1/Gturn1-2-3_S0_L002_R2_001.fastq.gz             |
+| D10-8.Gturn1.11       | DNA-PE | H04JDAFXX.3       | raw/D10-8.Gturn1/Gturn1-2-3_S0_L003_R1_001.fastq.gz             | raw/D10-8.Gturn1/Gturn1-2-3_S0_L003_R2_001.fastq.gz             |
+| D10-8.Gturn1.12       | DNA-PE | H04JDAFXX.4       | raw/D10-8.Gturn1/Gturn1-2-3_S0_L004_R1_001.fastq.gz             | raw/D10-8.Gturn1/Gturn1-2-3_S0_L004_R2_001.fastq.gz             |
+| D11-1.Gschw1.1        | DNA-PE | FCC57AFACXX.1     | raw/D11-1.Gschw1/FCC57AFACXX_L1_wHAIPI011240-21_1.fq.gz         | raw/D11-1.Gschw1/FCC57AFACXX_L1_wHAIPI011240-21_2.fq.gz         |
+| D11-1.Gschw1.2        | DNA-PE | FCC57AFACXX.2     | raw/D11-1.Gschw1/FCC57AFACXX_L2_wHAIPI011240-21_1.fq.gz         | raw/D11-1.Gschw1/FCC57AFACXX_L2_wHAIPI011240-21_2.fq.gz         |
+| D11-1.Gschw1.3        | DNA-PE | FCC5CNBACXX.4     | raw/D11-1.Gschw1/FCC5CNBACXX_L4_wHAIPI011240-21_1.fq.gz         | raw/D11-1.Gschw1/FCC5CNBACXX_L4_wHAIPI011240-21_2.fq.gz         |
+| D11-1.Gschw1.4        | DNA-PE | FCC5CNBACXX.5     | raw/D11-1.Gschw1/FCC5CNBACXX_L5_wHAIPI011240-21_1.fq.gz         | raw/D11-1.Gschw1/FCC5CNBACXX_L5_wHAIPI011240-21_2.fq.gz         |
+| D11-1.Gschw1.5        | DNA-PE | FCC6M50ACXX.7     | raw/D11-1.Gschw1/FCC6M50ACXX_L7_wHAIPI015265-113_1.fq.gz        | raw/D11-1.Gschw1/FCC6M50ACXX_L7_wHAIPI015265-113_2.fq.gz        |
+| D11-1.Gschw1.6        | DNA-PE | FCC6M50ACXX.8     | raw/D11-1.Gschw1/FCC6M50ACXX_L8_wHAIPI015265-113_1.fq.gz        | raw/D11-1.Gschw1/FCC6M50ACXX_L8_wHAIPI015265-113_2.fq.gz        |
+| D11-1.Gschw1.7        | DNA-PE | FCH9RUVADXX.2     | raw/D11-1.Gschw1/FCH9RUVADXX_L2_wHAIPI011240-21_1.fq.gz         | raw/D11-1.Gschw1/FCH9RUVADXX_L2_wHAIPI011240-21_2.fq.gz         |
+| D1-2.Gthur1.1         | DNA-PE | H14EGBGXX.1       | raw/D1-2.Gthur1/Gthur1-1_S1_L001_R1_001.fastq.gz                | raw/D1-2.Gthur1/Gthur1-1_S1_L001_R2_001.fastq.gz                |
+| D1-2.Gthur1.2         | DNA-PE | H14EGBGXX.2       | raw/D1-2.Gthur1/Gthur1-1_S1_L002_R1_001.fastq.gz                | raw/D1-2.Gthur1/Gthur1-1_S1_L002_R2_001.fastq.gz                |
+| D1-2.Gthur1.3         | DNA-PE | H14EGBGXX.3       | raw/D1-2.Gthur1/Gthur1-1_S1_L003_R1_001.fastq.gz                | raw/D1-2.Gthur1/Gthur1-1_S1_L003_R2_001.fastq.gz                |
+| D1-2.Gthur1.4         | DNA-PE | H14EGBGXX.4       | raw/D1-2.Gthur1/Gthur1-1_S1_L004_R1_001.fastq.gz                | raw/D1-2.Gthur1/Gthur1-1_S1_L004_R2_001.fastq.gz                |
+| D1-2.Gthur1.5         | DNA-PE | 000000000-AAJWC.1 | raw/D1-2.Gthur1/Gthur1-2-MSQ2_S1_L001_R1_001.fastq.gz           | raw/D1-2.Gthur1/Gthur1-2-MSQ2_S1_L001_R2_001.fastq.gz           |
+| D1-2.Gthur1.6         | DNA-PE | 000000000-A8MGR.1 | raw/D1-2.Gthur1/Gthur1-2_S1_L001_R1_001.fastq.gz                | raw/D1-2.Gthur1/Gthur1-2_S1_L001_R2_001.fastq.gz                |
+| D1-2.Gthur1.7         | DNA-PE | 000000000-AAJFR.1 | raw/D1-2.Gthur1/Gthur1-3-MSQ1_S1_L001_R1_001.fastq.gz           | raw/D1-2.Gthur1/Gthur1-3-MSQ1_S1_L001_R2_001.fastq.gz           |
+| D1-2.Gthur1.8         | DNA-PE | 000000000-A8P48.1 | raw/D1-2.Gthur1/Gthur1-3_S1_L001_R1_001.fastq.gz                | raw/D1-2.Gthur1/Gthur1-3_S1_L001_R2_001.fastq.gz                |
+| D1-35.Gthur2.1        | DNA-PE | FCC57CHACXX.5     | raw/D1-35.Gthur2/FCC57CHACXX_L5_wHAIPI011241-24_1.fq.gz         | raw/D1-35.Gthur2/FCC57CHACXX_L5_wHAIPI011241-24_2.fq.gz         |
+| D1-35.Gthur2.2        | DNA-PE | FCC5FV6ACXX.1     | raw/D1-35.Gthur2/FCC5FV6ACXX_L1_wHAIPI011241-24_1.fq.gz         | raw/D1-35.Gthur2/FCC5FV6ACXX_L1_wHAIPI011241-24_2.fq.gz         |
+| D1-35.Gthur2.3        | DNA-PE | FCC5FV6ACXX.2     | raw/D1-35.Gthur2/FCC5FV6ACXX_L2_wHAIPI011241-24_1.fq.gz         | raw/D1-35.Gthur2/FCC5FV6ACXX_L2_wHAIPI011241-24_2.fq.gz         |
+| D1-35.Gthur2.4        | DNA-PE | FCC5FV6ACXX.3     | raw/D1-35.Gthur2/FCC5FV6ACXX_L3_wHAIPI011241-24_1.fq.gz         | raw/D1-35.Gthur2/FCC5FV6ACXX_L3_wHAIPI011241-24_2.fq.gz         |
+| D1-35.Gthur2.5        | DNA-PE | FCH9RUVADXX.2     | raw/D1-35.Gthur2/FCH9RUVADXX_L2_wHAIPI011241-24_1.fq.gz         | raw/D1-35.Gthur2/FCH9RUVADXX_L2_wHAIPI011241-24_2.fq.gz         |
+| D2-1-6.Garmo1.1       | DNA-PE | FCC57CHACXX.5     | raw/D2-1-6.Garmo1/FCC57CHACXX_L5_wHAIPI011234-111_1.fq.gz       | raw/D2-1-6.Garmo1/FCC57CHACXX_L5_wHAIPI011234-111_2.fq.gz       |
+| D2-1-6.Garmo1.2       | DNA-PE | FCC5FV6ACXX.1     | raw/D2-1-6.Garmo1/FCC5FV6ACXX_L1_wHAIPI011234-111_1.fq.gz       | raw/D2-1-6.Garmo1/FCC5FV6ACXX_L1_wHAIPI011234-111_2.fq.gz       |
+| D2-1-6.Garmo1.3       | DNA-PE | FCC5FV6ACXX.2     | raw/D2-1-6.Garmo1/FCC5FV6ACXX_L2_wHAIPI011234-111_1.fq.gz       | raw/D2-1-6.Garmo1/FCC5FV6ACXX_L2_wHAIPI011234-111_2.fq.gz       |
+| D2-1-6.Garmo1.4       | DNA-PE | FCC5FV6ACXX.3     | raw/D2-1-6.Garmo1/FCC5FV6ACXX_L3_wHAIPI011234-111_1.fq.gz       | raw/D2-1-6.Garmo1/FCC5FV6ACXX_L3_wHAIPI011234-111_2.fq.gz       |
+| D2-1-6.Garmo1.5       | DNA-PE | FCH9RUVADXX.2     | raw/D2-1-6.Garmo1/FCH9RUVADXX_L2_wHAIPI011234-111_1.fq.gz       | raw/D2-1-6.Garmo1/FCH9RUVADXX_L2_wHAIPI011234-111_2.fq.gz       |
+| D2-2-7.Ghark1.1       | DNA-PE | H14EGBGXX.1       | raw/D2-2-7.Ghark1/Ghark1-1_S3_L001_R1_001.fastq.gz              | raw/D2-2-7.Ghark1/Ghark1-1_S3_L001_R2_001.fastq.gz              |
+| D2-2-7.Ghark1.2       | DNA-PE | H14EGBGXX.2       | raw/D2-2-7.Ghark1/Ghark1-1_S3_L002_R1_001.fastq.gz              | raw/D2-2-7.Ghark1/Ghark1-1_S3_L002_R2_001.fastq.gz              |
+| D2-2-7.Ghark1.3       | DNA-PE | H14EGBGXX.3       | raw/D2-2-7.Ghark1/Ghark1-1_S3_L003_R1_001.fastq.gz              | raw/D2-2-7.Ghark1/Ghark1-1_S3_L003_R2_001.fastq.gz              |
+| D2-2-7.Ghark1.4       | DNA-PE | H14EGBGXX.4       | raw/D2-2-7.Ghark1/Ghark1-1_S3_L004_R1_001.fastq.gz              | raw/D2-2-7.Ghark1/Ghark1-1_S3_L004_R2_001.fastq.gz              |
+| D2-2-7.Ghark1.5       | DNA-PE | H14EGBGXX.1       | raw/D2-2-7.Ghark1/Ghark1-1_S7_L001_R1_001.fastq.gz              | raw/D2-2-7.Ghark1/Ghark1-1_S7_L001_R2_001.fastq.gz              |
+| D2-2-7.Ghark1.6       | DNA-PE | H14EGBGXX.2       | raw/D2-2-7.Ghark1/Ghark1-1_S7_L002_R1_001.fastq.gz              | raw/D2-2-7.Ghark1/Ghark1-1_S7_L002_R2_001.fastq.gz              |
+| D2-2-7.Ghark1.7       | DNA-PE | H14EGBGXX.3       | raw/D2-2-7.Ghark1/Ghark1-1_S7_L003_R1_001.fastq.gz              | raw/D2-2-7.Ghark1/Ghark1-1_S7_L003_R2_001.fastq.gz              |
+| D2-2-7.Ghark1.8       | DNA-PE | H14EGBGXX.4       | raw/D2-2-7.Ghark1/Ghark1-1_S7_L004_R1_001.fastq.gz              | raw/D2-2-7.Ghark1/Ghark1-1_S7_L004_R2_001.fastq.gz              |
+| D3-D-27.Gdavi1.1      | DNA-PE | FCC57CHACXX.5     | raw/D3-D-27.Gdavi1/FCC57CHACXX-wHAIPI011235-112_L5_1.fq.gz      | raw/D3-D-27.Gdavi1/FCC57CHACXX-wHAIPI011235-112_L5_2.fq.gz      |
+| D3-D-27.Gdavi1.2      | DNA-PE | FCC5FV6ACXX.1     | raw/D3-D-27.Gdavi1/FCC5FV6ACXX-wHAIPI011235-112_L1_1.fq.gz      | raw/D3-D-27.Gdavi1/FCC5FV6ACXX-wHAIPI011235-112_L1_2.fq.gz      |
+| D3-D-27.Gdavi1.3      | DNA-PE | FCC5FV6ACXX.2     | raw/D3-D-27.Gdavi1/FCC5FV6ACXX-wHAIPI011235-112_L2_1.fq.gz      | raw/D3-D-27.Gdavi1/FCC5FV6ACXX-wHAIPI011235-112_L2_2.fq.gz      |
+| D3-D-27.Gdavi1.4      | DNA-PE | FCC5FV6ACXX.3     | raw/D3-D-27.Gdavi1/FCC5FV6ACXX-wHAIPI011235-112_L3_1.fq.gz      | raw/D3-D-27.Gdavi1/FCC5FV6ACXX-wHAIPI011235-112_L3_2.fq.gz      |
+| D3-K-57.Gklot1.5      | DNA-PE | FCC57AFACXX.1     | raw/D3-K-57.Gklot1/FCC57AFACXX-wHAIPI011237-100_L1_1.fq.gz      | raw/D3-K-57.Gklot1/FCC57AFACXX-wHAIPI011237-100_L1_2.fq.gz      |
+| D3-K-57.Gklot1.6      | DNA-PE | FCC57AFACXX.2     | raw/D3-K-57.Gklot1/FCC57AFACXX-wHAIPI011237-100_L2_1.fq.gz      | raw/D3-K-57.Gklot1/FCC57AFACXX-wHAIPI011237-100_L2_2.fq.gz      |
+| D3-K-57.Gklot1.7      | DNA-PE | FCC5CNBACXX.4     | raw/D3-K-57.Gklot1/FCC5CNBACXX-wHAIPI011237-100_L4_1.fq.gz      | raw/D3-K-57.Gklot1/FCC5CNBACXX-wHAIPI011237-100_L4_2.fq.gz      |
+| D3-K-57.Gklot1.8      | DNA-PE | FCC5CNBACXX.5     | raw/D3-K-57.Gklot1/FCC5CNBACXX-wHAIPI011237-100_L5_1.fq.gz      | raw/D3-K-57.Gklot1/FCC5CNBACXX-wHAIPI011237-100_L5_2.fq.gz      |
+| D4-12.Garid1.1        | DNA-PE | FCC57AFACXX.1     | raw/D4-12.Garid1/FCC57AFACXX-wHAIPI011233-110_L1_1.fq.gz        | raw/D4-12.Garid1/FCC57AFACXX-wHAIPI011233-110_L1_2.fq.gz        |
+| D4-12.Garid1.2        | DNA-PE | FCC57AFACXX.2     | raw/D4-12.Garid1/FCC57AFACXX-wHAIPI011233-110_L2_1.fq.gz        | raw/D4-12.Garid1/FCC57AFACXX-wHAIPI011233-110_L2_2.fq.gz        |
+| D4-12.Garid1.3        | DNA-PE | FCC5CNBACXX.4     | raw/D4-12.Garid1/FCC5CNBACXX-wHAIPI011233-110_L4_1.fq.gz        | raw/D4-12.Garid1/FCC5CNBACXX-wHAIPI011233-110_L4_2.fq.gz        |
+| D4-12.Garid1.4        | DNA-PE | FCC5CNBACXX.5     | raw/D4-12.Garid1/FCC5CNBACXX-wHAIPI011233-110_L5_1.fq.gz        | raw/D4-12.Garid1/FCC5CNBACXX-wHAIPI011233-110_L5_2.fq.gz        |
+| D5-6.Graim2.1         | DNA-PE | HABYUADXX.1       | raw/D5-6.Graim2/GRAIM2-1_S4_L001_R1_001.fastq.gz                | raw/D5-6.Graim2/GRAIM2-1_S4_L001_R2_001.fastq.gz                |
+| D5-6.Graim2.2         | DNA-PE | HABYUADXX.2       | raw/D5-6.Graim2/GRAIM2-1_S4_L002_R1_001.fastq.gz                | raw/D5-6.Graim2/GRAIM2-1_S4_L002_R2_001.fastq.gz                |
+| D5-6.Graim2.3         | DNA-PE | HABYUADXX.1       | raw/D5-6.Graim2/GRAIM2-2_S5_L001_R1_001.fastq.gz                | raw/D5-6.Graim2/GRAIM2-2_S5_L001_R2_001.fastq.gz                |
+| D5-6.Graim2.4         | DNA-PE | HABYUADXX.2       | raw/D5-6.Graim2/GRAIM2-2_S5_L002_R1_001.fastq.gz                | raw/D5-6.Graim2/GRAIM2-2_S5_L002_R2_001.fastq.gz                |
+| D5-6.Graim2.5         | DNA-PE | HABYUADXX.1       | raw/D5-6.Graim2/GRAIM2-3_S6_L001_R1_001.fastq.gz                | raw/D5-6.Graim2/GRAIM2-3_S6_L001_R2_001.fastq.gz                |
+| D5-6.Graim2.6         | DNA-PE | HABYUADXX.2       | raw/D5-6.Graim2/GRAIM2-3_S6_L002_R1_001.fastq.gz                | raw/D5-6.Graim2/GRAIM2-3_S6_L002_R2_001.fastq.gz                |
+| D5-8.Graim1.7         | DNA-PE | HABTTADXX.1       | raw/D5-8.Graim1/GRAIM1-1_S1_L001_R1_001.fastq.gz                | raw/D5-8.Graim1/GRAIM1-1_S1_L001_R2_001.fastq.gz                |
+| D5-8.Graim1.8         | DNA-PE | HABTTADXX.2       | raw/D5-8.Graim1/GRAIM1-1_S1_L002_R1_001.fastq.gz                | raw/D5-8.Graim1/GRAIM1-1_S1_L002_R2_001.fastq.gz                |
+| D6-5.Ggoss2.1         | DNA-PE | FCC57AFACXX.1     | raw/D6-5.Ggoss2/FCC57AFACXX-wHAIPI011236-113_L1_1.fq.gz         | raw/D6-5.Ggoss2/FCC57AFACXX-wHAIPI011236-113_L1_2.fq.gz         |
+| D6-5.Ggoss2.2         | DNA-PE | FCC57AFACXX.2     | raw/D6-5.Ggoss2/FCC57AFACXX-wHAIPI011236-113_L2_1.fq.gz         | raw/D6-5.Ggoss2/FCC57AFACXX-wHAIPI011236-113_L2_2.fq.gz         |
+| D6-5.Ggoss2.3         | DNA-PE | FCC5CNBACXX.4     | raw/D6-5.Ggoss2/FCC5CNBACXX-wHAIPI011236-113_L4_1.fq.gz         | raw/D6-5.Ggoss2/FCC5CNBACXX-wHAIPI011236-113_L4_2.fq.gz         |
+| D6-5.Ggoss2.4         | DNA-PE | FCC5CNBACXX.5     | raw/D6-5.Ggoss2/FCC5CNBACXX-wHAIPI011236-113_L5_1.fq.gz         | raw/D6-5.Ggoss2/FCC5CNBACXX-wHAIPI011236-113_L5_2.fq.gz         |
+| D6-7.Ggoss1.1         | DNA-PE | HABYUADXX.1       | raw/D6-7.Ggoss1/GGOSS1-1_S1_L001_R1_001.fastq.gz                | raw/D6-7.Ggoss1/GGOSS1-1_S1_L001_R2_001.fastq.gz                |
+| D6-7.Ggoss1.2         | DNA-PE | HABYUADXX.2       | raw/D6-7.Ggoss1/GGOSS1-1_S1_L002_R1_001.fastq.gz                | raw/D6-7.Ggoss1/GGOSS1-1_S1_L002_R2_001.fastq.gz                |
+| D6-7.Ggoss1.3         | DNA-PE | HABYUADXX.1       | raw/D6-7.Ggoss1/GGOSS1-2_S2_L001_R1_001.fastq.gz                | raw/D6-7.Ggoss1/GGOSS1-2_S2_L001_R2_001.fastq.gz                |
+| D6-7.Ggoss1.4         | DNA-PE | HABYUADXX.2       | raw/D6-7.Ggoss1/GGOSS1-2_S2_L002_R1_001.fastq.gz                | raw/D6-7.Ggoss1/GGOSS1-2_S2_L002_R2_001.fastq.gz                |
+| D6-7.Ggoss1.5         | DNA-PE | HABYUADXX.1       | raw/D6-7.Ggoss1/GGOSS1-3_S3_L001_R1_001.fastq.gz                | raw/D6-7.Ggoss1/GGOSS1-3_S3_L001_R2_001.fastq.gz                |
+| D6-7.Ggoss1.6         | DNA-PE | HABYUADXX.2       | raw/D6-7.Ggoss1/GGOSS1-3_S3_L002_R1_001.fastq.gz                | raw/D6-7.Ggoss1/GGOSS1-3_S3_L002_R2_001.fastq.gz                |
+| D7-4.Globa1.1         | DNA-PE | FCC57CHACXX.5     | raw/D7-4.Globa1/FCC57CHACXX-wHAIPI011239-19_L5_1.fq.gz          | raw/D7-4.Globa1/FCC57CHACXX-wHAIPI011239-19_L5_2.fq.gz          |
+| D7-4.Globa1.2         | DNA-PE | FCC5FV6ACXX.1     | raw/D7-4.Globa1/FCC5FV6ACXX-wHAIPI011239-19_L1_1.fq.gz          | raw/D7-4.Globa1/FCC5FV6ACXX-wHAIPI011239-19_L1_2.fq.gz          |
+| D7-4.Globa1.3         | DNA-PE | FCC5FV6ACXX.2     | raw/D7-4.Globa1/FCC5FV6ACXX-wHAIPI011239-19_L2_1.fq.gz          | raw/D7-4.Globa1/FCC5FV6ACXX-wHAIPI011239-19_L2_2.fq.gz          |
+| D7-4.Globa1.4         | DNA-PE | FCC5FV6ACXX.3     | raw/D7-4.Globa1/FCC5FV6ACXX-wHAIPI011239-19_L3_1.fq.gz          | raw/D7-4.Globa1/FCC5FV6ACXX-wHAIPI011239-19_L3_2.fq.gz          |
+| D8-8.Gtril2.1         | DNA-PE | FCD2EUDACXX.1     | raw/D8-8.Gtril2/FCD2EUDACXX_L1_wHAIPI015269-24_1.fq.gz          | raw/D8-8.Gtril2/FCD2EUDACXX_L1_wHAIPI015269-24_2.fq.gz          |
+| D8-9.Gtril1.1         | DNA-PE | HABTTADXX.1       | raw/D8-9.Gtril1/GTRIL1-1_S4_L001_R1_001.fastq.gz                | raw/D8-9.Gtril1/GTRIL1-1_S4_L001_R2_001.fastq.gz                |
+| D8-9.Gtril1.2         | DNA-PE | HABTTADXX.2       | raw/D8-9.Gtril1/GTRIL1-1_S4_L002_R1_001.fastq.gz                | raw/D8-9.Gtril1/GTRIL1-1_S4_L002_R2_001.fastq.gz                |
+| D9-4.Glaxu1.1         | DNA-PE | FCC57CHACXX.5     | raw/D9-4.Glaxu1/FCC57CHACXX_L5_wHAIPI011238-108_1.fq.gz         | raw/D9-4.Glaxu1/FCC57CHACXX_L5_wHAIPI011238-108_2.fq.gz         |
+| D9-4.Glaxu1.2         | DNA-PE | FCC5FV6ACXX.1     | raw/D9-4.Glaxu1/FCC5FV6ACXX_L1_wHAIPI011238-108_1.fq.gz         | raw/D9-4.Glaxu1/FCC5FV6ACXX_L1_wHAIPI011238-108_2.fq.gz         |
+| D9-4.Glaxu1.3         | DNA-PE | FCC5FV6ACXX.2     | raw/D9-4.Glaxu1/FCC5FV6ACXX_L2_wHAIPI011238-108_1.fq.gz         | raw/D9-4.Glaxu1/FCC5FV6ACXX_L2_wHAIPI011238-108_2.fq.gz         |
+| D9-4.Glaxu1.4         | DNA-PE | FCC5FV6ACXX.3     | raw/D9-4.Glaxu1/FCC5FV6ACXX_L3_wHAIPI011238-108_1.fq.gz         | raw/D9-4.Glaxu1/FCC5FV6ACXX_L3_wHAIPI011238-108_2.fq.gz         |
+| D9-4.Glaxu1.5         | DNA-PE | FCH9RUVADXX.2     | raw/D9-4.Glaxu1/FCH9RUVADXX_L2_wHAIPI011238-108_1.fq.gz         | raw/D9-4.Glaxu1/FCH9RUVADXX_L2_wHAIPI011238-108_2.fq.gz         |
+| D2-2.HFJ7YBGXX.1      | DNA-PE | HFJ7YBGXX.1       | raw/newDgenome/D2-2_S1_L001_R1_001.fastq.gz                     | raw/newDgenome/D2-2_S1_L001_R2_001.fastq.gz                     |
+| D2-2.HFJ7YBGXX.2      | DNA-PE | HFJ7YBGXX.2       | raw/newDgenome/D2-2_S1_L002_R1_001.fastq.gz                     | raw/newDgenome/D2-2_S1_L002_R2_001.fastq.gz                     |
+| D2-2.HFJ7YBGXX.3      | DNA-PE | HFJ7YBGXX.3       | raw/newDgenome/D2-2_S1_L003_R1_001.fastq.gz                     | raw/newDgenome/D2-2_S1_L003_R2_001.fastq.gz                     |
+| D2-2.HFJ7YBGXX.4      | DNA-PE | HFJ7YBGXX.4       | raw/newDgenome/D2-2_S1_L004_R1_001.fastq.gz                     | raw/newDgenome/D2-2_S1_L004_R2_001.fastq.gz                     |
+| D2-2.HHGLTBGXX.1      | DNA-PE | HHGLTBGXX.1       | raw/newDgenome/D2-2_S1_L005_R1_001.fastq.gz                     | raw/newDgenome/D2-2_S1_L005_R2_001.fastq.gz                     |
+| D2-2.HHGLTBGXX.2      | DNA-PE | HHGLTBGXX.2       | raw/newDgenome/D2-2_S1_L006_R1_001.fastq.gz                     | raw/newDgenome/D2-2_S1_L006_R2_001.fastq.gz                     |
+| D2-2.HHGLTBGXX.3      | DNA-PE | HHGLTBGXX.3       | raw/newDgenome/D2-2_S1_L007_R1_001.fastq.gz                     | raw/newDgenome/D2-2_S1_L007_R2_001.fastq.gz                     |
+| D2-2.HHGLTBGXX.4      | DNA-PE | HHGLTBGXX.4       | raw/newDgenome/D2-2_S1_L008_R1_001.fastq.gz                     | raw/newDgenome/D2-2_S1_L008_R2_001.fastq.gz                     |
+| D3K-56.HFJ7YBGXX.1    | DNA-PE | HFJ7YBGXX.1       | raw/newDgenome/D3K-56_S2_L001_R1_001.fastq.gz                   | raw/newDgenome/D3K-56_S2_L001_R2_001.fastq.gz                   |
+| D3K-56.HFJ7YBGXX.2    | DNA-PE | HFJ7YBGXX.2       | raw/newDgenome/D3K-56_S2_L002_R1_001.fastq.gz                   | raw/newDgenome/D3K-56_S2_L002_R2_001.fastq.gz                   |
+| D3K-56.HFJ7YBGXX.3    | DNA-PE | HFJ7YBGXX.3       | raw/newDgenome/D3K-56_S2_L003_R1_001.fastq.gz                   | raw/newDgenome/D3K-56_S2_L003_R2_001.fastq.gz                   |
+| D3K-56.HFJ7YBGXX.4    | DNA-PE | HFJ7YBGXX.4       | raw/newDgenome/D3K-56_S2_L004_R1_001.fastq.gz                   | raw/newDgenome/D3K-56_S2_L004_R2_001.fastq.gz                   |
+| D3K-56.HHGLTBGXX.1    | DNA-PE | HHGLTBGXX.1       | raw/newDgenome/D3K-56_S2_L005_R1_001.fastq.gz                   | raw/newDgenome/D3K-56_S2_L005_R2_001.fastq.gz                   |
+| D3K-56.HHGLTBGXX.2    | DNA-PE | HHGLTBGXX.2       | raw/newDgenome/D3K-56_S2_L006_R1_001.fastq.gz                   | raw/newDgenome/D3K-56_S2_L006_R2_001.fastq.gz                   |
+| D3K-56.HHGLTBGXX.3    | DNA-PE | HHGLTBGXX.3       | raw/newDgenome/D3K-56_S2_L007_R1_001.fastq.gz                   | raw/newDgenome/D3K-56_S2_L007_R2_001.fastq.gz                   |
+| D3K-56.HHGLTBGXX.4    | DNA-PE | HHGLTBGXX.4       | raw/newDgenome/D3K-56_S2_L008_R1_001.fastq.gz                   | raw/newDgenome/D3K-56_S2_L008_R2_001.fastq.gz                   |
+| D4-185.HFJ7YBGXX.1    | DNA-PE | HFJ7YBGXX.1       | raw/newDgenome/D4-185_S3_L001_R1_001.fastq.gz                   | raw/newDgenome/D4-185_S3_L001_R2_001.fastq.gz                   |
+| D4-185.HFJ7YBGXX.2    | DNA-PE | HFJ7YBGXX.2       | raw/newDgenome/D4-185_S3_L002_R1_001.fastq.gz                   | raw/newDgenome/D4-185_S3_L002_R2_001.fastq.gz                   |
+| D4-185.HFJ7YBGXX.3    | DNA-PE | HFJ7YBGXX.3       | raw/newDgenome/D4-185_S3_L003_R1_001.fastq.gz                   | raw/newDgenome/D4-185_S3_L003_R2_001.fastq.gz                   |
+| D4-185.HFJ7YBGXX.4    | DNA-PE | HFJ7YBGXX.4       | raw/newDgenome/D4-185_S3_L004_R1_001.fastq.gz                   | raw/newDgenome/D4-185_S3_L004_R2_001.fastq.gz                   |
+| D4-185.HHGLTBGXX.1    | DNA-PE | HHGLTBGXX.1       | raw/newDgenome/D4-185_S3_L005_R1_001.fastq.gz                   | raw/newDgenome/D4-185_S3_L005_R2_001.fastq.gz                   |
+| D4-185.HHGLTBGXX.2    | DNA-PE | HHGLTBGXX.2       | raw/newDgenome/D4-185_S3_L006_R1_001.fastq.gz                   | raw/newDgenome/D4-185_S3_L006_R2_001.fastq.gz                   |
+| D4-185.HHGLTBGXX.3    | DNA-PE | HHGLTBGXX.3       | raw/newDgenome/D4-185_S3_L007_R1_001.fastq.gz                   | raw/newDgenome/D4-185_S3_L007_R2_001.fastq.gz                   |
+| D4-185.HHGLTBGXX.4    | DNA-PE | HHGLTBGXX.4       | raw/newDgenome/D4-185_S3_L008_R1_001.fastq.gz                   | raw/newDgenome/D4-185_S3_L008_R2_001.fastq.gz                   |
+| D7-157.HFJ7YBGXX.1    | DNA-PE | HFJ7YBGXX.1       | raw/newDgenome/D7-157_S4_L001_R1_001.fastq.gz                   | raw/newDgenome/D7-157_S4_L001_R2_001.fastq.gz                   |
+| D7-157.HFJ7YBGXX.2    | DNA-PE | HFJ7YBGXX.2       | raw/newDgenome/D7-157_S4_L002_R1_001.fastq.gz                   | raw/newDgenome/D7-157_S4_L002_R2_001.fastq.gz                   |
+| D7-157.HFJ7YBGXX.3    | DNA-PE | HFJ7YBGXX.3       | raw/newDgenome/D7-157_S4_L003_R1_001.fastq.gz                   | raw/newDgenome/D7-157_S4_L003_R2_001.fastq.gz                   |
+| D7-157.HFJ7YBGXX.4    | DNA-PE | HFJ7YBGXX.4       | raw/newDgenome/D7-157_S4_L004_R1_001.fastq.gz                   | raw/newDgenome/D7-157_S4_L004_R2_001.fastq.gz                   |
+| D7-157.HHGLTBGXX.1    | DNA-PE | HHGLTBGXX.1       | raw/newDgenome/D7-157_S4_L005_R1_001.fastq.gz                   | raw/newDgenome/D7-157_S4_L005_R2_001.fastq.gz                   |
+| D7-157.HHGLTBGXX.2    | DNA-PE | HHGLTBGXX.2       | raw/newDgenome/D7-157_S4_L006_R1_001.fastq.gz                   | raw/newDgenome/D7-157_S4_L006_R2_001.fastq.gz                   |
+| D7-157.HHGLTBGXX.3    | DNA-PE | HHGLTBGXX.3       | raw/newDgenome/D7-157_S4_L007_R1_001.fastq.gz                   | raw/newDgenome/D7-157_S4_L007_R2_001.fastq.gz                   |
+| D7-157.HHGLTBGXX.4    | DNA-PE | HHGLTBGXX.4       | raw/newDgenome/D7-157_S4_L008_R1_001.fastq.gz                   | raw/newDgenome/D7-157_S4_L008_R2_001.fastq.gz                   |
 #+TBLFM: $3='(org-sbe findEncode (file $$4 ))
 
 * Trimmomatic
@@ -313,8 +317,8 @@ D10 had a error in the library making the last 40bp  questionable. So, those
 reads were re-trimmed with minlen60
 
 #+HEADER: :shebang #!/bin/bash :tangle trim/trim.pbs :mkdirp yes
-#+HEADER: :prologue #PBS -N Trim -l nodes=1:ppn=20 -l walltime=48:00:00 -t 93-124
-#+BEGIN_SRC sh :var libs=raw_files :var DIR=(file-name-directory buffer-file-name) 
+#+HEADER: :prologue #PBS -N Trim -l nodes=1:ppn=20 -l walltime=48:00:00 -t 1-15
+#+BEGIN_SRC sh :var libs=raw_ref :var DIR=(file-name-directory buffer-file-name) 
   cd $DIR
 
   TRIMER=/usr/local/igbb/trimmomatic/trimmomatic-0.32.jar
@@ -337,11 +341,10 @@ reads were re-trimmed with minlen60
       TYPE=PE
   fi
 
-  java -jar $TRIMER $TYPE -threads $PBS_NUM_PPN -phred${lib[2]} \
+  java -jar $TRIMER $TYPE -threads 20 -phred${lib[2]} \
        $DIR/${lib[3]} $DIR/${lib[4]} $TRM_PE_R1 $TRM_SE_R1 $TRM_PE_R2 $TRM_SE_R2 \
        ILLUMINACLIP:$ADAPTERS:2:30:15 LEADING:28 TRAILING:28 SLIDINGWINDOW:8:28 SLIDINGWINDOW:1:10 MINLEN:85 TOPHRED33 \
   &> $TRIM/${lib[0]}.log
-
 #+END_SRC
 
 #+BEGIN_SRC sh :results output table :var libs=raw_files[,0]
@@ -565,6 +568,10 @@ fi
 | A2_34                 | ILLUMINA | NULL              | A2_34               |
 | D5_ref                | ILLUMINA | NULL              | D5_ref              |
 | F1-1                  | ILLUMINA | NULL              | F1-1                |
+| D5_2                  | ILLUMINA | NULL              | D5_2                |
+| D5_4                  | ILLUMINA | NULL              | D5_4                |
+| D5_31                 | ILLUMINA | NULL              | D5_31               |
+| D5_53                 | ILLUMINA | NULL              | D5_53               |
 | AD1-DNWC1324.Ghirs1.1 | ILLUMINA | FCC6M4FACXX.5     | AD1-DNWC1324.Ghirs1 |
 | AD1-DNWC1324.Ghirs1.2 | ILLUMINA | FCC6M50ACXX.7     | AD1-DNWC1324.Ghirs1 |
 | AD1-DNWC1324.Ghirs1.3 | ILLUMINA | FCC6M50ACXX.8     | AD1-DNWC1324.Ghirs1 |
@@ -702,7 +709,7 @@ swsetup bwa
 bwa index db/G.raimondii_JGI_221_v2.0.assembly.fasta
 #+END_SRC
 #+HEADER: :shebang #!/bin/bash :tangle analysis/d.align/align.pbs :mkdirp yes
-#+HEADER: :prologue #PBS -N Align -l nodes=1:ppn=20 -l walltime=48:00:00 -t 1-135
+#+HEADER: :prologue #PBS -N Align -l nodes=1:ppn=20 -l walltime=48:00:00 -t 1-15
 #+BEGIN_SRC sh :var libs=read_groups :var DIR=(file-name-directory buffer-file-name) 
   swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
   swsetup bwa
@@ -735,6 +742,7 @@ bwa index db/G.raimondii_JGI_221_v2.0.assembly.fasta
   samtools merge $OUT/${lib[0]}.merged.bam $OUT/${lib[0]}.PE.sort.bam $OUT/${lib[0]}.SE.sort.bam
 
 #+END_SRC
+
 #+HEADER: :shebang #!/bin/bash :tangle analysis/d.align/minlen60/align.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N Align -l nodes=1:ppn=20 -l walltime=48:00:00 -t 1-135
 #+BEGIN_SRC sh :var libs=read_groups :var DIR=(file-name-directory buffer-file-name) 
@@ -769,6 +777,7 @@ bwa index db/G.raimondii_JGI_221_v2.0.assembly.fasta
   samtools merge $OUT/${lib[0]}.merged.bam $OUT/${lib[0]}.PE.sort.bam $OUT/${lib[0]}.SE.sort.bam
 
 #+END_SRC
+
 #+HEADER: :shebang #!/bin/bash :tangle analysis/d.align/merge.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N Merge -l nodes=1:ppn=20 -l walltime=48:00:00
 #+BEGIN_SRC sh :var libs=read_groups :var DIR=(file-name-directory buffer-file-name) 
@@ -792,6 +801,22 @@ bwa index db/G.raimondii_JGI_221_v2.0.assembly.fasta
       uniq -u |
       xargs -i cp analysis/d.align/{}.merged.bam analysis/d.align/{}.all.bam
 #+END_SRC
+
+#+HEADER: :shebang #!/bin/bash :tangle analysis/d.align/sra_clean.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N SRA_clean -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh :var libs=raw_ref :var DIR=(file-name-directory buffer-file-name) 
+  swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+  swsetup samtools
+
+  cut -f 1 <<<"$libs" |
+      xargs -i mv analysis/d.align/{}.merged.bam analysis/d.align/{}.all.bam
+
+  cut -f 1 <<<"$libs" |
+      xargs -i ln -s $DIR/analysis/d.align/{}.all.bam $DIR/analysis/d.align/{}.merged.bam 
+
+#+END_SRC
+
+
 ** Chloroplast
 :PROPERTIES:
 :ID:       79265d2e-3873-480e-bd8a-92b7a9ba0485
@@ -922,12 +947,42 @@ print $0}'
 
 
 
-#+HEADER: :shebang #!/bin/bash :tangle analysis/phylo/bam2consensus/high_cov/run.pbs :mkdirp yes
-#+HEADER: :prologue #PBS -N Merge -l nodes=1:ppn=20 -l walltime=48:00:00
+#+HEADER: :shebang #!/bin/bash :tangle analysis/phylo/bam2consensus/med_cov/run.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N Bam2consensus -l nodes=1:ppn=20 -l walltime=48:00:00
 #+BEGIN_SRC sh  :var libs=read_groups :var DIR=(file-name-directory buffer-file-name)
 LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/igbb/bambam-1.3/lib
 LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/igbb/htslib-1.1/lib/
 PATH=$PATH:/usr/local/igbb/bambam-1.3/bin
+
+swsetup ()
+{
+    eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`
+}
+
+# lfs setstripe -s 1536k -i -1 -c 1 analysis/phylo/bam2consensus/
+cd analysis/phylo/bam2consensus/med_cov
+
+bams=$(cut -f 4 <<<"$libs" |
+    sort -u | grep -v -e AD1-DNWC1324.Ghirs1 -e A1-73  -e D2-2-7.Ghark1 -e A2-JCVI |
+    sed 's#D10-8#minlen60/D10-8#' |
+    xargs printf "$DIR/analysis/d.align/%s.all.bam " )
+
+seq -w 0 37 |  parallel  mkdir {} ';' cd {} ';' bam2consensus -g $DIR/db/D5.CDS_range.gff.{}.gff -m 10 $bams
+
+
+#+END_SRC
+
+#+HEADER: :shebang #!/bin/bash :tangle analysis/phylo/bam2consensus/high_cov/run.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N Bam2consensus -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh  :var libs=read_groups :var DIR=(file-name-directory buffer-file-name)
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/igbb/bambam-1.3/lib
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/igbb/htslib-1.1/lib/
+PATH=$PATH:/usr/local/igbb/bambam-1.3/bin
+
+swsetup ()
+{
+    eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`
+}
 
 # lfs setstripe -s 1536k -i -1 -c 1 analysis/phylo/bam2consensus/
 cd analysis/phylo/bam2consensus/high_cov
@@ -937,11 +992,10 @@ bams=$(cut -f 4 <<<"$libs" |
     sed 's#D10-8#minlen60/D10-8#' |
     xargs printf "$DIR/analysis/d.align/%s.all.bam " )
 
-seq -w 0 37 |  parallel -j20 mkdir {} ';' cd {} ';' bam2consensus -g $DIR/db/D5.CDS_range.gff.{}.gff -m 20 $bams
+seq -w 0 37 |  parallel  mkdir {} ';' cd {} ';' bam2consensus -g $DIR/db/D5.CDS_range.gff.{}.gff -m 20 $bams
 
 
 #+END_SRC
-
 
 #+HEADER: :shebang #!/bin/bash :tangle analysis/phylo/bayes/run.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N MrBayes -l nodes=1:ppn=20 -l walltime=48:00:00
@@ -1041,6 +1095,10 @@ cat <<<"$libs" | uniq -w 11
 | D3K-56.HFJ7YBGXX.1 | D3K-56      |              880 |           8.8 |          103530 |
 | D4-185.HFJ7YBGXX.1 | D4-185      |              919 |          9.19 |          108118 |
 | D7-157.HFJ7YBGXX.1 | D7-157      |              934 |          9.34 |          109883 |
+| D5_2               | D5_2__      |              880 |           8.8 |          103530 |
+| D5_4               | D5_4__      |              880 |           8.8 |          103530 |
+| D5_31              | D5_31_      |              880 |           8.8 |          103530 |
+| D5_53              | D5_53_      |              880 |           8.8 |          103530 |
 #+TBLFM: $4=$3*0.01::$5=ceil($4*1000000/85)
 
 #+BEGIN_SRC sh :var libs=sample_tbl :var DIR=(file-name-directory buffer-file-name)
@@ -1050,7 +1108,6 @@ while read -a lib; do
 done <<< "$libs" | paste - - | tr ':' '\t'
 
 #+END_SRC
-
 #+RESULTS:
 | Sample             | Machine  | Flowcell        | Lane |
 |--------------------+----------+-----------------+------|
@@ -1115,14 +1172,15 @@ while sleep 30; do find . -type d -empty -print -exec touch {}/.empty \;; done &
 WATCH=$!
 
 time seqclust_cmd.py -s $DIR/analysis/clustering/sample.fa \
-    -d None -v . -k  $DIR/db/RBplantsANDcotton.21.08.fasta -f 6
+    -d None -v . -k  $DIR/db/RBplantsANDcotton.21.08.fixedDec2016.fasta -f 6
+
 
 kill $WATCH
 exec 1>&3 2>&4
 #+END_SRC
 
 
-  #+HEADER: :shebang "#!/bin/bash" :mkdirp t :tangle analysis/clustering/cluster_continue.sh
+#+HEADER: :shebang "#!/bin/bash" :mkdirp t :tangle analysis/clustering/cluster_continue.sh
 #+HEADER: :prologue #PBS -N RepeatExplorer -l nodes=1:ppn=20 -l walltime=48:00:00 
 #+BEGIN_SRC sh :var DIR=(file-name-directory buffer-file-name)
 export R_LIBS=$DIR/bin/repeatexplorer/Rlib:$R_LIBS
@@ -1148,7 +1206,7 @@ while sleep 30; do find . -type d -empty -print -exec touch {}/.empty \;; done &
 WATCH=$!
 
 time seqclust_continue.py -s $DIR/analysis/clustering/sample.fa \
-    -d None -v . -k  $DIR/db/RBplantsANDcotton.21.08.fasta -f 6
+    -d None -v . -k  $DIR/db/RBplantsANDcotton.21.08.fixedDec2016.fasta -f 6
 
 
 kill $WATCH
@@ -1412,30 +1470,30 @@ exec 1>&3 2>&4
 :END:
 
 #+NAME: assemble_groups
-| Species      | Libraries                                                                                                                                                                              |
-|--------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| AD1-DNWC1324 | AD1-DNWC1324.Ghirs1.1,AD1-DNWC1324.Ghirs1.2,AD1-DNWC1324.Ghirs1.3,AD1-DNWC1324.Ghirs1.4,AD1-DNWC1324.Ghirs1.5                                                                          |
-| D10-8        | D10-8.Gturn1.1,D10-8.Gturn1.2,D10-8.Gturn1.3,D10-8.Gturn1.4,D10-8.Gturn1.5,D10-8.Gturn1.6,D10-8.Gturn1.7,D10-8.Gturn1.8,D10-8.Gturn1.9,D10-8.Gturn1.10,D10-8.Gturn1.11,D10-8.Gturn1.12 |
-| D11-1        | D11-1.Gschw1.1,D11-1.Gschw1.2,D11-1.Gschw1.3,D11-1.Gschw1.4,D11-1.Gschw1.5,D11-1.Gschw1.6,D11-1.Gschw1.7                                                                               |
-| D1-2         | D1-2.Gthur1.1,D1-2.Gthur1.2,D1-2.Gthur1.3,D1-2.Gthur1.4,D1-2.Gthur1.5,D1-2.Gthur1.6,D1-2.Gthur1.7,D1-2.Gthur1.8                                                                        |
-| D1-35        | D1-35.Gthur2.1,D1-35.Gthur2.2,D1-35.Gthur2.3,D1-35.Gthur2.4,D1-35.Gthur2.5                                                                                                             |
-| D2-1-6       | D2-1-6.Garmo1.1,D2-1-6.Garmo1.2,D2-1-6.Garmo1.3,D2-1-6.Garmo1.4,D2-1-6.Garmo1.5                                                                                                        |
-| D2-2-7       | D2-2-7.Ghark1.1,D2-2-7.Ghark1.2,D2-2-7.Ghark1.3,D2-2-7.Ghark1.4,D2-2-7.Ghark1.5,D2-2-7.Ghark1.6,D2-2-7.Ghark1.7,D2-2-7.Ghark1.8                                                        |
-| D3-D-27      | D3-D-27.Gdavi1.1,D3-D-27.Gdavi1.2,D3-D-27.Gdavi1.3,D3-D-27.Gdavi1.4                                                                                                                    |
-| D3-K-57      | D3-K-57.Gklot1.5,D3-K-57.Gklot1.6,D3-K-57.Gklot1.7,D3-K-57.Gklot1.8                                                                                                                    |
-| D4-12        | D4-12.Garid1.1,D4-12.Garid1.2,D4-12.Garid1.3,D4-12.Garid1.4                                                                                                                            |
-| D5-6         | D5-6.Graim2.1,D5-6.Graim2.2,D5-6.Graim2.3,D5-6.Graim2.4,D5-6.Graim2.5,D5-6.Graim2.6                                                                                                    |
-| D5-8         | D5-8.Graim1.7,D5-8.Graim1.8                                                                                                                                                            |
-| D6-5         | D6-5.Ggoss2.1,D6-5.Ggoss2.2,D6-5.Ggoss2.3,D6-5.Ggoss2.4                                                                                                                                |
-| D6-7         | D6-7.Ggoss1.1,D6-7.Ggoss1.2,D6-7.Ggoss1.3,D6-7.Ggoss1.4,D6-7.Ggoss1.5,D6-7.Ggoss1.6                                                                                                    |
-| D7-4         | D7-4.Globa1.1,D7-4.Globa1.2,D7-4.Globa1.3,D7-4.Globa1.4                                                                                                                                |
-| D8-8         | D8-8.Gtril2.1                                                                                                                                                                          |
-| D8-9         | D8-9.Gtril1.1,D8-9.Gtril1.2                                                                                                                                                            |
-| D9-4         | D9-4.Glaxu1.1,D9-4.Glaxu1.2,D9-4.Glaxu1.3,D9-4.Glaxu1.4,D9-4.Glaxu1.5                                                                                                                  |
-| D2-2         | D2-2.HFJ7YBGXX.1,D2-2.HFJ7YBGXX.2,D2-2.HFJ7YBGXX.3,D2-2.HFJ7YBGXX.4,D2-2.HHGLTBGXX.1,D2-2.HHGLTBGXX.2,D2-2.HHGLTBGXX.3,D2-2.HHGLTBGXX.4                                                |
-| D3K-56       | D3K-56.HFJ7YBGXX.1,D3K-56.HFJ7YBGXX.2,D3K-56.HFJ7YBGXX.3,D3K-56.HFJ7YBGXX.4,D3K-56.HHGLTBGXX.1,D3K-56.HHGLTBGXX.2,D3K-56.HHGLTBGXX.3,D3K-56.HHGLTBGXX.4                                |
-| D4-185       | D4-185.HFJ7YBGXX.1,D4-185.HFJ7YBGXX.2,D4-185.HFJ7YBGXX.3,D4-185.HFJ7YBGXX.4,D4-185.HHGLTBGXX.1,D4-185.HHGLTBGXX.2,D4-185.HHGLTBGXX.3,D4-185.HHGLTBGXX.4                                |
-| D7-157       | D7-157.HFJ7YBGXX.1,D7-157.HFJ7YBGXX.2,D7-157.HFJ7YBGXX.3,D7-157.HFJ7YBGXX.4,D7-157.HHGLTBGXX.1,D7-157.HHGLTBGXX.2,D7-157.HHGLTBGXX.3,D7-157.HHGLTBGXX.4                                |
+| Species      | Libraries                                                                                                                                                                                                                  |
+|--------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| AD1-DNWC1324 | AD1-DNWC1324.Ghirs1.1,AD1-DNWC1324.Ghirs1.2,AD1-DNWC1324.Ghirs1.3,AD1-DNWC1324.Ghirs1.4,AD1-DNWC1324.Ghirs1.5                                                                                                              |
+| D10-8        | D10-8.Gturn1.1,D10-8.Gturn1.2,D10-8.Gturn1.3,D10-8.Gturn1.4,D10-8.Gturn1.5,D10-8.Gturn1.6,D10-8.Gturn1.7,D10-8.Gturn1.8,D10-8.Gturn1.9.minlen60,D10-8.Gturn1.10.minlen60,D10-8.Gturn1.11.minlen60,D10-8.Gturn1.12.minlen60 |
+| D11-1        | D11-1.Gschw1.1,D11-1.Gschw1.2,D11-1.Gschw1.3,D11-1.Gschw1.4,D11-1.Gschw1.5,D11-1.Gschw1.6,D11-1.Gschw1.7                                                                                                                   |
+| D1-2         | D1-2.Gthur1.1,D1-2.Gthur1.2,D1-2.Gthur1.3,D1-2.Gthur1.4,D1-2.Gthur1.5,D1-2.Gthur1.6,D1-2.Gthur1.7,D1-2.Gthur1.8                                                                                                            |
+| D1-35        | D1-35.Gthur2.1,D1-35.Gthur2.2,D1-35.Gthur2.3,D1-35.Gthur2.4,D1-35.Gthur2.5                                                                                                                                                 |
+| D2-1-6       | D2-1-6.Garmo1.1,D2-1-6.Garmo1.2,D2-1-6.Garmo1.3,D2-1-6.Garmo1.4,D2-1-6.Garmo1.5                                                                                                                                            |
+| D2-2-7       | D2-2-7.Ghark1.1,D2-2-7.Ghark1.2,D2-2-7.Ghark1.3,D2-2-7.Ghark1.4,D2-2-7.Ghark1.5,D2-2-7.Ghark1.6,D2-2-7.Ghark1.7,D2-2-7.Ghark1.8                                                                                            |
+| D3-D-27      | D3-D-27.Gdavi1.1,D3-D-27.Gdavi1.2,D3-D-27.Gdavi1.3,D3-D-27.Gdavi1.4                                                                                                                                                        |
+| D3-K-57      | D3-K-57.Gklot1.5,D3-K-57.Gklot1.6,D3-K-57.Gklot1.7,D3-K-57.Gklot1.8                                                                                                                                                        |
+| D4-12        | D4-12.Garid1.1,D4-12.Garid1.2,D4-12.Garid1.3,D4-12.Garid1.4                                                                                                                                                                |
+| D5-6         | D5-6.Graim2.1,D5-6.Graim2.2,D5-6.Graim2.3,D5-6.Graim2.4,D5-6.Graim2.5,D5-6.Graim2.6                                                                                                                                        |
+| D5-8         | D5-8.Graim1.7,D5-8.Graim1.8                                                                                                                                                                                                |
+| D6-5         | D6-5.Ggoss2.1,D6-5.Ggoss2.2,D6-5.Ggoss2.3,D6-5.Ggoss2.4                                                                                                                                                                    |
+| D6-7         | D6-7.Ggoss1.1,D6-7.Ggoss1.2,D6-7.Ggoss1.3,D6-7.Ggoss1.4,D6-7.Ggoss1.5,D6-7.Ggoss1.6                                                                                                                                        |
+| D7-4         | D7-4.Globa1.1,D7-4.Globa1.2,D7-4.Globa1.3,D7-4.Globa1.4                                                                                                                                                                    |
+| D8-8         | D8-8.Gtril2.1                                                                                                                                                                                                              |
+| D8-9         | D8-9.Gtril1.1,D8-9.Gtril1.2                                                                                                                                                                                                |
+| D9-4         | D9-4.Glaxu1.1,D9-4.Glaxu1.2,D9-4.Glaxu1.3,D9-4.Glaxu1.4,D9-4.Glaxu1.5                                                                                                                                                      |
+| D2-2         | D2-2.HFJ7YBGXX.1,D2-2.HFJ7YBGXX.2,D2-2.HFJ7YBGXX.3,D2-2.HFJ7YBGXX.4,D2-2.HHGLTBGXX.1,D2-2.HHGLTBGXX.2,D2-2.HHGLTBGXX.3,D2-2.HHGLTBGXX.4                                                                                    |
+| D3K-56       | D3K-56.HFJ7YBGXX.1,D3K-56.HFJ7YBGXX.2,D3K-56.HFJ7YBGXX.3,D3K-56.HFJ7YBGXX.4,D3K-56.HHGLTBGXX.1,D3K-56.HHGLTBGXX.2,D3K-56.HHGLTBGXX.3,D3K-56.HHGLTBGXX.4                                                                    |
+| D4-185       | D4-185.HFJ7YBGXX.1,D4-185.HFJ7YBGXX.2,D4-185.HFJ7YBGXX.3,D4-185.HFJ7YBGXX.4,D4-185.HHGLTBGXX.1,D4-185.HHGLTBGXX.2,D4-185.HHGLTBGXX.3,D4-185.HHGLTBGXX.4                                                                    |
+| D7-157       | D7-157.HFJ7YBGXX.1,D7-157.HFJ7YBGXX.2,D7-157.HFJ7YBGXX.3,D7-157.HFJ7YBGXX.4,D7-157.HHGLTBGXX.1,D7-157.HHGLTBGXX.2,D7-157.HHGLTBGXX.3,D7-157.HHGLTBGXX.4                                                                    |
 
 
 Each species was assembled using ABySS (v2.0.1) with every kmer inclusively
