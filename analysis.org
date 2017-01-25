@@ -947,6 +947,31 @@ print $0}'
 
 
 
+#+HEADER: :shebang #!/bin/bash :tangle analysis/phylo/bam2consensus/med_cov/run.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N Bam2consensus -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh  :var libs=read_groups :var DIR=(file-name-directory buffer-file-name)
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/igbb/bambam-1.3/lib
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/igbb/htslib-1.1/lib/
+PATH=$PATH:/usr/local/igbb/bambam-1.3/bin
+
+swsetup ()
+{
+    eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`
+}
+
+# lfs setstripe -s 1536k -i -1 -c 1 analysis/phylo/bam2consensus/
+cd analysis/phylo/bam2consensus/med_cov
+
+bams=$(cut -f 4 <<<"$libs" |
+    sort -u | grep -v -e AD1-DNWC1324.Ghirs1 -e A1-73  -e D2-2-7.Ghark1 -e A2-JCVI |
+    sed 's#D10-8#minlen60/D10-8#' |
+    xargs printf "$DIR/analysis/d.align/%s.all.bam " )
+
+seq -w 0 37 |  parallel  mkdir {} ';' cd {} ';' bam2consensus -g $DIR/db/D5.CDS_range.gff.{}.gff -m 10 $bams
+
+
+#+END_SRC
+
 #+HEADER: :shebang #!/bin/bash :tangle analysis/phylo/bam2consensus/high_cov/run.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N Bam2consensus -l nodes=1:ppn=20 -l walltime=48:00:00
 #+BEGIN_SRC sh  :var libs=read_groups :var DIR=(file-name-directory buffer-file-name)
@@ -971,7 +996,6 @@ seq -w 0 37 |  parallel  mkdir {} ';' cd {} ';' bam2consensus -g $DIR/db/D5.CDS_
 
 
 #+END_SRC
-
 
 #+HEADER: :shebang #!/bin/bash :tangle analysis/phylo/bayes/run.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N MrBayes -l nodes=1:ppn=20 -l walltime=48:00:00
