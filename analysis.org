@@ -820,8 +820,8 @@ bwa index db/G.raimondii_JGI_221_v2.0.assembly.fasta
 ** Chloroplast
 :PROPERTIES:
 :ID:       79265d2e-3873-480e-bd8a-92b7a9ba0485
-:END:
-#+HEADER: :shebang #!/bin/bash :tangle z :mkdirp yes
+:END:      
+#+HEADER: :shebang #!/bin/bash :tangle analysis/chloroplast/align.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N CP.Align -l nodes=1:ppn=20 -l walltime=48:00:00 -t 1-135
 #+BEGIN_SRC sh :var libs=read_groups :var DIR=(file-name-directory buffer-file-name) 
   swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
