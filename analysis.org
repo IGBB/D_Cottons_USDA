@@ -301,6 +301,9 @@ wget -O - "http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&r
 | D7-157.HHGLTBGXX.2    | DNA-PE | HHGLTBGXX.2       | raw/newDgenome/D7-157_S4_L006_R1_001.fastq.gz                   | raw/newDgenome/D7-157_S4_L006_R2_001.fastq.gz                   |
 | D7-157.HHGLTBGXX.3    | DNA-PE | HHGLTBGXX.3       | raw/newDgenome/D7-157_S4_L007_R1_001.fastq.gz                   | raw/newDgenome/D7-157_S4_L007_R2_001.fastq.gz                   |
 | D7-157.HHGLTBGXX.4    | DNA-PE | HHGLTBGXX.4       | raw/newDgenome/D7-157_S4_L008_R1_001.fastq.gz                   | raw/newDgenome/D7-157_S4_L008_R2_001.fastq.gz                   |
+| D10-3.HG7LFALXX.1     | DNA-PE | 33                | raw/D10_3/S10_3_USD16081436_HG7LFALXX_L1_1.fq.gz                | raw/D10_3/S10_3_USD16081436_HG7LFALXX_L1_2.fq.gz                |
+| D10-7.HGF7YALXX.5     | DNA-PE | 33                | raw/D10_7/S10_7_USD16081260_HGF7YALXX_L5_1.fq.gz                | raw/D10_7/S10_7_USD16081260_HGF7YALXX_L5_2.fq.gz                |
+| D10-8.HG7LFALXX.1     | DNA-PE | 33                | raw/D10_8/S10_8_USD16081437_HG7LFALXX_L1_1.fq.gz                | raw/D10_8/S10_8_USD16081437_HG7LFALXX_L1_2.fq.gz                |
 #+TBLFM: $3='(org-sbe findEncode (file $$4 ))
 
 * Trimmomatic
@@ -318,7 +321,7 @@ reads were re-trimmed with minlen60
 
 #+HEADER: :shebang #!/bin/bash :tangle trim/trim.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N Trim -l nodes=1:ppn=20 -l walltime=48:00:00 -t 1-15
-#+BEGIN_SRC sh :var libs=raw_ref :var DIR=(file-name-directory buffer-file-name) 
+#+BEGIN_SRC sh :var libs=raw_new :var DIR=(file-name-directory buffer-file-name) 
   cd $DIR
 
   TRIMER=/usr/local/igbb/trimmomatic/trimmomatic-0.32.jar
@@ -341,7 +344,7 @@ reads were re-trimmed with minlen60
       TYPE=PE
   fi
 
-  java -jar $TRIMER $TYPE -threads 20 -phred${lib[2]} \
+  java -jar $TRIMER $TYPE -threads 2 -phred${lib[2]} \
        $DIR/${lib[3]} $DIR/${lib[4]} $TRM_PE_R1 $TRM_SE_R1 $TRM_PE_R2 $TRM_SE_R2 \
        ILLUMINACLIP:$ADAPTERS:2:30:15 LEADING:28 TRAILING:28 SLIDINGWINDOW:8:28 SLIDINGWINDOW:1:10 MINLEN:85 TOPHRED33 \
   &> $TRIM/${lib[0]}.log
