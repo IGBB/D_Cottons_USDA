@@ -378,6 +378,12 @@ xargs -i  grep -H 'Input Read Pairs' trim/{}.log  <<<"$libs" | sed -e 's#.*/##' 
 | D10-8.Gturn1.4           |  16297999 |        17 | (0.00%)  |      877 | (0.01%)  |    2879 | (0.02%)  |  16294226 | (99.98%) |
 | D10-8.Gturn1.8           |  12267659 |        17 | (0.00%)  |      808 | (0.01%)  |    2530 | (0.02%)  |  12264304 | (99.97%) |
 |--------------------------+-----------+-----------+----------+----------+----------+---------+----------+-----------+----------|
+| D10-3.HG7LFALXX.1        | 136351407 |  94763529 | (69.50%) | 29291603 | (21.48%) | 2160126 | (1.58%)  |  10136149 | (7.43%)  |
+|--------------------------+-----------+-----------+----------+----------+----------+---------+----------+-----------+----------|
+| D10-8.HG7LFALXX.1        | 124131681 |  85789083 | (69.11%) | 27070194 | (21.81%) | 1929487 | (1.55%)  |   9342917 | (7.53%)  |
+|--------------------------+-----------+-----------+----------+----------+----------+---------+----------+-----------+----------|
+| D10-7.HGF7YALXX.5        | 197515336 | 161770051 | (81.90%) | 23747201 | (12.02%) | 2403047 | (1.22%)  |   9595037 | (4.86%)  |
+|--------------------------+-----------+-----------+----------+----------+----------+---------+----------+-----------+----------|
 | D11-1.Gschw1.6           |  82022453 |  55943217 | (68.20%) |  7908127 | (9.64%)  | 5959669 | (7.27%)  |  12211440 | (14.89%) |
 | D11-1.Gschw1.5           |  68828834 |  47482765 | (68.99%) |  6358246 | (9.24%)  | 4979427 | (7.23%)  |  10008396 | (14.54%) |
 | D11-1.Gschw1.2           |  36765023 |  25814652 | (70.22%) |  4394257 | (11.95%) | 1757423 | (4.78%)  |   4798691 | (13.05%) |
@@ -699,6 +705,9 @@ fi
 | D7-157.HHGLTBGXX.2    | ILLUMINA | HHGLTBGXX.2       | D7-157              |
 | D7-157.HHGLTBGXX.3    | ILLUMINA | HHGLTBGXX.3       | D7-157              |
 | D7-157.HHGLTBGXX.4    | ILLUMINA | HHGLTBGXX.4       | D7-157              |
+| D10-3.HG7LFALXX.1     | ILLUMINA | HG7LFALXX.1       | D10-3               |
+| D10-7.HGF7YALXX.5     | ILLUMINA | HGF7YALXX.5       | D10-7               |
+| D10-8.HG7LFALXX.1     | ILLUMINA | HG7LFALXX.1       | D10-8               |
 #+TBLFM: $3='(org-sbe get_flowcell (name $$1))
 
 ** D5 Reference Genome
@@ -815,6 +824,20 @@ bwa index db/G.raimondii_JGI_221_v2.0.assembly.fasta
       xargs -i mv analysis/d.align/{}.merged.bam analysis/d.align/{}.all.bam
 
   cut -f 1 <<<"$libs" |
+      xargs -i ln -s $DIR/analysis/d.align/{}.all.bam $DIR/analysis/d.align/{}.merged.bam 
+
+#+END_SRC
+
+#+HEADER: :shebang #!/bin/bash :tangle analysis/d.align/new_clean.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N SRA_clean -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh :var libs=read_groups[141:143,] :var DIR=(file-name-directory buffer-file-name) 
+  swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+  swsetup samtools
+
+  cut -f 4 <<<"$libs" |
+      xargs -i mv analysis/d.align/{}.merged.bam analysis/d.align/{}.all.bam
+
+  cut -f 4 <<<"$libs" |
       xargs -i ln -s $DIR/analysis/d.align/{}.all.bam $DIR/analysis/d.align/{}.merged.bam 
 
 #+END_SRC
@@ -958,42 +981,6 @@ cut -f 4 <<<"$libs" |
 | A1-73               |       0.00241941 |
 
 
-
-D5_4 1.55265
-A2-BGI 1.49656
-D5_2 3.58327
-D5_53 5.0361
-D5_31 7.37027
-D5-6 13.4317
-D1-2 11.2287
-D8-9 14.0253
-minlen60/D10-8 12.39
-D6-7 14.2018
-D5-8 22.1262
-A2_44 8.48002
-D3K-56 21.2111
-D4-185 21.7826
-D7-157 22.5818
-A1-97 13.3297
-D2-2 23.8639
-D5_ref 17.3843
-D8-8 22.1751
-D2-1-6 22.6315
-D4-12 22.8186
-D3-K-57 23.949
-D3-D-27 25.1444
-D6-5 24.498
-D7-4 24.8381
-D1-35 27.3339
-D9-4 28.6264
-D11-1 44.8914
-A2_4 34.3774
-A1-155 37.6362
-A2_34 36.1459
-A2_1011 37.7993
-F1-1 57.6295
-
-
 #+HEADER: :shebang #!/bin/bash :tangle analysis/phylo/bam2consensus/med_cov/run.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N Bam2consensus -l nodes=1:ppn=20 -l walltime=48:00:00
 #+BEGIN_SRC sh  :var libs=read_groups :var DIR=(file-name-directory buffer-file-name)
@@ -1010,13 +997,21 @@ swsetup ()
 cd analysis/phylo/bam2consensus/med_cov
 
 bams=$(cut -f 4 <<<"$libs" |
-    sort -u | grep -v -e AD1-DNWC1324.Ghirs1 -e A1-73  -e D2-2-7.Ghark1 -e A2-JCVI |
-    sed 's#D10-8#minlen60/D10-8#' |
+              sort -u |
+              grep -v -e AD1-DNWC1324.Ghirs1 \
+                   -e A1-73  \
+                   -e D2-2-7.Ghark1 \
+                   -e A2-JCVI  \
+                   -e A2-BGI \
+                   -e A2_44 \
+                   -e A1-97 \
+                   -e A2_4 \
+                   -e A1-155 \
+                   -e A2_34 \
+                   -e A2_1011 |
     xargs printf "$DIR/analysis/d.align/%s.all.bam " )
 
-seq -w 0 37 |  parallel  mkdir {} ';' cd {} ';' bam2consensus -g $DIR/db/D5.CDS_range.gff.{}.gff -m 10 -f 0.5 $bams
-
-
+seq -w 0 46 |  parallel  mkdir {} ';' cd {} ';' bam2consensus -g $DIR/db/D5.CDS_range.gff.{}.gff -m 10 -f 0.5 $bams
 #+END_SRC
 
 #+RESULTS:
@@ -1038,7 +1033,6 @@ cd analysis/phylo/bam2consensus/high_cov
 
 bams=$(cut -f 4 <<<"$libs" |
     sort -u | grep -v -e AD1-DNWC1324.Ghirs1 -e A1-73  -e D2-2-7.Ghark1 -e A2-JCVI |
-    sed 's#D10-8#minlen60/D10-8#' |
     xargs printf "$DIR/analysis/d.align/%s.all.bam " )
 
 seq -w 0 37 |  parallel  mkdir {} ';' cd {} ';' bam2consensus -g $DIR/db/D5.CDS_range.gff.{}.gff -m 20 $bams
@@ -1118,7 +1112,10 @@ cat <<<"$libs" | uniq -w 11
 #+NAME: sample_tbl
 | Library            | Sample Name | Genome Size (Mb) | Sampling (Mb) | Number of reads |
 |--------------------+-------------+------------------+---------------+-----------------|
-| D10-8.Gturn1.9     | D10-8_      |              910 |           9.1 |          107059 |
+| D10-8.Gturn1.9     | D10-8o      |              910 |           9.1 |          107059 |
+| D10-3              | D10-3_      |              910 |           9.1 |          107059 |
+| D10-7              | D10-7_      |              910 |           9.1 |          107059 |
+| D10-8              | D10-8_      |              910 |           9.1 |          107059 |
 | D11-1.Gschw1.7     | D11-1_      |              929 |          9.29 |          109295 |
 | D1-2.Gthur1.7      | D1-2__      |              841 |          8.41 |           98942 |
 | D1-35.Gthur2.5     | D1-35_      |              841 |          8.41 |           98942 |
@@ -1185,7 +1182,7 @@ done <<< "$libs" | paste - - | tr ':' '\t'
 #+HEADER: :shebang #!/bin/bash :tangle analysis/clustering/sample.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N Sample -l nodes=1:ppn=20 -l walltime=48:00:00 
 #+BEGIN_SRC sh :var libs=sample_tbl :var DIR=(file-name-directory buffer-file-name)
-PATH=$PATH:$DIR/bin/reservoir_sample
+PATH=$PATH:$DIR/bin/
 
 while read -a lib; do
     reservoir_sample -l 85 -n ${lib[1]} -s ${lib[4]} $DIR/trim/${lib[0]}.PE.R1.fq.gz
@@ -1543,7 +1540,9 @@ exec 1>&3 2>&4
 | D3K-56       | D3K-56.HFJ7YBGXX.1,D3K-56.HFJ7YBGXX.2,D3K-56.HFJ7YBGXX.3,D3K-56.HFJ7YBGXX.4,D3K-56.HHGLTBGXX.1,D3K-56.HHGLTBGXX.2,D3K-56.HHGLTBGXX.3,D3K-56.HHGLTBGXX.4                                                                    |
 | D4-185       | D4-185.HFJ7YBGXX.1,D4-185.HFJ7YBGXX.2,D4-185.HFJ7YBGXX.3,D4-185.HFJ7YBGXX.4,D4-185.HHGLTBGXX.1,D4-185.HHGLTBGXX.2,D4-185.HHGLTBGXX.3,D4-185.HHGLTBGXX.4                                                                    |
 | D7-157       | D7-157.HFJ7YBGXX.1,D7-157.HFJ7YBGXX.2,D7-157.HFJ7YBGXX.3,D7-157.HFJ7YBGXX.4,D7-157.HHGLTBGXX.1,D7-157.HHGLTBGXX.2,D7-157.HHGLTBGXX.3,D7-157.HHGLTBGXX.4                                                                    |
-
+| D10-3        | D10-3.HG7LFALXX.1                                                                                                                                                                                                          |
+| D10-7        | D10-7.HGF7YALXX.5                                                                                                                                                                                                          |
+| D10-8        | D10-8.HG7LFALXX.1                                                                                                                                                                                                          |
 
 Each species was assembled using ABySS (v2.0.1) with every kmer inclusively
 ranging from 40 to 100 stepping by 5. Species marked "BAD" did not have enough
