@@ -30,15 +30,10 @@ python - << END
 import sys
 from cogent import LoadSeqs, DNA
 
-#renameseq = open("${1%.fasta}.renamed.fasta", 'r')
-#pruneseq = open("${1%.fasta}.Nfil.fasta", 'w')
-
 aln = LoadSeqs("${1%.fasta}.renamed.fasta", moltype=DNA, format='fasta')
 filtered_aln = aln.omitGapSeqs(0.10)
 filtered_gaps = filtered_aln.omitGapPositions(0.1)
 filtered_gaps.writeToFile("${1%.fasta}.Nfil.fasta")
-
-#pruneseq.close
 
 #sys.exit()
 END
