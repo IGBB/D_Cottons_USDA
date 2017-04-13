@@ -1,5 +1,8 @@
 #!/usr/bin/bash
-# Corrinne Grover, December 2016
+# Corrinne Grover, December 2016, updated Apr 2017
+# run on Legion1
+# module load parallel
+# ls *.fasta | parallel --jobs 200 ./filter_alignments {}
 
 # if less than two arguments supplied, display usage
         if [  $# -le 0 ]
