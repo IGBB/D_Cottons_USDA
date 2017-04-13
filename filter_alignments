@@ -23,27 +23,29 @@
 module load python/2.7.12
 module load clustalw/2.1
 
-sed 's/-/_/g' $1 | sed 's/[/]work[/]maa146[/]shane[.]gossypiumD[/][/]analysis[/][/]d[.]align[/]//g' | sed 's/N/-/g' | sed 's/[.]all[.]bam//g' | sed 's/[.][G][a-z][a-z][a-z][a-z][12]//g' | sed 's/4_12/4_12C/' | sed 's/A2_1011/A2_101/' | sed 's/D3_/D3/' > temp.fasta
+sed 's/-/_/g' $1 | sed 's/[/]scratch[/]maa146[/]shane[.]gossypiumD[/][/]analysis[/]d[.]align[/]//g' | sed 's/N/-/g' | sed 's/[.]all[.]bam//g' | sed 's/Gturn1/o/g' | sed 's/[.][G][a-z][a-z][a-z][a-z][12]//g' $
 
 python - << END
 
 import sys
 from cogent import LoadSeqs, DNA
 
-aln = LoadSeqs('temp.fasta', moltype=DNA, format='fasta')
-prune_aln = aln.takeSeqs(['A2_44','A2_4', 'A2_BGI'], negate=True)
-filtered_aln = prune_aln.omitGapSeqs(0.10)
+#renameseq = open("${1%.fasta}.renamed.fasta", 'r')
+#pruneseq = open("${1%.fasta}.Nfil.fasta", 'w')
+
+aln = LoadSeqs("${1%.fasta}.renamed.fasta", moltype=DNA, format='fasta')
+filtered_aln = aln.omitGapSeqs(0.10)
 filtered_gaps = filtered_aln.omitGapPositions(0.1)
-filtered_gaps.writeToFile('temp2.fasta')
+filtered_gaps.writeToFile("${1%.fasta}.Nfil.fasta")
+
+#pruneseq.close
 
 #sys.exit()
 END
 
-sed 's/-/N/g' temp2.fasta > ${1%.fasta}.Nfil.fasta
-rm temp.fasta
-rm temp2.fasta
+sed -i.bak 's/-/N/g' ${1%.fasta}.Nfil.fasta
 
-outgroups=`grep ">[AF]" ${1%.fasta}.Nfil.fasta | wc -l`
+outgroups=`grep ">F" ${1%.fasta}.Nfil.fasta | wc -l`
 
 D1=`grep ">D1_" ${1%.fasta}.Nfil.fasta | wc -l`
 D2=`grep ">D2_" ${1%.fasta}.Nfil.fasta | wc -l`
@@ -55,21 +57,25 @@ D6=`grep ">D6" ${1%.fasta}.Nfil.fasta | wc -l`
 D7=`grep ">D7" ${1%.fasta}.Nfil.fasta | wc -l`
 D8=`grep ">D8" ${1%.fasta}.Nfil.fasta | wc -l`
 D9=`grep ">D9" ${1%.fasta}.Nfil.fasta | wc -l`
-D10=`grep ">D1[10]" ${1%.fasta}.Nfil.fasta | wc -l`
+D10=`grep ">D10" ${1%.fasta}.Nfil.fasta | wc -l`
+D11=`grep ">D11" ${1%.fasta}.Nfil.fasta | wc -l`
+
+mkdir -p filtered
+mkdir -p raxml
+mkdir -p bayes
+mkdir -p fasta
 
 
-if [ $outgroups  -lt 1 ] || [ $D1 -lt 1 ] || [ $D2 -lt 2 ] ||  [ $D3d -lt 1 ] || [ $D3k -lt 1 ] || [ $D4 -lt 2 ] || [ $D5 -lt 1 ] || [ $D6 -lt 1 ] || [ $D7 -lt 1 ] || [ $D8 -lt 1 ] || [ $D9 -lt 1 ] || [ $D10 -lt 2 ]
+if [ $outgroups  -lt 1 ] || [ $D1 -lt 1 ] || [ $D2 -lt 2 ] ||  [ $D3d -lt 1 ] || [ $D3k -lt 1 ] || [ $D4 -lt 2 ] || [ $D5 -lt 1 ] || [ $D6 -lt 1 ] || [ $D7 -lt 1 ] || [ $D8 -lt 1 ] || [ $D9 -lt 1 ] || [ $D10$
 then
   mv ${1%.fasta}.Nfil.fasta filtered
 else
   clustalw2 -infile=${1%.fasta}.Nfil.fasta -convert -type=nucleotide -output=phylip -outfile=${1%.fasta}.phy
   mv ${1%.fasta}.phy raxml
-  clustalw2 -infile=${1%.fasta}.Nfil.fasta -convert -type=nucleotide -output=nexus -outfile=${1%.fasta}.Nfil.nxs 
-  echo >> ${1%.fasta}.Nfil.nxs 
+  clustalw2 -infile=${1%.fasta}.Nfil.fasta -convert -type=nucleotide -output=nexus -outfile=${1%.fasta}.Nfil.nxs
+  echo >> ${1%.fasta}.Nfil.nxs
   cat ${1%.fasta}.Nfil.nxs bayes.block | sed "s/FILENAME/${1%.fasta}/" > ${1%.fasta}.nxs
   mv ${1%.fasta}.nxs bayes
   rm ${1%.fasta}.Nfil.nxs
   mv ${1%.fasta}.Nfil.fasta fasta
 fi
-
-
