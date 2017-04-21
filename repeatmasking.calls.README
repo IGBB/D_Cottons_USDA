@@ -1,0 +1,41 @@
+RepeatMasker custom library results:
+
+Top result is the annotation for each cluster, IF it is annotated for more than 10% of the reads AND if the top result is at least 1.5x the second best result.
+
+Exceptions:
+
+If the top result is LTR, it may be aggregated with the next result if the next result is LTR.Gypsy or LTR.Copia (which are subcategories) AND if the third result is either not in conflict (e.g., the opposite) or more than 50% less than the second result; the annotation should be the latter, reflecting the subgroup. It should not aggregate the other way around; however, the broader category should not be counted as the second best result.
+
+If the top result is DNA, it maybe aggregated with the next result if it begins "DNA."; the annotation should be the latter (subcategory, e.g. DNA.MULE.MuDR)
+
+If the top result is "Unknown", ignore this result and proceed to the next. It should also not be considered when comparing the top result to subsequent results or when aggregating results.
+
+
+Example, CL1: LTR.Gypsy, 38.2%.  This is over 10% and more than 1.5x the next annotation, LTR.Copia (2.87%). Unknown was ignored.
+
+LTR.Gypsy (11655hits, 38.2%)
+LTR (11078hits, 36.4%)
+Unknown (6319hits, 20.7%)
+LTR.Copia (877hits, 2.87%)
+gypsy (185hits, 0.595%)
+non.LTR_retroposon (2hits, 0.00668%)
+LINE (1hits, 0.00318%)
+
+
+Example, CL3: LTR aggregates with LTR.Gypsy for a total of 77.5% LTR.Gypsy.  This is over 10% and more than 1.5x the next annotation, LTR.Copia (9.95%). Unknown was ignored.
+
+LTR (8611hits, 44.1%)
+LTR.Gypsy (6518hits, 33.4%)
+LTR.Copia (1952hits, 9.95%)
+Unknown (1193hits, 6.08%)
+gypsy (842hits, 4.37%)
+DNA.MULE.MuDR (127hits, 0.653%)
+
+
+Example, CL14: LTR attempts to aggregate with LTR.Copia; however, LTR.Copia != 1.5 * LTR.Gypsy (20% versus 14.7%). Cluster is annotated as LTR, no subcategory.
+
+LTR (7517hits, 52.5%)
+LTR.Copia (2864hits, 20%)
+LTR.Gypsy (2124hits, 14.7%)
+Unknown (1526hits, 10.6%)
+gypsy (147hits, 1.02%)
