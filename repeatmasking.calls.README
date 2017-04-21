@@ -1,3 +1,5 @@
+# see annotate_clusters.pl
+
 RepeatMasker custom library results:
 
 Top result is the annotation for each cluster, IF it is annotated for more than 10% of the reads AND if the top result is at least 1.5x the second best result.
