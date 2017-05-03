@@ -1263,20 +1263,6 @@ exec 1>&3 2>&4
 
 
 
-#+BEGIN_SRC sh :var DIR=(file-name-directory buffer-file-name)
-  PATH=$PATH:/usr/local/gnu/bin
-  find $DIR/analysis/clustering/seqClust/clustering/clusters -name '*_domains.csv' |\
-      parallel -k --tag awk "'NR!=1 {if(\$3 == \"NA\"){print \$1}else{print \$3}}'" {} '|' sort -u |\
-      sed -e 's#[^\t]*/##' -e 's/_domains.csv//' | tr -d '"' | sort -n |\
-      awk 'length(head)==0 {printf "Cluster\tLineage"} head != $1 {printf "\n%s\t%s", $1,$2} head==$1{printf ",%s", $2} {head=$1}' |\
-      paste - $DIR/analysis/clustering/seqClust/clustering/comparativeAnalysis_table_clusters.csv \
-            > $DIR/analysis/clustering/seqClust/clustering/comparative_analysis.domains.txt
-
-  # mv $DIR/analysis/clustering/{seqClust/clustering,}
-  # tar -C $DIR/analysis/clustering/ -cvzf $DIR/analysis/clustering/clusters.tar.gz clustering/ summary/ comparative_analysis.domains.txt
-#+END_SRC
-
-#+RESULTS:
 
 
 #+HEADER: :shebang "#!/usr/bin/perl" :results output :tangle bin/annotate.pl
@@ -1383,6 +1369,38 @@ while(<$cluster_fh>){
 
 }
 close($cluster_fh);
+#+END_SRC
+
+#+BEGIN_SRC sh :var DIR=(file-name-directory buffer-file-name)
+  PATH=$PATH:/usr/local/gnu/bin
+  find $DIR/analysis/clustering/seqClust/clustering/clusters -name '*_domains.csv' |\
+      parallel -k --tag awk "'NR!=1 {if(\$3 == \"NA\"){print \$1}else{print \$3}}'" {} '|' sort -u |\
+      sed -e 's#[^\t]*/##' -e 's/_domains.csv//' | tr -d '"' | sort -n |\
+      awk 'length(head)==0 {printf "Cluster\tLineage"} head != $1 {printf "\n%s\t%s", $1,$2} head==$1{printf ",%s", $2} {head=$1}' |\
+      paste - $DIR/analysis/clustering/seqClust/clustering/comparativeAnalysis_table_clusters.csv \
+            > $DIR/analysis/clustering/seqClust/clustering/comparative_analysis.domains.txt
+
+  find $DIR/analysis/clustering/seqClust/clustering/clusters -name '*_domains.csv' |\
+      parallel -k --tag awk "'NR!=1 {if(\$3 == \"NA\"){print \$1}else{print \$3}}'" {} '|' sort -u |\
+      sed -e 's#[^\t]*/##' -e 's/_domains.csv//' | tr -d '"' | sort -n |\
+      awk 'length(head)==0 {printf "Cluster\tLineage"} head != $1 {printf "\n%s\t%s", $1,$2} head==$1{printf ",%s", $2} {head=$1}' |\
+      paste - $DIR/analysis/clustering/seqClust/clustering/comparativeAnalysis_table_clusters_counts.csv \
+            > $DIR/analysis/clustering/seqClust/clustering/comparative_analysis_counts.domains.txt
+
+  perl bin/annotate.pl analysis/clustering/seqClust/clustering/RM-custom_output_tablesummary.csv |
+     paste - $DIR/analysis/clustering/seqClust/clustering/comparative_analysis.domains.txt \
+     > $DIR/analysis/clustering/seqClust/clustering/comparative_analysis.domains.annotated.txt
+
+  perl bin/annotate.pl analysis/clustering/seqClust/clustering/RM-custom_output_tablesummary.csv |
+     paste - $DIR/analysis/clustering/seqClust/clustering/comparative_analysis_counts.domains.txt \
+     > $DIR/analysis/clustering/seqClust/clustering/comparative_analysis_counts.domains.annotated.txt
+
+  perl bin/annotate.pl analysis/clustering/seqClust/clustering/RM-custom_output_tablesummary.csv |
+     paste - $DIR/analysis/clustering/seqClust/clustering/comparativeAnalysis_table_clusters_counts.csv \
+     > $DIR/analysis/clustering/seqClust/clustering/comparative_analysis_counts.annotated.txt
+
+  # mv $DIR/analysis/clustering/{seqClust/clustering,}
+  # tar -C $DIR/analysis/clustering/ -cvzf $DIR/analysis/clustering/clusters.tar.gz clustering/ summary/ comparative_analysis.domains.txt
 #+END_SRC
 
 
@@ -1492,7 +1510,7 @@ find $DIR/analysis/clustering/seqClust/clustering/clusters/ -name reads.fas |
 #+BEGIN_SRC R
 library(ggplot2)
 
-data <- read.delim("comparativeAnalysis_table_clusters_counts.csv")
+data <- read.delim("analysis/clustering/seqClust/clustering/comparativeAnalysis_table_clusters_counts.csv")
 data$size <- rowSums(data[,-1])
 data$percent <- cumsum(data$size)/sum(data$size)
 
@@ -1500,7 +1518,7 @@ ggplot(data, aes(x=cluster, y=percent)) +
      geom_line() +
      geom_vline(xintercept=274, color='red') +
      scale_x_log10() + scale_y_log10()
-ggsave('dim_returns.cutoff.png')
+ggsave('analysis/clustering/seqClust/clustering/dim_returns.cutoff.png')
 #+END_SRC
 
 *** D5 triplicate
