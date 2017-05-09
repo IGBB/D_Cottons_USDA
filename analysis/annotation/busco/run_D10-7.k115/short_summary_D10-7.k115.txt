@@ -1,0 +1,15 @@
+# BUSCO version is: 2.0 
+# The lineage dataset is: embryophyta_odb9 (Creation date: 2016-02-13, number of species: 30, number of BUSCOs: 1440)
+# To reproduce this run: python /usr/local/igbb/busco_v2/BUSCO.py -i /scratch/thrash/shane.gossypiumD//analysis/assemble/D10-7/D10-7.k115.filtered.fa -o D10-7.k115 -l /scratch/thrash/shane.gossypiumD//analysis/annotation/busco/db/embryophyta_odb9/ -m genome -c 20 --long -t tmp_D10-7.k115 -sp arabidopsis
+#
+# Summarized benchmarking in BUSCO notation for file /scratch/thrash/shane.gossypiumD//analysis/assemble/D10-7/D10-7.k115.filtered.fa
+# BUSCO was run in mode: genome
+
+	C:90.9%[S:81.6%,D:9.3%],F:2.9%,M:6.2%,n:1440
+
+	1309	Complete BUSCOs (C)
+	1175	Complete and single-copy BUSCOs (S)
+	134	Complete and duplicated BUSCOs (D)
+	42	Fragmented BUSCOs (F)
+	89	Missing BUSCOs (M)
+	1440	Total BUSCO groups searched
