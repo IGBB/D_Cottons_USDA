@@ -55,6 +55,26 @@
 %\usepackage[applemac]{inputenc} %applemac support if unicode package fails
 %\usepackage[latin1]{inputenc} %UNIX support if unicode package fails
 
+% Modifications for comments
+% \usepackage[paperwidth=275.9mm, paperheight=279.4mm]{geometry} %regular letter size is 215.9 wide by 279.44 long
+% \setlength{\evensidemargin}{95mm}
+%\usepackage[dvipsnames,svgnames,x11names]{xcolor}
+\usepackage[markup=underlined]{changes}
+
+\definechangesauthor[color=red]{Corrinne}
+\definechangesauthor[color=blue]{Justin}
+%%% Alternative definition to have the remarks
+%%% in the margins instead of footnotes
+\usepackage{todonotes}
+\setlength{\marginparwidth}{3cm}
+\makeatletter
+\setremarkmarkup{\todo[color=Changes@Color#1!20,size=\scriptsize]{#1: #2}}
+\makeatother
+
+%% Rather hacky definition of a plain remark/note
+%% by riding on \added
+\newcommand{\note}[2][]{\added[id=#1,remark={#2}]{}}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                                             %%
@@ -275,9 +295,9 @@ Text for this section.
 %% Background %%
 %%
 \section*{Background}
-The American diploid “D-genome” cottons (subgenus \textit{Houzingenia}) comprise a monophyletic clade of cytogenetically and morphologically distinct species largely distributed from Southwest Mexico to Arizona, with additional disjunct species distributions in Peru and the Galapagos Islands \note[Corrinne]{which citations here}. Among the 13 species currently included in the D-genome /note[Corrinne]{although see Ulloa 2013} are \textit{G. raimondii} (D5), the model diploid progenitor to wild and domesticated allopolyploid cotton, and \textit{G. harknessii} (D2-2), an important species for cytoplasmic male sterility in cotton. Accordingly, the evolutionary relationships among these species, and their relationship to the allopolyploid species, has been a recurring subject in systematics and evolution.  
+The American diploid “D-genome” cottons (subgenus \textit{Houzingenia}) comprise a monophyletic clade of cytogenetically and morphologically distinct species largely distributed from Southwest Mexico to Arizona, with additional disjunct species distributions in Peru and the Galapagos Islands \note[Corrinne]{which citations here, Endrizzi et al 1985}. Among the 13 species currently included in the D-genome /note[Corrinne]{although see Ulloa 2013} are \textit{G. raimondii} (D5), the model diploid progenitor to wild and domesticated allopolyploid cotton, and \textit{G. harknessii} (D2-2), an important species for cytoplasmic male sterility in cotton.  Classic cytogenetic research regarding interspecific meiotic pairing patterns revealed that the origin of one allopolyploid progenitor was derived from subgenus \textit{Houzingenia} \note[Corrinne]{Endrizzi 1985, others?}. The close relationship of \textit{Houzingenia} to the agronomically important polyploid species, along with the relative ease of sampling this subgenus for early cotton taxonomists, led to the much of the current understanding of the relationships among D-genome species. 
 
-Classic cytogenetic investigations into meiotic pairing among species laid the foundation upon which cotton evolutionary studies have been built, both by dividing species into distinct genome groups (i.e., subgenera) and by revealing which subgenera were reunited in the allopolyploid species, namely \textit{Gossypium} and \textit{Houzingenia}/note[Corrinne]{cite Endrizzi et al 1985}. The revelation of the American D-genome cottons as one ancestor to the agronomically important allopolyploid species, along with the relative ease of sampling this subgenus for early cotton taxonomists, led to the much of the current understanding of the relationships among D-genome species.
+These early taxonomists divided subgenus \textit{Houzingenia} into two sections and six subsections, whose species alliances have largely been retained by subsequent phylogenetic studies \note[Corrinne]{Cronn et al., 1996; Seelanan et al., 1997; Small and Wendel, 2000b; Wendel and Albert, 1992; Wendel et al., 1995b; alvarez 2005}. Several molecular datasets have been used to evaluate these relationships, including chloroplast restriction sites \note[Corrinne]{citation}; simple sequence repeat (SSR) and expressed sequence tag (EST)-SSR markers \note[Corrinne]{citation}; random amplified polymorphic DNA (RAPD) markers \note[Corrinne]{citation}; internal transcribed sequences (ITS) \note[Corrinne]{citation}; and few single-copy nuclear genes \note[Corrinne]{citation}. Relationships among the six subsections, however, remain unclear despite numerous, and often conflicting, studies \note[Corrinne]{Cronn et al., 1996; Liu et al., 2001b; Small and Wendel, 2000b more citations}. Determining the closest living relative of the D-genome ancestor to the polyploid, however, has been met with greater success. Early morphological and cytogenetic comparisons using intergenomic hybrids quickly identified G. raimondii as the closest living relative to the D-genome ancestor of polyploid cotton species (Stephens, 1944b Hutchinson et al., 1945, 1947 ; Gerstel and Phillips, 1958; Phillips, 1964; reviewed in Wendel and Cronn 2003). Subsequent analyses have largely supported this observation (Abdalla et al., 2001; cronn 1999, liu 2001, Cronn et al., 1996 Seelanan et al., 1997 Small et al., 1998; Small and Wendel, 2000a,b), with few conflicts (see, however Wendel et al., 1995b; I know there are others…. What are they?).
 
 %\cite{koon,oreg,khar,zvai,xjon,schn,pond,smith,marg,hunn,advi,koha,mouse}
 
