@@ -1,6 +1,5 @@
 This is BibTeX, Version 0.99dThe top-level auxiliary file: Dresequencing.aux
 The style file: bmc-mathphys.bst
+I found no \citation commands---while reading file Dresequencing.aux
 Database file #1: bmc_article.bib
-Warning--entry type for "khar" isn't style-file defined
---line 45 of file bmc_article.bib
-(There was 1 warning)
+(There was 1 error message)
