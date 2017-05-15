@@ -161,7 +161,46 @@ png("cotton.ordination.log.png", 5000, 5000, pointsize=12, res=600)
 ggplot(logcmdpoints, aes(x=V1, y=V2, color=subsection)) + geom_point(size=2) + xlab("PCoA component 1") + ylab("PCoA component 2") + geom_text_repel(aes(label=species))
 dev.off()
 
+
+### PCA to get the variation ###
+
+cluster.pca <- prcomp(logdata, scale = TRUE)
+cluster.eig <- get_eigenvalue(cluster.pca)
+
+ind.coord <- cluster.pca$x
+
+subsections <- as.data.frame(logdata[,1:2])
+subsections$sub <-c("Houzingenia", "Houzingenia", 
+"Caducibracteata", "Caducibracteata", 
+"Integrifolia", "Integrifolia", "Integrifolia",
+"Erioxylum", "Erioxylum",
+"Austroamericana","Austroamericana","Austroamericana","Austroamericana","Austroamericana","Austroamericana","Austroamericana",
+"Selera", "Selera", 
+"Erioxylum","Erioxylum",
+"Houzingenia", "Houzingenia", 
+"Erioxylum",
+"Caducibracteata","Caducibracteata","Caducibracteata","Caducibracteata",
+"Erioxylum")
+
+subfac <- as.factor(subsections[,3])
+
+png("cotton_outgroup.PCA.direct.annot.png", 5000, 5000, pointsize=12, res=600)
+fviz_pca_ind(cluster.pca, habillage=subfac, pointsize =2, invisible="quali", repel=TRUE, labelsize=3) + theme_minimal() + labs(title = "PCA of log counts") + theme(axis.text = element_text(size = rel(1.5)), plot.margin=margin(2,2,2,2,"cm"), plot.title=element_text(face="bold", hjust=0.5), axis.title.x = element_text(face="bold", hjust=0.5), axis.title.y = element_text(face="bold", vjust=0.5), legend.position="none") +theme_set(theme_grey(base_size=12))
+dev.off()
+
+
+
+
+
+
 ### took out Procrustea ANOVA because nothing appears different
+# maybe it should go back in to differentiate subsections?
+
+
+
+
+
+
 
 ########### characterize composition ###########
 
@@ -269,28 +308,40 @@ ggplot(KBm, aes(x=Lineage, y=value, fill = variable)) + geom_bar(stat = "identit
 
 dev.off()
 
-sum(KBsum$kirkii)/1000 # convert to Mb
-# [1] 110.3615
-sum(KBsum$kokia_)/1000 # convert to Mb
-# [1] 109.4685
+D1<-sum(KBsum$D1sum)/1000
+D2_1<-sum(KBsum$D2.1sum)/1000
+D2_2<-sum(KBsum$D2.2sum)/1000
+D3d<-sum(KBsum$D3Dsum)/1000
+D3k<-sum(KBsum$D3Ksum)/1000
+D4<-sum(KBsum$D4sum)/1000
+D5<-sum(KBsum$D5sum)/1000
+D6<-sum(KBsum$D6sum)/1000
+D7<-sum(KBsum$D7sum)/1000
+D8<-sum(KBsum$D8sum)/1000
+D9<-sum(KBsum$D9sum)/1000
+D10<-sum(KBsum$D10sum)/1000
+D11<-sum(KBsum$D11sum)/1000
+A1<-sum(KBsum$A1sum)/1000
+A2<-sum(KBsum$A2sum)/1000
+F1<-sum(KBsum$F1sum)/1000
 
-sum(KBsum$D1sum)/1000
-sum(KBsum$D2.1sum)/1000
-sum(KBsum$D2.2sum)/1000
-sum(KBsum$D3Dsum)/1000
-sum(KBsum$D3Ksum)/1000
-sum(KBsum$D4sum)/1000
-sum(KBsum$D5sum)/1000
-sum(KBsum$D6sum)/1000
-sum(KBsum$D7sum)/1000
-sum(KBsum$D8sum)/1000
-sum(KBsum$D9sum)/1000
-sum(KBsum$D10sum)/1000
-sum(KBsum$D11sum)/1000
-sum(KBsum$A1sum)/1000
-sum(KBsum$A2sum)/1000
-sum(KBsum$F1sum)/1000
+names <- c("D1","D2-1","D2-2","D3d", "D3k", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "A1", "A2", "F1")
+TEamounts <- as.data.frame(names)
+TEamounts$totalTE <-(c(D1,D2_1,D2_2, D3d, D3k, D4, D5, D6, D7, D8, D9, D10, D11, A1, A2, F1))
+TEamounts$genomeSize <- (c(841,856,910,910,880,919,880,841,934,851,934,910,929,1667,1698,1311))
+TEamounts$percent <- TEamounts$totalTE/TEamounts$genomeSize
 
+gypsies <- KBsum[7,(1:17)]
+row.names(gypsies) <- gypsies$Lineage
+gypsies$Lineage <- NULL
+TEamounts$gypsies <- t(gypsies/1000)
+TEamounts$gypPerc <- TEamounts$gypsies/TEamounts$genomeSize
+
+
+# min(TEamounts$percent)
+# [1] 0.4451014
+# max(TEamounts$percent[c(1:13)])
+# [1] 0.5196145
 
 
 
