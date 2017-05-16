@@ -123,8 +123,8 @@ cmdpoints$subsection <- gsub("D1|D8", "Houzingenia", cmdpoints$subsection)
 
 
 # should add R hue here to differentiate colors
-png("cotton.ordination.png", 5000, 5000, pointsize=12, res=600)
-ggplot(cmdpoints, aes(x=V1, y=V2, color=subsection)) + geom_point(size=2) + xlab("PCoA component 1") + ylab("PCoA component 2") + geom_text_repel(aes(label=species))
+png("cotton.GS.ordination.png", 5000, 5000, pointsize=12, res=600)
+ggplot(cmdpoints, aes(x=V1, y=V2, color=subsection)) + geom_point(size=1) + xlab("PCoA component 1") + ylab("PCoA component 2") + geom_text_repel(aes(label=species))+stat_ellipse()
 dev.off()
 
 ### PCoA of log-transformed data ###
@@ -158,7 +158,7 @@ logcmdpoints$subsection <- gsub("D6", "Selera", logcmdpoints$subsection)
 logcmdpoints$subsection <- gsub("D1|D8", "Houzingenia", logcmdpoints$subsection)
 
 png("cotton.ordination.log.png", 5000, 5000, pointsize=12, res=600)
-ggplot(logcmdpoints, aes(x=V1, y=V2, color=subsection)) + geom_point(size=2) + xlab("PCoA component 1") + ylab("PCoA component 2") + geom_text_repel(aes(label=species))
+ggplot(logcmdpoints, aes(x=V1, y=V2, color=subsection)) + geom_point(size=2) + xlab("PCoA component 1") + ylab("PCoA component 2") + geom_text_repel(aes(label=species))+stat_ellipse()
 dev.off()
 
 
@@ -189,17 +189,36 @@ fviz_pca_ind(cluster.pca, habillage=subfac, pointsize =2, invisible="quali", rep
 dev.off()
 
 
-
-
-
-
 ### took out Procrustea ANOVA because nothing appears different
 # maybe it should go back in to differentiate subsections?
 
+### which species differ from one another in repeats
+### https://groups.google.com/forum/#!topic/geomorph-r-package/8_B2thhxU_o
 
+# Adams, D.C., and E. Otarola-Castillo. 2013. geomorph: an R package for the collection and analysis of geometric morphometric shape data. Methods in Ecology and Evolution. 4:393-399.
+# Adams, D.C., M. L. Collyer, A. Kaliontzopoulou, and E. Sherratt. 2016 geomorph: Software for geometric morphometric analyses. R package version 3.0.2 http://cran.r-project.org/web/packages/geomorph/index.html.
 
+# procD.lm with data as raw count data
+mycountdata <- as.matrix(t(ord_table))
+count.diff <- advanced.procD.lm(mycountdata~subfac, ~1, groups=~subfac)
 
+#Effect sizes (Z)
+#                Austroamericana Caducibracteata Erioxylum Houzingenia Integrifolia    Selera
+#Austroamericana        0.000000       1.5480375 1.4458440   1.1730662    1.4247672 1.1961982
+#Caducibracteata        1.548037       0.0000000 0.8888284   1.1820123    1.0312718 1.0868600
+#Erioxylum              1.445844       0.8888284 0.0000000   1.2057821    0.9522423 1.1302263
+#Houzingenia            1.173066       1.1820123 1.2057821   0.0000000    1.2384624 0.7678256
+#Integrifolia           1.424767       1.0312718 0.9522423   1.2384624    0.0000000 1.2668033
+#Selera                 1.196198       1.0868600 1.1302263   0.7678256    1.2668033 0.0000000
 
+#P-values
+#                Austroamericana Caducibracteata Erioxylum Houzingenia Integrifolia Selera
+#Austroamericana           1.000           0.033     0.047       0.201        0.080  0.172
+#Caducibracteata           0.033           1.000     0.565       0.211        0.333  0.247
+#Erioxylum                 0.047           0.565     1.000       0.181        0.435  0.221
+#Houzingenia               0.201           0.211     0.181       1.000        0.192  0.637
+#Integrifolia              0.080           0.333     0.435       0.192        1.000  0.171
+#Selera                    0.172           0.247     0.221       0.637        0.171  1.000
 
 
 ########### characterize composition ###########
