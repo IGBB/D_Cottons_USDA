@@ -1056,6 +1056,22 @@ for file in $(find $DIR/analysis/phylo/bayes -name *.nxs | sed -n ${S},${E}p); d
 done
 #+END_SRC
 
+#+HEADER: :shebang #!/bin/bash :tangle analysis/phylo/mb/run.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N MrBayes -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh  :var DIR=(file-name-directory buffer-file-name)
+PATH=/usr/local/igbb/mrbayes-3.2.5/bin/:/usr/local/mpi/x86_64/openmpi-1.8.2/bin:$PATH
+LD_LIBRARY_PATH=/usr/local/mpi/x86_64/openmpi-1.8.2/lib:$LD_LIBRARY_PATH
+cd $DIR/analysis/phylo/mb/run/
+
+
+S=$[ ${PBS_ARRAYID} * 50 + 1 ]
+E=$[ ${PBS_ARRAYID} * 50 + 50]
+
+for file in $(find $DIR/analysis/phylo/mb -name *.nxs | sed -n ${S},${E}p); do
+    mpirun -np 16 mb $file > $file.stdout
+done
+#+END_SRC
+
 
 #+HEADER: :shebang #!/bin/bash :tangle analysis/phylo/raxml_runs/raxml.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N raxML -l nodes=1:ppn=12 -l walltime=72:00:00 -q q48p192h
