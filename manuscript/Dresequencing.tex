@@ -118,8 +118,8 @@
 %%                                          %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%\title{Thirteen genome sequences representing the entire subgenus Houzingenia (Gossypium): insights into evolution of the New World diploid cottons}
-\title{Thirteen genomes}
+\title{Thirteen genome sequences representing the entire subgenus Houzingenia (Gossypium): insights into evolution of the New World diploid cottons}
+%\title{Thirteen genomes}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                                          %%
 %% Enter the authors here                   %%
@@ -316,10 +316,10 @@ Chloroplast reads were also recovered from the raw reads, representing an averag
 
 
 \subsection*{Gene evolution stuff}
-Text for this sub-heading \ldots
+Justin's got this section/two covered.  Patterns of dn/ds evolution, patterns of CNV, etc.\ldots
 
 \subsection*{Phylogenetics}
-Text for this sub-heading \ldots
+Right now, we have a raxml/astral tree, but idk how to get the branch lengths on there for use in ancestral state reconstructions.  Probably have to make a concatenated nuclear tree for that.  Could see if we could get TICR running, but it is not the easiest and may take a while to get results.\ldots
 
 \subsection*{Transposable element characterization}
 Similar to previous reports, repetitive DNAs contribute roughly half of the total genome sequence for all species in subgenus \textit{Houzingenia}, from an average of 44.5\% in D7 to 52\% in \textit{G. anomalum D2-1}. Like most flowering plants, a vast majority of this sequence is due to the occupation of class II \textit{gypsy} elements, which comprise 
@@ -327,7 +327,11 @@ Similar to previous reports, repetitive DNAs contribute roughly half of the tota
 Multi-dimensional transposable element profile visualization using both log transformed and percent-genome size standardized counts showed considerable overlap among species, and even among subsections (Figure Ordination). Multivariate t-distribution confidence ellipses for each subsection overlap at least one other. Even those subsections where insufficient sampling precludes the generation of a confidence ellipse (i.e., Selera and Integrifolia), the plotted data points are contained within the occupied space of another subsection. Selera, for example, is contained within the confidence ellipse for both Caducibractaea and Houzingenia; Integrifolia is within Houzingenia and Austroamericana. PCA visualization of the same data suggests that 31.6\% and 13.8\% of the variability can be explained by the first two components; however, to formerly compare the overlap in repetitive profiles among subsections, we performed a Procrustes ANOVA with complex linear models, as implemented in the R package \{geomorph\}. For this analysis, we compared each subsection using all representatives of that subsection as indicators of variance. Few comparisons showed statistically significant differences, with the patterns of repetitive abundance differing only in Austroamericana versus both Caducibractaea and Erioxylum (p<0.05). Interestingly, the variation in repetitive elements found in monotypic Selera, i.e., \textit{G. gossypioides}, was not distinct from the remainder of subgenus \textit{Houzingenia}. This stands in contrast to previous reports (\textbf{cite these}), which noted a relative abundance of repeats derived from "African cottons" (here represented by subgenera \textit{Gossypium} and \textit{Longiloba}, i.e., A- and F-genome species). This result is further apparent when including the African subgenera in the ordination (Figure African Ordination); that is, \textit{G. gossypioides} is clearly lumped with the other \textit{Houzingenia} species. 
 
 \subsection*{Ancestral state reconstructions}
-Text for this sub-heading \ldots
+Once the phylogeny is created, we can do ancestral state reconstructions for key TE types, criteria for selection TBD.
+
+\subsection*{Patterns of indel evolution}
+GATK analysis of indels, use F1 as outgroup. What sort of patterns do we want to do? Gain and loss along phylogeny, rate of gain and loss along branches? This could be complicated. Look for shared indels? Unique indels?
+
 
 \section*{Discussion}
 \subsection*{Discussion subheading}
