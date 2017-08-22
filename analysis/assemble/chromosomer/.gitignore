@@ -1,0 +1,14 @@
+
+#Ignore genome and split files (takes a few minutes to recreate)
+genome.fa        
+genome.part-*.fa 
+
+#Ignore individual blast results (saving the cat'd version) 
+fragment_alignments.part-*.txt
+
+#Ignore everything chromosomer outputs except results and cat'd blast results
+*.chromosomes.fa
+*.fragment_map.txt
+*.fragment_map_unlocalized.txt
+*.fragment_map_unplaced.txt
+*.length
