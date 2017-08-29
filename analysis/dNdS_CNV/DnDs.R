@@ -43,8 +43,8 @@ dS.summary.df[dS.summary.df=="NA (NA-NA)"] <- NA
 
 
 dN.summary.table <- summarize(groups, LQ = quantile(dN, 0.25), Median = median(dN), UQ = quantile(dN, 0.75))
-levels(dN.summary.table$sspecies) <- c(levels(dN.summary.table$sspecies), "D1-35")
-levels(dN.summary.table$qspecies) <- c(levels(dN.summary.table$qspecies), "D9-4")
+levels(dN.summary.table$sspecies) <- c(levels(dN.summary.table$sspecies), "D1-35","---")
+levels(dN.summary.table$qspecies) <- c(levels(dN.summary.table$qspecies), "D9-4","---")
 dN.summary.table[nrow(dN.summary.table) + 1,] <- c("D1-35", "D1-35", NA, NA, NA)
 dN.summary.table[nrow(dN.summary.table) + 1,] <- c("D9-4", "D9-4", NA, NA, NA)
 dN.summary.table$IQR <- paste(dN.summary.table$LQ, dN.summary.table$UQ, sep="-")
@@ -54,7 +54,10 @@ dN.summary.df <- as.data.frame(acast(dN.summary.table, sspecies~qspecies, value.
 dN.summary.df <- dN.summary.df[order(rownames(dN.summary.df)),order(colnames(dN.summary.df))]
 dN.summary.df[dN.summary.df=="NA (NA-NA)"] <- NA
 
-dN.summary.df[is.na(dN.summary.df)] <- "-" #THIS DOESN"T FREAKING WORK AND I DON"T KNOW WHY 
+dN.summary.df <- data.frame(lapply(dN.summary.df, as.character), stringsAsFactors=FALSE)
+dS.summary.df <- data.frame(lapply(dS.summary.df, as.character), stringsAsFactors=FALSE)
+
+dN.summary.df[is.na(dN.summary.df)] <- "---" #THIS DOESN"T FREAKING WORK AND I DON"T KNOW WHY 
 Total.df <- replace(dS.summary.df, is.na(dS.summary.df), dN.summary.df[is.na(dS.summary.df)])
 
 
