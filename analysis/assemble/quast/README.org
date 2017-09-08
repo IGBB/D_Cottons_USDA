@@ -1,0 +1,87 @@
+#+TITLE: Quast
+#+AUTHOR: Tony Arick
+#+TODO: BAD TODO | GOOD QUEUE DONE SKIP
+#+DRAWERS: HIDDEN
+#+OPTIONS: d:RESULTS 
+#+STARTUP: hideblocks align
+
+#+PROPERTY:  header-args :exports results :eval never-export
+#+OPTIONS: ^:nil
+
+
+#+NAME: genomes
+| Species | Genome                                                       |
+|---------+--------------------------------------------------------------|
+| D1-35   | analysis/assemble/chromosomer/D1-35/D1-35.complete.fa.gz     |
+| D10-7   | analysis/assemble/chromosomer/D10-7/D10-7.complete.fa.gz     |
+| D10-8   | analysis/assemble/chromosomer/D10-8/D10-8.complete.fa.gz     |
+| D11-1   | analysis/assemble/chromosomer/D11-1/D11-1.complete.fa.gz     |
+| D2-1-6  | analysis/assemble/chromosomer/D2-1-6/D2-1-6.complete.fa.gz   |
+| D2-2    | analysis/assemble/chromosomer/D2-2/D2-2.complete.fa.gz       |
+| D3-D-27 | analysis/assemble/chromosomer/D3-D-27/D3-D-27.complete.fa.gz |
+| D3-K-57 | analysis/assemble/chromosomer/D3-K-57/D3-K-57.complete.fa.gz |
+| D3K-56  | analysis/assemble/chromosomer/D3K-56/D3K-56.complete.fa.gz   |
+| D4-12   | analysis/assemble/chromosomer/D4-12/D4-12.complete.fa.gz     |
+| D4-185  | analysis/assemble/chromosomer/D4-185/D4-185.complete.fa.gz   |
+| D5-8    | analysis/assemble/chromosomer/D5-8/D5-8.complete.fa.gz       |
+| D6-5    | analysis/assemble/chromosomer/D6-5/D6-5.complete.fa.gz       |
+| D6-7    | analysis/assemble/chromosomer/D6-7/D6-7.complete.fa.gz       |
+| D7-157  | analysis/assemble/chromosomer/D7-157/D7-157.complete.fa.gz   |
+| D7-4    | analysis/assemble/chromosomer/D7-4/D7-4.complete.fa.gz       |
+| D8-8    | analysis/assemble/chromosomer/D8-8/D8-8.complete.fa.gz       |
+| D8-9    | analysis/assemble/chromosomer/D8-9/D8-9.complete.fa.gz       |
+| D9-4    | analysis/assemble/chromosomer/D9-4/D9-4.complete.fa.gz       |
+
+# | D5-6    | analysis/assemble/D5-6/40/40-scaffolds.fa       |
+# | D5-8    | analysis/assemble/D5-8/55/55-scaffolds.fa       |
+# | D7-4    | analysis/assemble/D7-4/50/50-scaffolds.fa       |
+# | D2-1-6  | analysis/assemble/D2-1-6/70/70-scaffolds.fa     |
+# | D6-7    | analysis/assemble/D6-7/45/45-scaffolds.fa       |
+# | D8-8    | analysis/assemble/D8-8/70/70-scaffolds.fa       |
+# | D10-8   | analysis/assemble/D10-8/40/40-scaffolds.fa      |
+# | D6-5    | analysis/assemble/D6-5/70/70-scaffolds.fa       |
+# | D1-35   | analysis/assemble/D1-35/70/70-scaffolds.fa      |
+# | D3-K-57 | analysis/assemble/D3-K-57/70/70-scaffolds.fa    |
+# | D4-185  | analysis/assemble/D4-185/60/60-scaffolds.fa     |
+# | D8-9    | analysis/assemble/D8-9/40/40-scaffolds.fa       |
+# | D2-2    | analysis/assemble/D2-2/65/65-scaffolds.fa       |
+# | D3K-56  | analysis/assemble/D3K-56/60/60-scaffolds.fa     |
+
+
+#+BEGIN_SRC sh
+swsetup singularity
+export SINGULARITY_CACHEDIR=/work/maa146/cache
+alias s=singularity
+s pull --size=4096 docker://quay.io/biocontainers/quast:4.5--boost1.61_1
+mv quast-4.5--boost1.61_1.img quast-4.5.img
+#+END_SRC
+
+#+HEADER: :shebang #!/bin/bash :tangle run.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N Align -l nodes=1:ppn=20:mem132 -l walltime=48:00:00
+#+BEGIN_SRC sh :var libs=genomes 
+cd $PBS_O_WORKDIR
+
+swsetup ()
+{
+    eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`
+}
+swsetup singularity
+alias s=singularity
+
+ROOT="$(git rev-parse --show-toplevel)"
+DIR=$ROOT/analysis/assemble/quast/ 
+
+DB=$ROOT/db/G.raimondii_JGI_221_v2.0.assembly.fasta
+
+
+awk '{print root "/" $2}' root=$ROOT <<<"$libs" |
+    xargs singularity exec $DIR/quast-4.5.img quast.py \
+          -o $DIR/chromosomer.report \
+          -R $DB \
+          --threads $PBS_NUM_PPN \
+          -L \
+          --eukaryote \
+           --scaffolds \
+          --no-plots \
+          --no-html 
+#+END_SRC
