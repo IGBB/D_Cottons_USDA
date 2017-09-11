@@ -1800,32 +1800,33 @@ Replace $num_part with the number of parts that the genome is divided into
 | 1033 |  1033 |   6 | 696 | 54.88e6 | 61.19e6 | 61.7e6 | 57.28e6 | 69.57e6 | 748.1e6 | G.raimondii_JGI_221_v2.0.assembly.fasta |
 
 #+NAME:completed
-| Species | Path                                         | Number of Parts | Number of Pieces | esize |
-|---------+----------------------------------------------+-----------------+------------------+-------|
-| D1-35   | analysis/assemble/D1-35/70/70-scaffolds.fa   |             945 |              100 |  9074 |
-| D10-8   | analysis/assemble/D10-8/40/40-scaffolds.fa   |             285 |              100 |  1066 |
-| D11-1   | analysis/assemble/D11-1/70/70-scaffolds.fa   |             921 |               99 | 10495 |
-| D2-1-6  | analysis/assemble/D2-1-6/70/70-scaffolds.fa  |             957 |              100 |  3891 |
-| D2-2    | analysis/assemble/D2-2/65/65-scaffolds.fa    |            1260 |              100 |  5724 |
-| D3-D-27 | analysis/assemble/D3-D-27/70/70-scaffolds.fa |             927 |              100 | 10350 |
-| D3-K-57 | analysis/assemble/D3-K-57/70/70-scaffolds.fa |            1095 |              100 |  7051 |
-| D3K-56  | analysis/assemble/D3K-56/60/60-scaffolds.fa  |            1327 |              100 |  5467 |
-| D4-12   | analysis/assemble/D4-12/70/70-scaffolds.fa   |            1060 |              100 |  5255 |
-| D4-185  | analysis/assemble/D4-185/60/60-scaffolds.fa  |            1366 |              100 |  4778 |
-| D5-6    | analysis/assemble/D5-6/40/40-scaffolds.fa    |             790 |              100 |  1587 |
-| D5-8    | analysis/assemble/D5-8/40/40-scaffolds.fa    |             878 |              100 |  2718 |
-| D6-5    | analysis/assemble/D6-5/70/70-scaffolds.fa    |            1039 |              100 |  7621 |
-| D6-7    | analysis/assemble/D6-7/55/55-scaffolds.fa    |            1035 |              100 |  1918 |
-| D7-157  | analysis/assemble/D7-157/60/60-scaffolds.fa  |            1360 |              100 |  4940 |
-| D7-4    | analysis/assemble/D7-4/50/50-scaffolds.fa    |             973 |              100 |  3267 |
-| D8-8    | analysis/assemble/D8-8/70/70-scaffolds.fa    |             840 |              100 |  9368 |
-| D8-9    | analysis/assemble/D8-9/40/40-scaffolds.fa    |             411 |              100 |  1765 |
-| D9-4    | analysis/assemble/D9-4/70/70-scaffolds.fa    |             992 |              100 |  5530 |
+| Species    | Path                                            | Number of Parts | Number of Pieces | esize |
+|------------+-------------------------------------------------+-----------------+------------------+-------|
+| D1-35      | analysis/assemble/D1-35/70/70-scaffolds.fa      |             945 |              100 |  9074 |
+| D10-8      | analysis/assemble/D10-8/40/40-scaffolds.fa      |             285 |              100 |  1066 |
+| D11-1      | analysis/assemble/D11-1/70/70-scaffolds.fa      |             921 |               99 | 10495 |
+| D2-1-6     | analysis/assemble/D2-1-6/70/70-scaffolds.fa     |             957 |              100 |  3891 |
+| D2-2       | analysis/assemble/D2-2/65/65-scaffolds.fa       |            1260 |              100 |  5724 |
+| D3-D-27    | analysis/assemble/D3-D-27/70/70-scaffolds.fa    |             927 |              100 | 10350 |
+| D3-K-57    | analysis/assemble/D3-K-57/70/70-scaffolds.fa    |            1095 |              100 |  7051 |
+| D3K-56     | analysis/assemble/D3K-56/60/60-scaffolds.fa     |            1327 |              100 |  5467 |
+| D4-12      | analysis/assemble/D4-12/70/70-scaffolds.fa      |            1060 |              100 |  5255 |
+| D4-185     | analysis/assemble/D4-185/60/60-scaffolds.fa     |            1366 |              100 |  4778 |
+| D5-6       | analysis/assemble/D5-6/40/40-scaffolds.fa       |             790 |              100 |  1587 |
+| D5-8       | analysis/assemble/D5-8/40/40-scaffolds.fa       |             878 |              100 |  2718 |
+| D6-5       | analysis/assemble/D6-5/70/70-scaffolds.fa       |            1039 |              100 |  7621 |
+| D6-7       | analysis/assemble/D6-7/55/55-scaffolds.fa       |            1035 |              100 |  1918 |
+| D7-157     | analysis/assemble/D7-157/60/60-scaffolds.fa     |            1360 |              100 |  4940 |
+| D7-4       | analysis/assemble/D7-4/50/50-scaffolds.fa       |             973 |              100 |  3267 |
+| D8-8       | analysis/assemble/D8-8/70/70-scaffolds.fa       |             840 |              100 |  9368 |
+| D8-9       | analysis/assemble/D8-9/40/40-scaffolds.fa       |             411 |              100 |  1765 |
+| D9-4       | analysis/assemble/D9-4/70/70-scaffolds.fa       |             992 |              100 |  5530 |
+| D10-7.k115 | analysis/assemble/D10-7/D10-7.k115.scaffolds.fa |                 |                  |       |
 
 #+NAME:genome_paths
-| Species    | Path                                            | Part Size | Number of Pieces | esize |
-|------------+-------------------------------------------------+-----------+------------------+-------|
-| D10-7.k115 | analysis/assemble/D10-7/D10-7.k115.scaffolds.fa |           |                  |       |
+| Species | Path | Part Size | Number of Pieces | esize |
+|---------+------+-----------+------------------+-------|
+
 
 #+NAME:not_filtered
 | Species | Path | Number of Parts |   |
@@ -1844,6 +1845,17 @@ Replace $num_part with the number of parts that the genome is divided into
     cp /work/maa146/shane.gossypiumD/${lib[1]} $OUT_PATH
   done <<< "$genomes";
 #+END_SRC
+
+#+HEADER: :shebang #!/bin/bash :tangle get.sh
+#+BEGIN_SRC sh :var genomes=completed :var DIR=(file-name-directory buffer-file-name)
+  while read -a lib; do 
+    echo ${lib[0]}
+    OUT_PATH=$(dirname ${lib[1]})
+    mkdir -p $DIR/$OUT_PATH
+    git annex get ${lib[1]} --from=origin
+  done <<< "$genomes";
+#+END_SRC
+
 
 #+COMMENT: rename sequences in genome and filter at minimum length
 #+HEADER: :shebang #!/bin/bash :tangle filter.sh :mkdirp yes
@@ -1888,7 +1900,7 @@ Replace $num_part with the number of parts that the genome is divided into
 #+COMMENT: run BUSCO on filtered genome
 #+HEADER: :shebang #!/bin/bash :tangle analysis/annotation/busco/run.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N busco -l nodes=1:ppn=20 -l walltime=48:00:00
-#+BEGIN_SRC sh :var DIR=(file-name-directory buffer-file-name) :var genomes=genome_paths
+#+BEGIN_SRC sh :var DIR=(file-name-directory buffer-file-name) :var genomes=completed
   swsetup()
   {
     eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`
@@ -1903,8 +1915,8 @@ Replace $num_part with the number of parts that the genome is divided into
   read -a lib < <(sed "${PBS_ARRAYID}q;d" <<< "$genomes")
   IN_PATH=$DIR/$(dirname ${lib[1]})
   cd $DIR/analysis/annotation/busco
-  /usr/local/igbb/busco_v2/BUSCO.py -i $IN_PATH/${lib[0]}.filtered.fa -l $DIR/analysis/annotation/busco/db/embryophyta_odb9/ -m genome --long -c 20 -o ${lib[0]} -r -t tmp_${lib[0]}
-  mkdir -p augustus_setup/config/species/${lib[0]}/
+  /usr/local/igbb/busco_v2/BUSCO.py -i $DIR/analysis/assemble/${lib[0]}/${lib[0]}.filtered.fa -l $DIR/analysis/annotation/busco/db/embryophyta_odb9/ -m genome -c 20 -o ${lib[0]} -r -t tmp_${lib[0]}
+  #mkdir -p augustus_setup/config/species/${lib[0]}/
   #cp run_${lib[0]}/augustus_output/retraining_parameters/* augustus_setup/config/species/${lib[0]}/
   #for file in $(ls -1); do name=$(sed -e 's/BUSCO_D4-12_947729041/D4-12/' <<< "$file"); cp $file $name; done
 #+END_SRC
@@ -3205,3 +3217,353 @@ D6-7.Ggoss1 needed to be fixed.
 |  125379 |   1240 |     84 | 500 |  677 | 1922 | 29711 |  13386 | 53512 | 1728923 | 100-contigs.fa   |
 |  124123 |   1315 |    123 | 500 |  777 | 1920 | 29711 |  16596 | 95521 | 2015255 | 100-scaffolds.fa |
 
+
+* SNPs
++Workflow from [[https://www.broadinstitute.org/gatk/guide/best-practices][GATK Best Practices]]+
+Workflow from [[http://www.htslib.org/workflow/][Samtools]]
+
+** Pre-Processing
+*** Split
+#+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/dedup/split.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N split -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh :var libs=read_groups[,3] :var DIR=(file-name-directory buffer-file-name) 
+  swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+  swsetup samtools
+
+  PATH=$PATH:/usr/local/gnu/bin/:/usr/local/igbb/bamtools/bin
+  LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/igbb/bamtools/lib/
+  PICARD=/usr/local/igbb/picard-tools-1.140/picard.jar
+  ALIGN=$DIR/analysis/SNP/dedup
+  cd $ALIGN
+  
+  uniq=$(uniq <<< "$libs")
+  parallel -j 5 'mkdir -p {}; cd {}; ln -s /work/thrash/shane.gossypiumD.annex//analysis/d.align/{}.all.bam {}.bam; ln -s /work/thrash/shane.gossypiumD.annex//analysis/d.align/{}.all.bam.bai {}.bam.bai; for chrom in {01..13}; do samtools view -bh {}.bam Chr${chrom} > {}.Chr_${chrom}.bam; done' <<<"$uniq"
+
+#+END_SRC
+
+*** Mark Duplicated
+#+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/dedup/dedup.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N dedup -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh :var libs=read_groups[,3] :var DIR=(file-name-directory buffer-file-name) 
+  swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+  swsetup samtools
+
+  PATH=$PATH:/usr/local/gnu/bin/:/usr/local/igbb/bamtools/bin
+  LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/igbb/bamtools/lib/
+  PICARD=/usr/local/igbb/picard-tools-1.140/picard.jar
+  ALIGN=$DIR/analysis/SNP/dedup
+  cd $ALIGN
+
+  uniq=$(uniq <<< "$libs")
+  read -a lib < <(sed -n -e "${PBS_ARRAYID}p" <<<"$uniq")
+  mkdir -p ${lib[0]}/dedup
+  
+  files=$(ls ${lib[0]} -1 | grep -v dedup | grep Chr)
+  cd ${lib[0]}
+    
+  #parallel -j 20 mv {} {.}.orig.bam <<< "$files"
+
+  #parallel -j 20 java -cp /usr/local/igbb/picard-tools-1.140/htsjdk-1.140.jar htsjdk.samtools.FixBAMFile {.}.orig.bam {} <<< "$files"
+
+  parallel -j 5 java -jar $PICARD MarkDuplicates \
+      INPUT={} OUTPUT=dedup/{.}.dedup.bam \
+      METRICS_FILE={.}.metrics.txt <<< "$files"
+  
+ 
+  parallel -j0 samtools index dedup/{.}.dedup.bam  <<< "$files"
+
+
+#+END_SRC
+*** Realign Indels
+#+BEGIN_SRC sh :var DIR=(file-name-directory buffer-file-name)
+  swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+  swsetup samtools
+
+  PICARD=/usr/local/igbb/picard-tools-1.140/picard.jar
+  DB=$DIR/db/G.raimondii_JGI_221_v2.0.assembly
+
+  java -jar $PICARD NormalizeFasta I=$DB.fasta O=$DB.normalized.fasta 
+  samtools faidx $DB.normalized.fasta
+  java -jar $PICARD CreateSequenceDictionary REFERENCE=$DB.normalized.fasta OUTPUT=$DB.normalized.dict
+#+END_SRC
+
+#+RESULTS:
+
+#+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/realign/target_creator.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N RealignerTargetCreator -l nodes=1:ppn=20 -l walltime=48:00:00 -t 1-31
+#+BEGIN_SRC sh :var libs=read_groups[,3] :var DIR=(file-name-directory buffer-file-name) 
+  swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+  swsetup samtools
+
+  PATH=$PATH:/usr/local/gnu/bin/
+  PICARD=/usr/local/igbb/picard-tools-1.140/picard.jar
+  GATK=/usr/local/igbb/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar
+  ALIGN=$DIR/analysis/SNP
+  DB=$DIR/db/G.raimondii_JGI_221_v2.0.assembly.normalized.fasta
+
+
+  uniq=$(uniq <<< "$libs")
+  read -a lib < <(sed -n -e "${PBS_ARRAYID}p" <<<"$uniq")
+
+  TMP=$ALIGN/realign/${lib[0]}
+  mkdir -p $TMP
+
+  files=$(ls $ALIGN/dedup/${lib[0]}/dedup/*bam | grep Chr)
+  
+  for file in $files; do
+    mkdir $TMP/$(basename ${file%.*}) -p
+    java -Djava.io.tmpdir=$TMP/$(basename ${file%.*}) -Xmx3g -jar $GATK -T RealignerTargetCreator -nt 20 -R $DB \
+        -I $ALIGN/dedup/${lib[0]}/dedup/$(basename ${file%.*}).bam \
+        -o $ALIGN/realign/${lib[0]}/$lib.$(basename ${file%.*}).intervals &> $ALIGN/realign/${lib[0]}/${lib[0]}.$(basename ${file%.*}.)realigner.log
+  done;
+#+END_SRC
+
+#+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/realign/indel_realigner.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N IndelRealigner -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh :var libs=read_groups[,3] :var DIR=(file-name-directory buffer-file-name) 
+  swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+  swsetup samtools
+
+  PATH=$PATH:/usr/local/gnu/bin/
+  PICARD=/usr/local/igbb/picard-tools-1.140/picard.jar
+  GATK=/usr/local/igbb/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar
+  ALIGN=$DIR/analysis/SNP
+  DB=$DIR/db/G.raimondii_JGI_221_v2.0.assembly.normalized.fasta
+
+  uniq=$(uniq <<< "$libs")
+  read -a lib < <(sed -n -e "${PBS_ARRAYID}p" <<<"$uniq")
+
+  TMP=$ALIGN/realign/tmp/${lib[0]}
+  mkdir -p $TMP
+
+  files=$(ls $ALIGN/dedup/${lib[0]}/dedup/*bam | grep Chr)
+
+  for file in $files; do 
+    basename=$(basename $file)
+    name=${basename%.*}
+    mkdir $TMP/$name
+  done;
+
+  parallel -j20 java -Djava.io.tmpdir=$TMP/{/.} -Xmx3g -jar $GATK -T IndelRealigner -R $DB \
+           -I $ALIGN/dedup/${lib[0]}/dedup/${lib[0]}.dedup.bam \
+           -targetIntervals $ALIGN/realign/${lib[0]}/${lib[0]}.{/.}.intervals \
+           -o $ALIGN/realign/${lib[0]}/{/.}.realigned.bam '&>' $ALIGN/realign/${lib[0]}/${lib[0]}.indel_realigner.log <<<"$files"
+
+#+END_SRC
+
+*** SKIP Recalibrate
+
+BaseRecalibrator must have know SNPs. Since AD1 doesn't have know SNPs in a
+usable format, this set was skipped. To continue with the pipeline,
+'*.recal_reads.bam' were symlinked to '*.realigned.bam'.
+
+#+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/recal/recalibrator.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N BaseRecalibrator -l nodes=1:ppn=20 -l walltime=48:00:00 -t 1-31
+#+BEGIN_SRC sh :var libs=read_groups[,0] :var DIR=(file-name-directory buffer-file-name) 
+  swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+  swsetup samtools
+
+  PATH=$PATH:/usr/local/gnu/bin/
+  PICARD=/usr/local/igbb/picard-tools-1.140/picard.jar
+  GATK=/usr/local/igbb/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar
+  ALIGN=$DIR/analysis/SNP
+  DB=$DIR/db/NBI_Gossypium_hirsutum_v1.1.fa
+
+  lib=$(sed -n -e "${PBS_ARRAYID}p" <<<"$libs")
+
+  BAM=$ALIGN/realign/$lib.realigned.bam
+
+  TMP=$ALIGN/tmp/$PBS_JOBID
+  mkdir $TMP
+
+  java -Djava.io.tmpdir=$TMP -jar $GATK \
+       -T BaseRecalibrator \
+       -nct 20 \
+       -R $DB \
+       -I $BAM \
+       -o $ALIGN/recal/$lib.recal_data.table &> $ALIGN/recal/$lib.recalib.log
+
+  java -Djava.io.tmpdir=$TMP -jar $GATK \
+       -T BaseRecalibrator \
+       -nct 20 \
+       -R $DB \
+       -I $BAM \
+       -BQSR $ALIGN/recal/$lib.recal_data.table \
+       -o $ALIGN/recal/$lib.post_recal_data.table &> $ALIGN/recal/$lib.post_recalib.log
+
+  java -Djava.io.tmpdir=$TMP -jar $GATK \
+       -T PrintReads \
+       -nct 20 \
+       -R $DB \
+       -I $BAM \
+       -BQSR $ALIGN/recal/$lib.recal_data.table \
+       -o $ALIGN/recal/$lib.recal_reads.bam &> $ALIGN/recal/$lib.print_recalib.log
+
+#+END_SRC
+** Variant Discovery (GATK)
+*** Call Variants
+#+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/call/HaplotypeCaller.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N HaplotypeCaller -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh :var libs=read_groups[,3] :var DIR=(file-name-directory buffer-file-name) 
+    swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+    swsetup samtools
+
+    PATH=$PATH:/usr/local/gnu/bin/
+    PICARD=/usr/local/igbb/picard-tools-1.140/picard.jar
+    GATK=/usr/local/igbb/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar
+    ALIGN=$DIR/analysis/SNP
+    DB=$DIR/db/G.raimondii_JGI_221_v2.0.assembly.normalized.fasta
+
+    uniq=$(uniq <<< "$libs")
+    read -a lib < <(sed -n -e "${PBS_ARRAYID}p" <<<"$uniq")
+
+    TMP=$ALIGN/call/tmp/${lib[0]}/
+    mkdir -p $TMP
+    mkdir -p $ALIGN/call/${lib[0]}
+    
+    files=$(ls $ALIGN/realign/${lib[0]}/*.realigned.bam)
+    for file in $files; do 
+        basename=$(basename $file)
+        name=${basename%.*}
+        mkdir -p $TMP/$name
+    done;
+
+    parallel -j20 java -Djava.io.tmpdir=$TMP/{/.} -Xmx3g -jar $GATK -T HaplotypeCaller -R $DB \
+             -I $ALIGN/realign/${lib[0]}/{/.}.bam \
+             -nct 20 \
+             -stand_emit_conf 10 \
+             -stand_call_conf 30 \
+             --emitRefConfidence GVCF \
+             -variant_index_type LINEAR \
+             -variant_index_parameter 128000 \
+             --genotyping_mode DISCOVERY \
+             -o $ALIGN/call/${lib[0]}/{/.}.g.raw_variants.vcf '&>' $ALIGN/call/${lib[0]}/{/.}.HaplotypeCaller.log <<<"$files"
+#+END_SRC
+
+*** Join VCF
+#+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/call/join.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N VCF_JOIN -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh :var libs=read_groups[,3] :var DIR=(file-name-directory buffer-file-name) 
+    swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+    swsetup samtools
+
+    PATH=$PATH:/usr/local/gnu/bin/
+    PICARD=/usr/local/igbb/picard-tools-1.140/picard.jar
+    GATK=/usr/local/igbb/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar
+    ALIGN=$DIR/analysis/SNP
+    DB=$DIR/db/G.raimondii_JGI_221_v2.0.assembly.normalized.fasta
+    TMP=$ALIGN/call/tmp/${lib[0]}/
+
+    uniq=$(uniq <<< "$libs")
+    read -a lib < <(sed -n -e "${PBS_ARRAYID}p" <<<"$uniq")
+    cd $ALIGN/call/${lib[0]}
+    variants=""
+    for i in *.g.raw_variants.vcf; do variants+="--variant $i "; done
+    pwd
+    java -Djava.io.tmpdir=$TMP/${lib[0]} -Xmx3g -jar $GATK -T GenotypeGVCFs -R $DB \
+        $variants \
+        --out all.${lib[0]}.vcf \
+        -stand_emit_conf 10 \
+        -stand_call_conf 30  &> $ALIGN/call/${lib[0]}/joint.genotype.log
+#+END_SRC
+
+*** Filter
+#+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/call/filter.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N filter -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh :var libs=read_groups[,3] :var DIR=(file-name-directory buffer-file-name) 
+    swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+    swsetup samtools
+
+    PATH=$PATH:/usr/local/gnu/bin/
+    PICARD=/usr/local/igbb/picard-tools-1.140/picard.jar
+    GATK=/usr/local/igbb/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar
+    ALIGN=$DIR/analysis/SNP
+    DB=$DIR/db/G.raimondii_JGI_221_v2.0.assembly.normalized.fasta
+    TMP=$ALIGN/call/tmp/${lib[0]}/
+
+    uniq=$(uniq <<< "$libs")
+    read -a lib < <(sed -n -e "${PBS_ARRAYID}p" <<<"$uniq")
+    cd $ALIGN/call/${lib[0]}
+
+    java -Djava.io.tmpdir=$TMP/${lib[0]} -Xmx3g -jar $GATK -T SelectVariants -R $DB \
+        -V all.${lib[0]}.vcf \
+        -selectType SNP \
+        -o all.raw_snp.${lib[0]}.vcf &> $ALIGN/call/${lib[0]}/all.selectVariants_snp.eff
+
+    java -Djava.io.tmpdir=$TMP/${lib[0]} -Xmx3g -jar $GATK -T SelectVariants -R $DB \
+        -V all.${lib[0]}.vcf \
+        -selectType INDEL \
+        -o all.raw_indel.${lib[0]}.vcf &> $ALIGN/call/${lib[0]}/all.selectVariants_indel.eff
+
+    java -Djava.io.tmpdir=$TMP/${lib[0]} -Xmx3g -jar $GATK -T VariantFiltration -R $DB \
+        -V all.raw_snp.${lib[0]}.vcf \
+        --filterExpression "QD<2.0||FS>60.0||MQ<40.0||SOR>4.0||MQRankSum<-12.5||ReadPosRankSum<-8.0" \
+        --filterName all_snp_filter \
+        -o all.filtered_snp.vcf &> all.VariantFiltration_snp.err
+
+    java -Djava.io.tmpdir=$TMP/${lib[0]} -Xmx3g -jar $GATK -T VariantFiltration -R $DB \
+        -V all.raw_snp.${lib[0]}.vcf \
+        --filterExpression "QD<2.0||FS>200.0||SOR>10.0||ReadPosRankSum<-20.0" \
+        --filterName indel_filter \
+        -o all.filtered_indel.vcf &> all.VariantFiltration_indel.err
+
+    java -Djava.io.tmpdir=$TMP/${lib[0]} -Xmx3g -jar $GATK -T SelectVariants -R $DB \
+        -V all.filtered_snp.vcf \
+        --excludeFiltered \
+        -o all.PASS_snp.vcf &> all.PASS_snp.err
+
+    java -Djava.io.tmpdir=$TMP/${lib[0]} -Xmx3g -jar $GATK -T SelectVariants -R $DB \
+        -V all.filtered_indel.vcf \
+        --excludeFiltered \
+        -o all.PASS_indel.vcf &> all.PASS_indel.err
+#+END_SRC
+
+*** SKIP Joint Genotype
+#+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/genotype/JointGenotype.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N HaplotypeCaller -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh :var libs=read_groups[,0] :var DIR=(file-name-directory buffer-file-name) 
+
+#+END_SRC
+** Variant Discovery (Samtools)
+#+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/call_st/merge.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N Merge -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh :var libs=read_groups :var DIR=(file-name-directory buffer-file-name) 
+  swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+  swsetup samtools
+
+  PATH=$PATH:/usr/local/gnu/bin/
+  PICARD=/usr/local/igbb/picard-tools-1.140/picard.jar
+  ALIGN=$DIR/analysis/SNP/
+
+  declare -A grps
+
+  IFS=$'\t'
+  while read -a lib; do
+      grps[${lib[3]}]+=" INPUT=$ALIGN/realign/${lib[0]}.realigned.bam"
+  done <<<"$libs"
+
+  for k in "${!grps[@]}"
+  do
+      echo java -jar $PICARD MarkDuplicates ${grps[$k]} \
+           OUTPUT=$ALIGN/call_st/$k.merge.bam \
+           METRICS_FILE=$ALIGN/call_st/$k.metrics.txt \
+           VALIDATION_STRINGENCY=LENIENT MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000
+  done | parallel -j 4
+
+
+  uniq -f3 <<<"$libs" | \
+      awk -F$'\t' \
+          '$5 != sample { printf "\nsamtools merge %s/call_st/%s.bam ", align, $5; sample = $5} 
+           {printf "%s/call_st/%s.merge.bam ", align, $4}' align=$ALIGN | parallel -j 4
+#+END_SRC
+
+#+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/call_st/call.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N Call -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh :var libs=read_groups :var DIR=(file-name-directory buffer-file-name) 
+PATH=$PATH:/usr/local/igbb/htslib-1.1/bin/
+samtools mpileup -l analysis/QTL_Marker_Location_NBIAD1.bed -go analysis/SNP/call_st/study.bcf \
+                 -f db/NBI_Gossypium_hirsutum_v1.1.fa \
+                 analysis/SNP/call_st/{SG747,GB713,Ren1,Ren2}.bam
+bcftools call -vmO z -o analysis/SNP/call_st/study.vcf.gz analysis/SNP/call_st/study.bcf
+tabix -p vcf analysis/SNP/call_st/study.vcf.gz
+#+END_SRC
