@@ -1,0 +1,58 @@
+t <- readTrees("D.tre")[1]
+d <- readDiscreteCharacterData("OrthogroupsAll.nex")
+
+mvi = 1
+
+gain_loss ~ dnExp(1)
+moves[mvi++] = mvScale(gain_loss, weight=10)
+
+
+k <- 32
+
+for(i in 1:k)
+{
+	for(j in 1:k)
+	{
+		if(i == j - 1){
+			R[i][j] <- 1
+		}else if(i == j + 1){
+			R[i][j] := gain_loss
+		}else{
+			R[i][j] = 0
+		}
+	}
+}
+
+Q := fnFreeK(R)
+
+
+taxa = d.taxa()
+n_branches = 2*taxa.size() - 2
+
+for(i in 1:n_branches)
+{
+	brlen[i] ~ dnExp(10)
+	moves[mvi++] = mvScale(brlen[i])
+}
+
+tau := treeAssembly(t, brlen)
+
+TL := sum(brlen)
+
+alpha ~ dnExp(1)
+moves[mvi++] = mvScale(alpha, weight=10)
+
+rates := fnDiscretizeGamma(alpha, alpha, 4)
+
+seq ~ dnPhyloCTMC(tree=tau, Q=Q, siteRates=rates, type="Standard")
+seq.clamp(d)
+
+mymodel = model(Q)
+
+mni = 1
+monitors[mni++] = mnScreen(gain_loss, TL, alpha, printgen=1)
+monitors[mni++] = mnModel(filename="cnv.log",printgen=1)
+
+# run the analysis
+mymcmc = mcmc(mymodel, moves, monitors, moveschedule="single")
+mymcmc.run(1000000000)
