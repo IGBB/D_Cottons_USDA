@@ -37,10 +37,10 @@ dS.summary.table[nrow(dS.summary.table) + 1,] <- c("D1-35", "D1-35", NA, NA, NA)
 dS.summary.table[nrow(dS.summary.table) + 1,] <- c("D9-4", "D9-4", NA, NA, NA)
 dS.summary.table$IQR <- paste(dS.summary.table$LQ, dS.summary.table$UQ, sep="-")
 dS.summary.table$IQR <- paste("(", dS.summary.table$IQR, ")", sep="")
-dS.summary.table$concat <- paste(dS.summary.table$Median, dS.summary.table$IQR, sep = "\t")
+dS.summary.table$concat <- paste(dS.summary.table$Median, dS.summary.table$IQR, sep = " ")
 dS.summary.df <- as.data.frame(t(acast(dS.summary.table, sspecies~qspecies, value.var = "concat")))
 dS.summary.df <- dS.summary.df[order(rownames(dS.summary.df)),order(colnames(dS.summary.df))]
-dS.summary.df[dS.summary.df=="NA\t(NA-NA)"] <- NA
+dS.summary.df[dS.summary.df=="NA (NA-NA)"] <- NA
 
 
 dN.summary.table <- summarize(groups, LQ = quantile(dN, 0.25), Median = median(dN), UQ = quantile(dN, 0.75))
@@ -50,10 +50,10 @@ dN.summary.table[nrow(dN.summary.table) + 1,] <- c("D1-35", "D1-35", NA, NA, NA)
 dN.summary.table[nrow(dN.summary.table) + 1,] <- c("D9-4", "D9-4", NA, NA, NA)
 dN.summary.table$IQR <- paste(dN.summary.table$LQ, dN.summary.table$UQ, sep="-")
 dN.summary.table$IQR <- paste("(", dN.summary.table$IQR, ")", sep="")
-dN.summary.table$concat <- paste(dN.summary.table$Median, dN.summary.table$IQR, sep = "\t")
+dN.summary.table$concat <- paste(dN.summary.table$Median, dN.summary.table$IQR, sep = " ")
 dN.summary.df <- as.data.frame(acast(dN.summary.table, sspecies~qspecies, value.var = "concat"))
 dN.summary.df <- dN.summary.df[order(rownames(dN.summary.df)),order(colnames(dN.summary.df))]
-dN.summary.df[dN.summary.df=="NA\t(NA-NA)"] <- NA
+dN.summary.df[dN.summary.df=="NA (NA-NA)"] <- NA
 
 dN.summary.df <- data.frame(lapply(dN.summary.df, as.character), stringsAsFactors=FALSE)
 dS.summary.df <- data.frame(lapply(dS.summary.df, as.character), stringsAsFactors=FALSE)
@@ -81,5 +81,5 @@ newDf.melted <- Df.melted[Df.melted$variable == "dS",]
 #dev.off()
 
 
-write.table(Total.df, "dNdS_table.txt")
+write.table(Total.df, "dNdS_table.txt", quote=F, sep="\t")
 
