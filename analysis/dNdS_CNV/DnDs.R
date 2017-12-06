@@ -35,6 +35,8 @@ Species_translate$order <- c("I", "D", "H", "B", "C", "K", "L", "E", "A", "M", "
 ######
 
 groups <- DF %>% group_by(`sspecies`, `qspecies`)
+
+#dS Table
 dS.summary.table <- summarize(groups, LQ = quantile(dS, 0.25), Median = median(dS), UQ = quantile(dS, 0.75))
 levels(dS.summary.table$sspecies) <- c(levels(dS.summary.table$sspecies), "D1-35", levels(Species_translate$order))
 levels(dS.summary.table$qspecies) <- c(levels(dS.summary.table$qspecies), "D9-4", levels(Species_translate$order))
@@ -52,12 +54,7 @@ dS.summary.df <- dS.summary.df[order(rownames(dS.summary.df)),order(colnames(dS.
 dS.summary.df <- as.data.frame(replace(dS.summary.df, is.na(dS.summary.df), t(dS.summary.df)[is.na(dS.summary.df)]))
 dS.summary.df[lower.tri(dS.summary.df, diag = T)] <- NA
 
-
-
-
-
-
-
+#dN Table
 
 dN.summary.table <- summarize(groups, LQ = quantile(dN, 0.25), Median = median(dN), UQ = quantile(dN, 0.75))
 levels(dN.summary.table$sspecies) <- c(levels(dN.summary.table$sspecies), "D1-35", levels(Species_translate$order))
@@ -66,16 +63,21 @@ dN.summary.table[nrow(dN.summary.table) + 1,] <- list("D1-35", "D1-35", NA, NA, 
 dN.summary.table[nrow(dN.summary.table) + 1,] <- list("D9-4", "D9-4", NA, NA, NA)
 dN.summary.table$sspecies <- Species_translate$order[match(dN.summary.table$sspecies, Species_translate$Species)]
 dN.summary.table$qspecies <- Species_translate$order[match(dN.summary.table$qspecies, Species_translate$Species)]
-dN.summary.table$IQR <- paste(format(dN.summary.table$LQ, digits = 3, drop0trailing = F), format(dN.summary.table$UQ, digits = 3), sep="-")
+dN.summary.table$IQR <- paste(format(dN.summary.table$LQ, digits = 2), format(dN.summary.table$UQ, digits = 3), sep="-")
 dN.summary.table$IQR <- paste("(", dN.summary.table$IQR, ")", sep="")
-dN.summary.table$concat <- paste(format(dN.summary.table$Median, digits = 3), dN.summary.table$IQR, sep = " ")
+dN.summary.table$concat <- paste(format(dN.summary.table$Median, digits = 2), dN.summary.table$IQR, sep = " ")
+
+
 dN.summary.df <- as.matrix(acast(dN.summary.table, sspecies~qspecies, value.var = "concat"))
 dN.summary.df <- dN.summary.df[order(rownames(dN.summary.df)),order(colnames(dN.summary.df))]
-
-
 dN.summary.df <- as.data.frame(replace(dN.summary.df, is.na(dN.summary.df), t(dN.summary.df)[is.na(dN.summary.df)]))
 dN.summary.df[upper.tri(dN.summary.df, diag = T)] <- NA
 
+
+
+#######
+#Combine tables
+#######
 
 dN.summary.df <- as.data.frame(lapply(dN.summary.df, as.character), stringsAsFactors=FALSE)
 dS.summary.df <- as.data.frame(lapply(dS.summary.df, as.character), stringsAsFactors=FALSE)
