@@ -3227,7 +3227,7 @@ Workflow from [[http://www.htslib.org/workflow/][Samtools]]
 #+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/dedup/split.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N split -l nodes=1:ppn=20 -l walltime=48:00:00
 #+BEGIN_SRC sh :var libs=read_groups[,3] :var DIR=(file-name-directory buffer-file-name) 
-  swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+  swsetup () { eval `/usr/local/swsetup/swsetup.pl $*`; }
   swsetup samtools
 
   PATH=$PATH:/usr/local/gnu/bin/:/usr/local/igbb/bamtools/bin
@@ -3245,7 +3245,7 @@ Workflow from [[http://www.htslib.org/workflow/][Samtools]]
 #+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/dedup/dedup.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N dedup -l nodes=1:ppn=20 -l walltime=48:00:00
 #+BEGIN_SRC sh :var libs=read_groups[,3] :var DIR=(file-name-directory buffer-file-name) 
-  swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+  swsetup () { eval `/usr/local/swsetup/swsetup.pl $*`; }
   swsetup samtools
 
   PATH=$PATH:/usr/local/gnu/bin/:/usr/local/igbb/bamtools/bin
@@ -3261,22 +3261,22 @@ Workflow from [[http://www.htslib.org/workflow/][Samtools]]
   files=$(ls ${lib[0]} -1 | grep -v dedup | grep Chr)
   cd ${lib[0]}
     
-  #parallel -j 20 mv {} {.}.orig.bam <<< "$files"
+  parallel -j 20 mv {} {.}.orig.bam <<< "$files"
 
-  #parallel -j 20 java -cp /usr/local/igbb/picard-tools-1.140/htsjdk-1.140.jar htsjdk.samtools.FixBAMFile {.}.orig.bam {} <<< "$files"
+  parallel -j 20 java -cp /usr/local/igbb/picard-tools-1.140/htsjdk-1.140.jar htsjdk.samtools.FixBAMFile {.}.orig.bam {} <<< "$files"
 
   parallel -j 5 java -jar $PICARD MarkDuplicates \
       INPUT={} OUTPUT=dedup/{.}.dedup.bam \
       METRICS_FILE={.}.metrics.txt <<< "$files"
   
  
-  parallel -j0 samtools index dedup/{.}.dedup.bam  <<< "$files"
+  parallel -j 5 samtools index dedup/{.}.dedup.bam  <<< "$files"
 
 
 #+END_SRC
 *** Realign Indels
 #+BEGIN_SRC sh :var DIR=(file-name-directory buffer-file-name)
-  swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+  swsetup () { eval `/usr/local/swsetup/swsetup.pl $*`; }
   swsetup samtools
 
   PICARD=/usr/local/igbb/picard-tools-1.140/picard.jar
@@ -3287,12 +3287,10 @@ Workflow from [[http://www.htslib.org/workflow/][Samtools]]
   java -jar $PICARD CreateSequenceDictionary REFERENCE=$DB.normalized.fasta OUTPUT=$DB.normalized.dict
 #+END_SRC
 
-#+RESULTS:
-
 #+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/realign/target_creator.pbs :mkdirp yes
-#+HEADER: :prologue #PBS -N RealignerTargetCreator -l nodes=1:ppn=20 -l walltime=48:00:00 -t 1-31
+#+HEADER: :prologue #PBS -N RealignerTargetCreator -l nodes=1:ppn=20 -l walltime=48:00:00 
 #+BEGIN_SRC sh :var libs=read_groups[,3] :var DIR=(file-name-directory buffer-file-name) 
-  swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+  swsetup () { eval `/usr/local/swsetup/swsetup.pl $*`; }
   swsetup samtools
 
   PATH=$PATH:/usr/local/gnu/bin/
@@ -3321,7 +3319,7 @@ Workflow from [[http://www.htslib.org/workflow/][Samtools]]
 #+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/realign/indel_realigner.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N IndelRealigner -l nodes=1:ppn=20 -l walltime=48:00:00
 #+BEGIN_SRC sh :var libs=read_groups[,3] :var DIR=(file-name-directory buffer-file-name) 
-  swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+  swsetup () { eval `/usr/local/swsetup/swsetup.pl $*`; }
   swsetup samtools
 
   PATH=$PATH:/usr/local/gnu/bin/
@@ -3345,9 +3343,9 @@ Workflow from [[http://www.htslib.org/workflow/][Samtools]]
   done;
 
   parallel -j20 java -Djava.io.tmpdir=$TMP/{/.} -Xmx3g -jar $GATK -T IndelRealigner -R $DB \
-           -I $ALIGN/dedup/${lib[0]}/dedup/${lib[0]}.dedup.bam \
+           -I {} \
            -targetIntervals $ALIGN/realign/${lib[0]}/${lib[0]}.{/.}.intervals \
-           -o $ALIGN/realign/${lib[0]}/{/.}.realigned.bam '&>' $ALIGN/realign/${lib[0]}/${lib[0]}.indel_realigner.log <<<"$files"
+           -o $ALIGN/realign/${lib[0]}/{/.}.realigned.bam '&>' {}.indel_realigner.log <<<"$files"
 
 #+END_SRC
 
@@ -3405,7 +3403,7 @@ usable format, this set was skipped. To continue with the pipeline,
 #+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/call/HaplotypeCaller.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N HaplotypeCaller -l nodes=1:ppn=20 -l walltime=48:00:00
 #+BEGIN_SRC sh :var libs=read_groups[,3] :var DIR=(file-name-directory buffer-file-name) 
-    swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
+    swsetup () { eval `/usr/local/swsetup/swsetup.pl $*`; }
     swsetup samtools
 
     PATH=$PATH:/usr/local/gnu/bin/
