@@ -3221,7 +3221,6 @@ D6-7.Ggoss1 needed to be fixed.
 * SNPs
 +Workflow from [[https://www.broadinstitute.org/gatk/guide/best-practices][GATK Best Practices]]+
 Workflow from [[http://www.htslib.org/workflow/][Samtools]]
-
 ** Pre-Processing
 *** Split
 #+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/dedup/split.pbs :mkdirp yes
@@ -3442,33 +3441,31 @@ usable format, this set was skipped. To continue with the pipeline,
 #+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/call/join.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N VCF_JOIN -l nodes=1:ppn=20 -l walltime=48:00:00
 #+BEGIN_SRC sh :var libs=read_groups[,3] :var DIR=(file-name-directory buffer-file-name) 
-    swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
-    swsetup samtools
-
     PATH=$PATH:/usr/local/gnu/bin/
     PICARD=/usr/local/igbb/picard-tools-1.140/picard.jar
     GATK=/usr/local/igbb/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar
     ALIGN=$DIR/analysis/SNP
     DB=$DIR/db/G.raimondii_JGI_221_v2.0.assembly.normalized.fasta
-    TMP=$ALIGN/call/tmp/${lib[0]}/
+    TMP=$ALIGN/call/tmp/
 
-    uniq=$(uniq <<< "$libs")
-    read -a lib < <(sed -n -e "${PBS_ARRAYID}p" <<<"$uniq")
-    cd $ALIGN/call/${lib[0]}
+    name="Chr_"$(printf "%02d" $PBS_ARRAYID)
+    mkdir -p $ALIGN/call/join/
+    cd $ALIGN/call/join
     variants=""
-    for i in *.g.raw_variants.vcf; do variants+="--variant $i "; done
+    for i in $(find ../ -name '*vcf' | grep $name); do variants+="--variant $i "; done
     pwd
-    java -Djava.io.tmpdir=$TMP/${lib[0]} -Xmx3g -jar $GATK -T GenotypeGVCFs -R $DB \
+
+    java -Djava.io.tmpdir=$TMP/ -Xmx3g -jar $GATK -T GenotypeGVCFs -R $DB \
         $variants \
-        --out all.${lib[0]}.vcf \
+        --out all.$name.vcf \
         -stand_emit_conf 10 \
-        -stand_call_conf 30  &> $ALIGN/call/${lib[0]}/joint.genotype.log
+        -stand_call_conf 30  &> $ALIGN/call/join/$name.joint.genotype.log
 #+END_SRC
 
 *** Filter
 #+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/call/filter.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N filter -l nodes=1:ppn=20 -l walltime=48:00:00
-#+BEGIN_SRC sh :var libs=read_groups[,3] :var DIR=(file-name-directory buffer-file-name) 
+#+BEGIN_SRC sh :var DIR=(file-name-directory buffer-file-name) 
     swsetup () { eval `/usr/erc-share/etc/swsetup/swsetup.pl $*`; }
     swsetup samtools
 
@@ -3477,43 +3474,72 @@ usable format, this set was skipped. To continue with the pipeline,
     GATK=/usr/local/igbb/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar
     ALIGN=$DIR/analysis/SNP
     DB=$DIR/db/G.raimondii_JGI_221_v2.0.assembly.normalized.fasta
-    TMP=$ALIGN/call/tmp/${lib[0]}/
+    TMP=$ALIGN/call/tmp/
 
-    uniq=$(uniq <<< "$libs")
-    read -a lib < <(sed -n -e "${PBS_ARRAYID}p" <<<"$uniq")
-    cd $ALIGN/call/${lib[0]}
+    name="Chr_"$(printf "%02d" $PBS_ARRAYID)
+    cd $ALIGN/call/join
 
-    java -Djava.io.tmpdir=$TMP/${lib[0]} -Xmx3g -jar $GATK -T SelectVariants -R $DB \
-        -V all.${lib[0]}.vcf \
+    java -Djava.io.tmpdir=$TMP/ -Xmx3g -jar $GATK -T SelectVariants -R $DB \
+        -V all.$name.vcf \
         -selectType SNP \
-        -o all.raw_snp.${lib[0]}.vcf &> $ALIGN/call/${lib[0]}/all.selectVariants_snp.eff
+        -o all.raw_snp.$name.vcf &> $ALIGN/call/join/$name.all.selectVariants_snp.eff
 
-    java -Djava.io.tmpdir=$TMP/${lib[0]} -Xmx3g -jar $GATK -T SelectVariants -R $DB \
-        -V all.${lib[0]}.vcf \
+    java -Djava.io.tmpdir=$TMP/ -Xmx3g -jar $GATK -T SelectVariants -R $DB \
+        -V all.$name.vcf \
         -selectType INDEL \
-        -o all.raw_indel.${lib[0]}.vcf &> $ALIGN/call/${lib[0]}/all.selectVariants_indel.eff
+        -o all.raw_indel.$name.vcf &> $ALIGN/call/join/$name.all.selectVariants_indel.eff
 
-    java -Djava.io.tmpdir=$TMP/${lib[0]} -Xmx3g -jar $GATK -T VariantFiltration -R $DB \
-        -V all.raw_snp.${lib[0]}.vcf \
+    java -Djava.io.tmpdir=$TMP/ -Xmx3g -jar $GATK -T VariantFiltration -R $DB \
+        -V all.raw_snp.$name.vcf \
         --filterExpression "QD<2.0||FS>60.0||MQ<40.0||SOR>4.0||MQRankSum<-12.5||ReadPosRankSum<-8.0" \
         --filterName all_snp_filter \
-        -o all.filtered_snp.vcf &> all.VariantFiltration_snp.err
+        -o all.filtered_snp.$name.vcf &> $name.all.VariantFiltration_snp.err
 
-    java -Djava.io.tmpdir=$TMP/${lib[0]} -Xmx3g -jar $GATK -T VariantFiltration -R $DB \
-        -V all.raw_snp.${lib[0]}.vcf \
+    java -Djava.io.tmpdir=$TMP -Xmx3g -jar $GATK -T VariantFiltration -R $DB \
+        -V all.raw_indel.$name.vcf \
         --filterExpression "QD<2.0||FS>200.0||SOR>10.0||ReadPosRankSum<-20.0" \
         --filterName indel_filter \
-        -o all.filtered_indel.vcf &> all.VariantFiltration_indel.err
+        -o all.filtered_indel.$name.vcf &> $name.all.VariantFiltration_indel.err
 
-    java -Djava.io.tmpdir=$TMP/${lib[0]} -Xmx3g -jar $GATK -T SelectVariants -R $DB \
-        -V all.filtered_snp.vcf \
+    java -Djava.io.tmpdir=$TMP/ -Xmx3g -jar $GATK -T SelectVariants -R $DB \
+        -V all.filtered_snp.$name.vcf \
         --excludeFiltered \
-        -o all.PASS_snp.vcf &> all.PASS_snp.err
+        -o all.PASS_snp.$name.vcf &> $name.all.PASS_snp.err
 
-    java -Djava.io.tmpdir=$TMP/${lib[0]} -Xmx3g -jar $GATK -T SelectVariants -R $DB \
-        -V all.filtered_indel.vcf \
+    java -Djava.io.tmpdir=$TMP/ -Xmx3g -jar $GATK -T SelectVariants -R $DB \
+        -V all.filtered_indel.$name.vcf \
         --excludeFiltered \
-        -o all.PASS_indel.vcf &> all.PASS_indel.err
+        -o all.PASS_indel.$name.vcf &> $name.all.PASS_indel.err
+#+END_SRC
+
+*** Join Chromosomes
+#+HEADER: :shebang #!/bin/bash :tangle analysis/SNP/call/chr_join.pbs :mkdirp yes
+#+HEADER: :prologue #PBS -N CHR_JOIN -l nodes=1:ppn=20 -l walltime=48:00:00
+#+BEGIN_SRC sh :var libs=read_groups[,3] :var DIR=(file-name-directory buffer-file-name) 
+    PATH=$PATH:/usr/local/gnu/bin/
+    PICARD=/usr/local/igbb/picard-tools-1.140/picard.jar
+    GATK=/usr/local/igbb/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar
+    ALIGN=$DIR/analysis/SNP
+    DB=$DIR/db/G.raimondii_JGI_221_v2.0.assembly.normalized.fasta
+    TMP=$ALIGN/call/tmp/
+
+    mkdir $ALIGN/call/final
+    cd $ALIGN/call/final
+    variants=""
+    for i in $(find ../join/ -name '*PASS*snp*Chr*vcf' | sort); do variants+="--variant $i "; done
+    java -Djava.io.tmpdir=$TMP/ -Xmx3g -jar $GATK -T CombineVariants -R $DB \
+        $variants \
+        --out all.PASS_snp.vcf \
+        -genotypeMergeOptions UNIQUIFY \
+        --minimalVCF &> $ALIGN/call/final/chr.snp.join.log
+
+    variants=""
+    for i in $(find ../join/ -name '*PASS*indel*Chr*vcf' | sort); do variants+="--variant $i "; done
+    java -Djava.io.tmpdir=$TMP/ -Xmx3g -jar $GATK -T CombineVariants -R $DB \
+        $variants \
+        --out all.PASS_indel.vcf \
+        -genotypeMergeOptions UNIQUIFY \
+        --minimalVCF &> $ALIGN/call/final/chr.indel.join.log
 #+END_SRC
 
 *** SKIP Joint Genotype
