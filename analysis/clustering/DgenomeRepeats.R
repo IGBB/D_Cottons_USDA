@@ -8,6 +8,7 @@ library(geomorph)
 library(testit)
 library(ape)
 library(geiger)
+library(phytools)
 
 #############################################
 sessionInfo()
@@ -364,9 +365,149 @@ TEamounts$gypPerc <- TEamounts$gypsies/TEamounts$genomeSize
 # max(TEamounts$percent[c(1:13)])
 # [1] 0.5196145
 
+### as % genome size
 
-# glm/anova for cluster abundance
+# from above
+# Kbamount <- data.frame(annot_clust[1], apply(annot_clust[2:33], 2, function (x) x*9.5))
 
+# convert to percent of genome, asks are the relative proportions the same
+#genome	size	reads
+#D01	841	98942
+#D02.1	856	100706
+#D02.2	910	107059
+#D10	910	107059
+#D11	929	109295
+#D3D	910	107059
+#D3K	880	103530
+#D4	919	108118
+#D5	880	103530
+#D6	841	98942
+#D7	934	109883
+#D8	851	100118
+#D9	934	109883
+#A1	1667	196118
+#A2	1698	199765
+#F1	1311	154236
+GSamount <- data.frame(Kbamount$Lineage, lapply(Kbamount[2:3], function(x) 100*x/841000), 
+lapply(Kbamount[4], function(x) 100*x/856000), 
+lapply(Kbamount[5], function(x) 100*x/910000),
+lapply(Kbamount[6], function(x) 100*x/910000),
+lapply(Kbamount[7:8], function(x) 100*x/880000),
+lapply(Kbamount[9:10], function(x) 100*x/919000),
+lapply(Kbamount[11:17], function(x) 100*x/880000),
+lapply(Kbamount[18:19], function(x) 100*x/841000), 
+lapply(Kbamount[20:21], function(x) 100*x/934000),
+lapply(Kbamount[22:23], function(x) 100*x/851000),
+lapply(Kbamount[24], function(x) 100*x/934000),
+lapply(Kbamount[25:27], function(x) 100*x/910000),
+lapply(Kbamount[28], function(x) 100*x/929000),lapply(Kbamount[29:30], function(x) 100*x/1667000),
+lapply(Kbamount[31:32], function(x) 100*x/1698000),
+lapply(Kbamount[33], function(x) 100*x/1311000) )
+
+GSsum <- aggregate(. ~Kbamount.Lineage, data=GSamount, FUN=sum)
+
+GSsum$D1sum  <- rowMeans(GSsum[,2:3])
+GSsum$D2.1sum <-GSsum$D2.1_6
+GSsum$D2.2sum <-GSsum$D2.2
+GSsum$D3Dsum <-GSsum$D3D_2
+GSsum$D3Ksum <- rowMeans(GSsum[,7:8])
+GSsum$D4sum  <- rowMeans(GSsum[,9:10])
+GSsum$D5sum  <- rowMeans(GSsum[,11:17])
+GSsum$D6sum  <- rowMeans(GSsum[,18:19])
+GSsum$D7sum  <- rowMeans(GSsum[,20:21])
+GSsum$D8sum  <- rowMeans(GSsum[,22:23])
+GSsum$D9sum <-GSsum$D9_4
+GSsum$D10sum <- rowMeans(GSsum[,25:27])
+GSsum$D11sum <-GSsum$D11_1
+GSsum$A1sum  <- rowMeans(GSsum[,29:30])
+GSsum$A2sum  <- rowMeans(GSsum[,31:32])
+GSsum$F1sum <-GSsum$F1_1
+
+GSsum$D1min  <- apply(GSsum[,2:3], 1, min)
+GSsum$D2.1min <-GSsum$D2.1_6
+GSsum$D2.2min <-GSsum$D2.2
+GSsum$D3Dmin <-GSsum$D3D_2
+GSsum$D3Kmin <- apply(GSsum[,7:8], 1, min)
+GSsum$D4min  <- apply(GSsum[,9:10], 1, min)
+GSsum$D5min  <- apply(GSsum[,11:17], 1, min)
+GSsum$D6min  <- apply(GSsum[,18:19], 1, min)
+GSsum$D7min  <- apply(GSsum[,20:21], 1, min)
+GSsum$D8min  <- apply(GSsum[,22:23], 1, min)
+GSsum$D9min <-GSsum$D9_4
+GSsum$D10min <- apply(GSsum[,25:27], 1, min)
+GSsum$D11min <-GSsum$D11_1
+GSsum$A1min  <- apply(GSsum[,29:30], 1, min)
+GSsum$A2min  <- apply(GSsum[,31:32], 1, min)
+GSsum$F1min <-GSsum$F1_1
+
+GSsum$D1max  <- apply(GSsum[,2:3], 1, max)
+GSsum$D2.1max <-GSsum$D2.1_6
+GSsum$D2.2max <-GSsum$D2.2
+GSsum$D3Dmax <-GSsum$D3D_2
+GSsum$D3Kmax <- apply(GSsum[,7:8], 1, max)
+GSsum$D4max  <- apply(GSsum[,9:10], 1, max)
+GSsum$D5max  <- apply(GSsum[,11:17], 1, max)
+GSsum$D6max  <- apply(GSsum[,18:19], 1, max)
+GSsum$D7max  <- apply(GSsum[,20:21], 1, max)
+GSsum$D8max  <- apply(GSsum[,22:23], 1, max)
+GSsum$D9max <-GSsum$D9_4
+GSsum$D10max <- apply(GSsum[,25:27], 1, max)
+GSsum$D11max <-GSsum$D11_1
+GSsum$A1max  <- apply(GSsum[,29:30], 1, max)
+GSsum$A2max  <- apply(GSsum[,31:32], 1, max)
+GSsum$F1max <-GSsum$F1_1
+
+GSsum <- GSsum[,-(2:33)]
+GSm <- melt(GSsum[,-(18:49)])
+min <- c(GSsum$D1min,
+GSsum$D2.1min,
+GSsum$D2.2min,
+GSsum$D3Dmin,
+GSsum$D3Kmin,
+GSsum$D4min,
+GSsum$D5min,
+GSsum$D6min,
+GSsum$D7min,
+GSsum$D8min,
+GSsum$D9min,
+GSsum$D10min,
+GSsum$D11min,
+GSsum$A1min,
+GSsum$A2min,
+GSsum$F1min)
+max <- c(GSsum$D1max,
+GSsum$D2.1max,
+GSsum$D2.2max,
+GSsum$D3Dmax,
+GSsum$D3Kmax,
+GSsum$D4max,
+GSsum$D5max,
+GSsum$D6max,
+GSsum$D7max,
+GSsum$D8max,
+GSsum$D9max,
+GSsum$D10max,
+GSsum$D11max,
+GSsum$A1max,
+GSsum$A2max,
+GSsum$F1max)
+GSm$min <- min
+GSm$max <- max
+
+limits <- aes(ymax=GSm$max, ymin=GSm$min)
+
+dodge <- position_dodge(width=0.9)
+
+png("Figure_TE.amounts.GS.png", 7500, 5000, pointsize=12, res=600)
+
+ggplot(GSm, aes(x=Kbamount.Lineage, y=value, fill = variable)) + geom_bar(stat = "identity",position = dodge) + geom_errorbar(limits, position = dodge) + labs(title = "Percent Genome Size", x="Broad element category", y="Percent Genome Size") + theme(axis.text = element_text(size = rel(1.5)), plot.margin=margin(2,2,2,2,"cm"), plot.title=element_text( face="bold", hjust=0.5), axis.title.x = element_text(face="bold", hjust=0.5), axis.title.y = element_text(face="bold", vjust=0.5))+theme_set(theme_grey(base_size=12))
+
+dev.off()
+
+
+
+###################### glm/anova for cluster abundance
+#
 glm_clust <- annot_clust[,c(2:28)]
 subsections <- subfac
 
@@ -389,50 +530,157 @@ row.names(glm_clust[(glm_clust$p.valueBH<0.05),])
 [1] "CL0020" "CL0067" "CL0096" "CL0112" "CL0142" "CL0172" "CL0181" "CL0186" "CL0211" "CL0248" "CL0253" "CL0254" "CL0295" "CL0351" "CL0360"
 
 
-######## ancestral state reconstruction of "very" significant clusters ######## 
+############################
+## D6 clusters significantly different from other Houzingenia
 
-cptree <- read.nexus("concat.raxml.tre")
-cptree <- drop.tip(cptree, "'D10_8.o'")
+D6Hglm <- annot_clust[,c(2:28)]
+D6Hsub <- t(D6Hglm[c(1:3),])
+D6Hsub[,1]<-"NW"
+D6Hsub[17,1]<-"Gg"
+D6Hsub[18,1]<-"Gg"
+D6Hsub <- D6Hsub[,1]
 
-plot.phylo(cptree, cex =1, label.offset=0.0005, align.tip.label=TRUE)
-nodelabels(cptree$node, adj=c(1.1,-0.2), frame="none", cex=1)
-
-sigclusters <- row.names(glm_clust[(glm_clust$p.valueBH<0.05),])
-ancTable <- Kbamount[sigclusters ,-c(1,29:32)]
-names(ancTable) <- gsub("\\.", "_", names(ancTable))
-names(ancTable)[names(ancTable) == 'D5ref'] <- 'D5_ref'
-names(ancTable)[names(ancTable) == 'D3D_2'] <- 'D3D_27'
-names(ancTable)[names(ancTable) == 'D3K_5'] <- 'D3K_57'
-names(ancTable)[names(ancTable) == 'D4_12'] <- 'D4_12C'
-
-anc20 <- t(ancTable["CL0020", ])
-anc67 <- t(ancTable["CL0067", ])
-anc96 <- t(ancTable["CL0096", ])
-anc112 <- t(ancTable["CL0112", ])
-anc142 <- t(ancTable["CL0142", ])
-anc172 <- t(ancTable["CL0172", ])
-anc181 <- t(ancTable["CL0181", ])
-anc186 <- t(ancTable["CL0186", ])
-anc211 <- t(ancTable["CL0211", ])
-anc248 <- t(ancTable["CL0248", ])
-anc253 <- t(ancTable["CL0253", ])
-anc254 <- t(ancTable["CL0254", ])
-anc295 <- t(ancTable["CL0295", ])
-anc351 <- t(ancTable["CL0351", ])
-anc360 <- t(ancTable["CL0360", ])
-
-varNames <- grep("anc", ls(), value=TRUE)
-varNames <- varNames[c(2:16)]
-
-for (anc in varNames) {  
-	obj <- get(anc)
-	names(obj) <- row.names(obj)
-	assign(anc, obj, envir=globalenv())
+data.in <- t(D6Hglm)
+D6H.P.scores <- rep(NA, ncol(data.in))
+for (i in 1:ncol(data.in)){
+  D6H.P.scores[i] <- anova(lm(data.in[,i]~D6Hsub))$`Pr(>F)`[1]
 }
 
+D6Hglm$p.value <- D6H.P.scores
 
-name.check(cptree,anc20) # check one table to make sure the names match
-#[1] "OK"
+D6Hglm$p.valueBH <- p.adjust(D6Hglm$p.value, method="BH")
+
+# get rid of NA
+D6Hglm$p.valueBH[is.na(D6Hglm$p.valueBH)] <- 99
+
+row.names(D6Hglm[(D6Hglm$p.valueBH<0.05),])
+# Notably, there are none
+
+D6Hsig <- row.names(D6Hglm[(D6Hglm$p.valueBH<0.1),])
+# "CL0186" "CL0368"
+
+## D6 clusters significantly similar to Af species
+
+D6Aglm <- annot_clust[,c(18:19,29:33)]
+D6Asub <- t(D6Aglm[c(1:3),])
+D6Asub[,1]<-"Af"
+D6Asub[1,1]<-"Gg"
+D6Asub[2,1]<-"Gg"
+D6Asub <- D6Asub[,1]
+
+data.in <- t(D6Aglm)
+D6A.P.scores <- rep(NA, ncol(data.in))
+for (i in 1:ncol(data.in)){
+  D6A.P.scores[i] <- anova(lm(data.in[,i]~D6Asub))$`Pr(>F)`[1]
+}
+
+D6Aglm$p.value <- D6A.P.scores
+
+D6Aglm$p.valueBH <- p.adjust(D6Aglm$p.value, method="BH")
+
+# get rid of NA
+D6Aglm$p.valueBH[is.na(D6Aglm$p.valueBH)] <- 99
+
+row.names(D6Aglm[(D6Aglm$p.valueBH<0.05),])
+#  [1] "CL0003" "CL0004" "CL0005" "CL0006" "CL0007" "CL0008" "CL0011" "CL0012" "CL0013" "CL0015" "CL0017" "CL0018" "CL0019" "CL0024" "CL0025" "CL0026" "CL0027" "CL0028" "CL0029" "CL0030" "CL0031" "CL0034" "CL0035" "CL0039"
+# [25] "CL0041" "CL0042" "CL0043" "CL0046" "CL0049" "CL0052" "CL0054" "CL0055" "CL0056" "CL0059" "CL0060" "CL0062" "CL0064" "CL0067" "CL0069" "CL0071" "CL0073" "CL0074" "CL0075" "CL0077" "CL0079" "CL0082" "CL0083" "CL0084"
+# [49] "CL0086" "CL0087" "CL0088" "CL0089" "CL0090" "CL0092" "CL0095" "CL0096" "CL0097" "CL0098" "CL0099" "CL0100" "CL0102" "CL0103" "CL0105" "CL0106" "CL0109" "CL0112" "CL0113" "CL0118" "CL0120" "CL0122" "CL0123" "CL0124"
+# [73] "CL0127" "CL0128" "CL0129" "CL0134" "CL0136" "CL0140" "CL0142" "CL0145" "CL0148" "CL0149" "CL0151" "CL0152" "CL0154" "CL0155" "CL0156" "CL0158" "CL0159" "CL0160" "CL0161" "CL0162" "CL0163" "CL0164" "CL0171" "CL0173"
+# [97] "CL0174" "CL0176" "CL0180" "CL0182" "CL0184" "CL0186" "CL0187" "CL0191" "CL0199" "CL0200" "CL0203" "CL0204" "CL0206" "CL0211" "CL0212" "CL0213" "CL0214" "CL0215" "CL0217" "CL0219" "CL0220" "CL0221" "CL0227" "CL0230"
+#[121] "CL0231" "CL0248" "CL0250" "CL0261" "CL0277" "CL0278" "CL0280" "CL0284" "CL0285" "CL0286" "CL0287" "CL0288" "CL0293" "CL0296" "CL0297" "CL0301" "CL0302" "CL0303" "CL0305" "CL0306" "CL0308" "CL0313" "CL0314" "CL0319"
+#[145] "CL0329" "CL0330" "CL0333" "CL0338" "CL0340" "CL0341" "CL0342" "CL0353" "CL0356" "CL0357" "CL0365" "CL0368" "CL0371" "CL0372" "CL0373" "CL0375" "CL0384" "CL0385" "CL0387" "CL0389" "CL0390" "CL0391"
+
+# notably "CL0186" and "CL0368" also show up here
+
+### Af versus Houz
+
+D6AZglm <- annot_clust[,c(2:17,20:33)]
+D6AZsub <- t(D6AZglm[c(1:3),])
+D6AZsub[,1]<-"Hz"
+D6AZsub[c(26:30),1]<-"Af"
+D6AZsub <- D6AZsub[,1]
+
+data.in <- t(D6AZglm)
+D6AZ.P.scores <- rep(NA, ncol(data.in))
+for (i in 1:ncol(data.in)){
+  D6AZ.P.scores[i] <- anova(lm(data.in[,i]~D6AZsub))$`Pr(>F)`[1]
+}
+
+D6AZglm$p.value <- D6AZ.P.scores
+
+D6AZglm$p.valueBH <- p.adjust(D6AZglm$p.value, method="BH")
+
+# get rid of NA
+D6AZglm$p.valueBH[is.na(D6AZglm$p.valueBH)] <- 99
+
+row.names(D6AZglm[(D6AZglm$p.valueBH<0.05),])
+#  [1] "CL0003" "CL0004" "CL0005" "CL0006" "CL0007" "CL0008" "CL0011" "CL0012" "CL0013" "CL0015" "CL0017" "CL0018" "CL0019" "CL0024" "CL0025" "CL0026" "CL0027" "CL0028" "CL0029" "CL0030" "CL0031" "CL0034" "CL0035" "CL0039"
+# [25] "CL0041" "CL0042" "CL0043" "CL0046" "CL0049" "CL0052" "CL0054" "CL0055" "CL0056" "CL0059" "CL0060" "CL0062" "CL0064" "CL0067" "CL0069" "CL0071" "CL0073" "CL0074" "CL0075" "CL0077" "CL0079" "CL0082" "CL0083" "CL0084"
+# [49] "CL0086" "CL0087" "CL0088" "CL0089" "CL0090" "CL0092" "CL0095" "CL0096" "CL0097" "CL0098" "CL0099" "CL0100" "CL0102" "CL0103" "CL0105" "CL0106" "CL0109" "CL0112" "CL0113" "CL0118" "CL0120" "CL0122" "CL0123" "CL0124"
+# [73] "CL0127" "CL0128" "CL0129" "CL0134" "CL0136" "CL0140" "CL0142" "CL0145" "CL0148" "CL0149" "CL0151" "CL0152" "CL0154" "CL0155" "CL0156" "CL0158" "CL0159" "CL0160" "CL0161" "CL0162" "CL0163" "CL0164" "CL0171" "CL0173"
+# [97] "CL0174" "CL0176" "CL0180" "CL0182" "CL0184" "CL0186" "CL0187" "CL0191" "CL0199" "CL0200" "CL0203" "CL0204" "CL0206" "CL0211" "CL0212" "CL0213" "CL0214" "CL0215" "CL0217" "CL0219" "CL0220" "CL0221" "CL0227" "CL0230"
+#[121] "CL0231" "CL0248" "CL0250" "CL0261" "CL0277" "CL0278" "CL0280" "CL0284" "CL0285" "CL0286" "CL0287" "CL0288" "CL0293" "CL0296" "CL0297" "CL0301" "CL0302" "CL0303" "CL0305" "CL0306" "CL0308" "CL0313" "CL0314" "CL0319"
+#[145] "CL0329" "CL0330" "CL0333" "CL0338" "CL0340" "CL0341" "CL0342" "CL0353" "CL0356" "CL0357" "CL0365" "CL0368" "CL0371" "CL0372" "CL0373" "CL0375" "CL0384" "CL0385" "CL0387" "CL0389" "CL0390" "CL0391"
+
+# notably "CL0186" and "CL0368" also show up here
+
+
+######## divergence times ######## 
+
+dsTime <- read.csv("final_dNdS.csv", header=T, row.names=1)[,c(2,4,6)]
+dsTime <- dsTime[ !grepl("D6-5", dsTime$qspecies),]
+dsTime <- dsTime[ !grepl("D6-5", dsTime$sspecies),]
+dsTime$sspecies <- gsub("D9-4|D4-185|D7-157|D11-1", "Erio", dsTime$sspecies)
+dsTime$qspecies <- gsub("D9-4|D4-185|D7-157|D11-1", "Erio", dsTime$qspecies)
+
+dsTime$sspecies <- gsub("D8-8|D2-2|D3-K-57|D3-D-27|D5-8|D2-1-6|D10-7|D1-35", "other", dsTime$sspecies)
+dsTime$qspecies <- gsub("D8-8|D2-2|D3-K-57|D3-D-27|D5-8|D2-1-6|D10-7|D1-35", "other", dsTime$qspecies)
+
+dsTime <- subset(dsTime, sspecies != qspecies)
+dsTime <- subset(dsTime, dS<3)
+
+quantile(dsTime$dS)
+#  0%     25%    50%    75%   100% 
+#0.0000 0.0138 0.0223 0.0371 2.8869 
+
+# median time for Malvaceae, as per Grover GBE 2018 = 3.61E-09
+
+erioNodeMin = 0.0138/(2*3.61e-09)/1000000 # 1.911357
+erioNodeMax = 0.0371/(2*3.61e-09)/1000000 # 5.138504
+erioNodeMedian = 0.0223/(2*3.61e-09)/1000000 #3.088643
+
+
+trfn = "small.concat.raxml.nwk.tre"
+tr = read.tree(trfn)
+
+# find the node that corresponds to the Erioxylum/rest of Houzingenia divergence; node 17
+plot(tr, cex = 0.5)
+nodelabels()
+
+# add dates to the tree
+cal <- makeChronosCalib(tr, node=17, age.min=erioNodeMin, age.max=erioNodeMin)
+chr <- chronos(tr, calibration = cal)
+write.tree(chr, file="phylo.date.tre", digits=10)
+
+
+
+######## ancestral state reconstruction of genome size for figure ######## 
+
+cattree <- read.nexus("small.concat.raxml.tre")
+
+# cattree$tip.label
+# [1] "D6_5"   "D8_8"   "D1_35"  "D3K_57" "D3D_27" "D5_8"   "D2_1_6" "D10_7"  "D2_2"   "D11_1"  "D7_157" "D4_185" "D9_4"   "F1_1"
+
+cattree$tip.label <- gsub("2_","2-",cattree$tip.label)
+cattree$tip.label <- gsub("_.*","",cattree$tip.label)
+cattree$tip.label <- gsub("K","k",cattree$tip.label)
+cattree$tip.label <- gsub("3D","3d",cattree$tip.label)
+#cattree$tip.label <- gsub("q","_",cattree$tip.label)
+
+gsv <- TEamounts[c(1:13,16),3]
+names(gsv) <- TEamounts[c(1:13,16),1]
+
+name.check(cattree,gsv)
 
 checkModel <- function (tree, df, outdf="name")
 {
@@ -480,6 +728,153 @@ checkModel <- function (tree, df, outdf="name")
 	assign(paste0(outdf,"aicw"), aicres, envir=globalenv())
 }
 
+checkModel(cattree, gsv, outdf="GSphylog")
+
+# > GSphylog
+#          lnL      aic
+# BM -79.55543 163.1109
+# OU -79.55544 165.1109
+# LA -79.55543 165.1109
+# KA -79.55543 165.1109
+# DE -73.78319 153.5664
+# EB -74.77727 155.5545
+# WH -86.02424 176.0485
+# TR -76.43052 158.8610
+
+# WH <- fitContinuous(cattree, genomesizes , model="white")
+# WH$opt$sigsq
+# [1] 12724.69
+
+rescale.cat <- rescale(cattree, model="white", WH$opt$siqsq)
+# This tree looks unreasonably like a rake; discarding this model
+
+
+makeGSstate <- function (tree, df, name="name")
+{
+    GSgradient <- contMap(tree, df, res=1000, plot=FALSE, lwd=0.5, fsize=1, sig=0)
+    GSgradient$tree$tip.label <- gsub("F1",paste0("G.longicalx, ",round(df[["F1"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D11",paste0("G.schwendimanii, ",round(df[["D11"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D6",paste0("G.gossypioides, ",round(df[["D6"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D10",paste0("G.turnerii, ",round(df[["D10"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D1",paste0("G.thurberi, ",round(df[["D1"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D8",paste0("G.trilobum, ",round(df[["D8"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D3d",paste0("G.davidsonii, ",round(df[["D3d"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D3k",paste0("G.klotzschianum, ",round(df[["D3k"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D5",paste0("G.raimondii, ",round(df[["D5"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D2-2",paste0("G.harknessii, ",round(df[["D2-2"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D2-1",paste0("G.armourianum, ",round(df[["D2-1"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D7",paste0("G.lobatum, ",round(df[["D7"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D4",paste0("G.aridum, ",round(df[["D4"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D9",paste0("G.laxum, ",round(df[["D9"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSfit <- fastAnc(tree, df, vars=TRUE, CI=TRUE)
+    gfit <- round(GSfit$ace)
+    assign(paste0("G",name), GSgradient, envir=globalenv())
+    assign(paste0("fit",name),gfit,envir=globalenv())
+}
+
+makeGSstateF1 <- function (tree, df, name="name")
+{
+    GSgradient <- contMap(tree, df, res=1000, plot=FALSE, lwd=0.5, fsize=1, sig=0)
+    GSgradient$tree$tip.label <- gsub("D6",paste0("G.gossypioides, ",round(df[["D6"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D11",paste0("G.schwendimanii, ",round(df[["D11"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D10",paste0("G.turnerii, ",round(df[["D10"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D1",paste0("G.thurberi, ",round(df[["D1"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D8",paste0("G.trilobum, ",round(df[["D8"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D3d",paste0("G.davidsonii, ",round(df[["D3d"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D3k",paste0("G.klotzschianum, ",round(df[["D3k"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D5",paste0("G.raimondii, ",round(df[["D5"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D2-2",paste0("G.harknessii, ",round(df[["D2-2"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D2-1",paste0("G.armourianum, ",round(df[["D2-1"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D7",paste0("G.lobatum, ",round(df[["D7"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D4",paste0("G.aridum, ",round(df[["D4"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D9",paste0("G.laxum, ",round(df[["D9"]]), " Mbp"),GSgradient$tree$tip.label)
+    GSfit <- fastAnc(tree, df, vars=TRUE, CI=TRUE)
+    gfit <- round(GSfit$ace)
+    assign(paste0("G",name), GSgradient, envir=globalenv())
+    assign(paste0("fit",name),gfit,envir=globalenv())
+}
+
+makeGSstate(cattree, gsv, name="GS.gradient")
+
+noF1 <- drop.tip(cattree, "F1")
+plot(noF1)
+gsvF <- gsv[-14]
+
+makeGSstateF1(noF1, gsvF, name="GS.F1")
+
+GGS.gradient$tree$tip.label <- gsub("Mbp.*", "Mbp                _____________________", GGS.gradient$tree$tip.label)
+GGS.F1$tree$tip.label <- gsub("Mbp.*", "Mbp", GGS.F1$tree$tip.label)
+
+time.labels=c(6.58,2.56,1.91,1.76,1.56,0.73,1.45,0.01,1.17,0.54,1.13,1.05,0.92)
+
+png("Figure.ancGS.png", 15000, 7320, pointsize=12, res=600)
+
+layout(matrix(c(1,2,0,0), 1, 2, byrow=FALSE))
+#layout.show(2)
+
+cw<-reorder(GGS.gradient$tree)
+par(fg="transparent", bg="white")
+plot(GGS.gradient, lwd=c(5,1), outline=FALSE, fsize=1) + nodelabels(time.labels, adj=c(-0.15,0.2), frame="none", cex=1.5)
+par(fg="black", bg="white")
+obj<-get("last_plot.phylo",envir=.PlotPhyloEnv)
+text(rep(max(obj$xx[1:Ntip(cw)]),Ntip(cw)),obj$yy[1:Ntip(cw)], labels=gsub("_"," ",cw$tip.label), font=3,pos=4,cex=2,offset=0.3)
+for(i in 1:Ntip(cw)) lines(c(obj$xx[i],max(obj$xx[1:Ntip(cw)])), rep(obj$yy[i],2),lty="dotted")
+
+cw<-reorder(GGS.F1$tree)
+par(fg="transparent")
+plot(GGS.F1, lwd=c(5,1), outline=FALSE, fsize=1, direction="leftwards") + nodelabels(round(fitGS.gradient[-1]), adj=c(1.2,0.2), frame="none", cex=1.5)
+dev.off()
+
+png("Figure.ancGSscale.png", 10000, 7320, pointsize=12, res=600)
+plot(GGS.F1)
+dev.off()
+
+######## ancestral state reconstruction of "very" significant clusters ######## 
+
+cptree <- read.nexus("concat.raxml.tre")
+
+plot.phylo(cptree, cex =1, label.offset=0.0005, align.tip.label=TRUE)
+nodelabels(cptree$node, adj=c(1.1,-0.2), frame="none", cex=1)
+
+sigclusters <- row.names(glm_clust[(glm_clust$p.valueBH<0.05),])
+ancTable <- Kbamount[sigclusters ,-c(1,29:32)]
+names(ancTable) <- gsub("\\.", "_", names(ancTable))
+names(ancTable)[names(ancTable) == 'D5ref'] <- 'D5_ref'
+names(ancTable)[names(ancTable) == 'D3D_2'] <- 'D3D_27'
+names(ancTable)[names(ancTable) == 'D3K_5'] <- 'D3K_57'
+names(ancTable)[names(ancTable) == 'D4_12'] <- 'D4_12C'
+
+anc20 <- t(ancTable["CL0020", ])
+anc67 <- t(ancTable["CL0067", ])
+anc96 <- t(ancTable["CL0096", ])
+anc112 <- t(ancTable["CL0112", ])
+anc142 <- t(ancTable["CL0142", ])
+anc172 <- t(ancTable["CL0172", ])
+anc181 <- t(ancTable["CL0181", ])
+anc186 <- t(ancTable["CL0186", ])
+anc211 <- t(ancTable["CL0211", ])
+anc248 <- t(ancTable["CL0248", ])
+anc253 <- t(ancTable["CL0253", ])
+anc254 <- t(ancTable["CL0254", ])
+anc295 <- t(ancTable["CL0295", ])
+anc351 <- t(ancTable["CL0351", ])
+anc360 <- t(ancTable["CL0360", ])
+
+varNames <- grep("anc", ls(), value=TRUE)
+varNames <- varNames[c(2:16)]
+
+for (anc in varNames) {  
+	obj <- get(anc)
+	names(obj) <- row.names(obj)
+	assign(anc, obj, envir=globalenv())
+}
+
+
+name.check(cptree,anc20) # check one table to make sure the names match
+#[1] "OK"
+
+
+
 checkModel(cptree, anc20, outdf="mdf20")
 checkModel(cptree, anc67, outdf="mdf67")
 checkModel(cptree, anc96, outdf="mdf96")
@@ -497,7 +892,6 @@ checkModel(cptree, anc351, outdf="mdf351")
 checkModel(cptree, anc360, outdf="mdf360")
 
 data.frame(mdf20[,1],mdf67[,1],mdf96[,1],mdf112[,1],mdf142[,1],mdf172[,1],mdf181[,1],mdf186[,1],mdf211[,1],mdf248[,1],mdf253[,1],mdf254[,1],mdf295[,1],mdf351[,1],mdf360[,1])
-
 
 
 row.names(as.data.frame(which(mdf96[,2] == min(mdf96[,2]))))
@@ -945,9 +1339,484 @@ close.screen(all.screens=TRUE)
 dev.off()
 
 
+
+
+
+
+
+
                
+######## ancestral state reconstruction of copia clusters ######## 
+
+cptree <- read.nexus("concat.raxml.tre")
+cptree <- drop.tip(cptree, "'D10_8.o'")
+
+#plot.phylo(cptree, cex =1, label.offset=0.0005, align.tip.label=TRUE)
+#nodelabels(cptree$node, adj=c(1.1,-0.2), frame="none", cex=1)
+
+copiaclusters <- row.names(annot_clust[(annot_clust$Lineage=="LTR/Copia"),])
+copTable <- Kbamount[copiaclusters ,-c(1,29:32)]
+names(copTable)[names(copTable) == 'D5ref'] <- 'D5_ref'
+names(copTable)[names(copTable) == 'D3D_2'] <- 'D3D_27'
+names(copTable)[names(copTable) == 'D3K_5'] <- 'D3K_57'
+names(copTable)[names(copTable) == 'D4_12'] <- 'D4_12C'
+names(copTable)[names(copTable) == 'D2.1_6'] <- 'D2_1_6'
+names(copTable)[names(copTable) == 'D2.2'] <- 'D2_2'
+
+#> copiaclusters
+# [1] "CL0059" "CL0068" "CL0072" "CL0088" "CL0094" "CL0103" "CL0105" "CL0107" "CL0115" "CL0118"
+#[11] "CL0125" "CL0126" "CL0129" "CL0132" "CL0139" "CL0141" "CL0144" "CL0146" "CL0150" "CL0159"
+#[21] "CL0171" "CL0172" "CL0184" "CL0192" "CL0194" "CL0195" "CL0202" "CL0205" "CL0207" "CL0208"
+#[31] "CL0219" "CL0227" "CL0250" "CL0253" "CL0257" "CL0271" "CL0283" "CL0294" "CL0295" "CL0298"
+#[41] "CL0305" "CL0314" "CL0319" "CL0322" "CL0335" "CL0342" "CL0348" "CL0356" "CL0358" "CL0364"
+#[51] "CL0382" "CL0388"
+
+for (i in c(1:52)) { assign(paste0("cop",copiaclusters[i]), t(subset(copTable, row.names(copTable) %in% copiaclusters[i]))) }
+
+
+varNames <- grep("copCL", ls(), value=TRUE)
+#varNames <- varNames[c(2:16)]
+
+for (cop in varNames) {  
+	obj <- get(cop)
+	names(obj) <- row.names(obj)
+	assign(cop, obj, envir=globalenv())
+}
+
+
+name.check(cptree,copCL0059) # check one table to make sure the names match
+#[1] "OK"
+
+
+for (name in varNames) { checkModel(cptree, get(name),outdf=paste0("mdf",name)) }
+
+mdfNames <- grep("mdfcopCL", ls(), value=TRUE)
+mdfNames <- gsub("aicw|diff", "", mdfNames)
+mdfNames <- mdfNames[!duplicated(mdfNames)]
+
+
+# how does the best model compare to the BM module; i.e., using AIC, how much information is lost if we use BM instead of the preferred model
+bestModel <- data.frame(cluster=rep(NA, length(mdfNames)), bestModel=rep("", length(mdfNames)), modelAIC=rep("", length(mdfNames)), BMAIC=rep("", length(mdfNames)), stringsAsFactors=FALSE)
+
+for (i in (1:length(mdfNames))) {
+bestModel[i,] <- list((mdfNames[i]), (row.names(as.data.frame(which(get(mdfNames[i])[,2] == min(get(mdfNames[i])[,2]))))), min(get(mdfNames[i])[,2]), (get(mdfNames[i])[1,2]))
+ }
+
+bestModel <- bestModel[order(bestModel$bestModel),]
+
+bestModel$diff <- abs(as.numeric(bestModel$modelAIC) - as.numeric(bestModel$BMAIC))
+bestModel$exp <- exp(bestModel$diff/2)
+
+# Interesting that the WH model is most often the best, but let's not use it
+
+makeState <- function (tree, df, name="name")
+{
+    GSgradient <- contMap(tree, df, res=1000, plot=FALSE, lwd=0.5, fsize=1, sig=0)
+    GSgradient$tree$tip.label <- gsub("F1_1",paste0("G.longicalx, ",round(df[["F1_1"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D6_7",paste0("G.gossypioides 7, ",round(df[["D6_7"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D6_5",paste0("G.gossypioides 5, ",round(df[["D6_5"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D1_35",paste0("G.thurberi 35, ",round(df[["D1_35"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D1_2",paste0("G.thurberi 2, ",round(df[["D1_2"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D8_9",paste0("G.trilobum 9, ",round(df[["D8_9"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D8_8",paste0("G.trilobum 8, ",round(df[["D8_8"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D3D_27",paste0("G.davidsonii 27, ",round(df[["D3D_27"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D3K_57",paste0("G.klotzschianum 57, ",round(df[["D3K_57"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D3K_56",paste0("G.klotzschianum 56, ",round(df[["D3K_56"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D5_6",paste0("G.raimondii 6, ",round(df[["D5_6"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D5_53",paste0("G.raimondii 53, ",round(df[["D5_53"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D5_31",paste0("G.raimondii 31, ",round(df[["D5_31"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D5_2",paste0("G.raimondii 2, ",round(df[["D5_2"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D5_4",paste0("G.raimondii 4, ",round(df[["D5_4"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D5_8",paste0("G.raimondii 8, ",round(df[["D5_8"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D5_ref",paste0("G.raimondii ref, ",round(df[["D5_ref"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D10_3",paste0("G.turnerii 3, ",round(df[["D10_3"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D10_7",paste0("G.turnerii 7, ",round(df[["D10_7"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D10_8",paste0("G.turnerii 8, ",round(df[["D10_8"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D2_2",paste0("G.harknessii, ",round(df[["D2_2"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D2_1_6",paste0("G.armourianum 6, ",round(df[["D2_1_6"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D11_1",paste0("G.schwendimanii 1, ",round(df[["D11_1"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D7_157",paste0("G.lobatum 157, ",round(df[["D7_157"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D7_4",paste0("G.lobatum 7, ",round(df[["D7_4"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D4_185",paste0("G.aridum 185, ",round(df[["D4_185"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D9_4",paste0("G.laxum 4, ",round(df[["D9_4"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D4_12C",paste0("G.aridum 12C, ",round(df[["D4_12C"]])),GSgradient$tree$tip.label)
+    GSfit <- fastAnc(tree, df, vars=TRUE, CI=TRUE)
+    gfit <- round(GSfit$ace)
+    assign(paste0("G",name), GSgradient, envir=globalenv())
+    assign(paste0("fit",name),gfit,envir=globalenv())
+}
+
+varNames <- gsub("mdf|aicw|diff", "", varNames)
+varNames <- varNames [!duplicated(varNames )]
+
+for (name in varNames) { makeState(cptree, get(name),(paste0("anc",name))) }
+
+nodeSize <- ls(pattern="fitanc")
+
+vals <- vector(mode="numeric", length=0) # compare tips to reconstructed basal D node
+Fvals <- vector(mode="numeric", length=0)  # compare tips to reconstructed basal node
+Fchange <- vector(mode="numeric", length=0)
+
+for (name in row.names(copCL0059)) { 
+    newvec <- vector(mode="numeric", length=0)
+    assign(paste0("vec",name),newvec,envir=globalenv()) }
+
+for (i in varNames) { 
+    
+    temp <- get(i)
+    sub <- get(paste0("fitanc",i))
+
+    # how much did each change compared to the reconstructed D root
+    temp <- as.data.frame(temp[c(1:27),])
+    temp$diff <- temp[,1] - sub[[2]]
+    vals <-c(vals,temp$diff)    
+
+    # how much did each change compared to reconstructed root
+    temp$Fdiff <- temp[,1] - sub[[1]]
+    Fvals <-c(Fvals,temp$Fdiff)
+
+    for (r in c(1:27)) {
+        newr <- temp[r,1]-sub[[2]]
+        assign(paste0("vec",row.names(temp)[r]), c(get(paste0("vec",row.names(temp)[r])),newr), envir=globalenv()) 
+    }   
+
+    assign(i,temp,envir=globalenv())
+}
+
+vecs <- ls(pattern="vecD")
+#  [1] "vecD1_2"   "vecD1_35"  "vecD10_3"  "vecD10_7"  "vecD10_8"  "vecD11_1"  "vecD2_1_6" "vecD2_2"   "vecD3D_27" "vecD3K_56" "vecD3K_57"
+# [12] "vecD4_12C" "vecD4_185" "vecD5_2"   "vecD5_31"  "vecD5_4"   "vecD5_53"  "vecD5_6"   "vecD5_8"   "vecD5_ref" "vecD6_5"   "vecD6_7"  
+# [23] "vecD7_157" "vecD7_4"   "vecD8_8"   "vecD8_9"   "vecD9_4"
+
+
+boxplot(vals)
+boxplot(Fvals)
+boxplot(Fchange)
+
+boxplot.matrix <- cbind(vals, Fvals,vecD1_2, vecD1_35, vecD2_1_6, vecD2_2, vecD3D_27, vecD3K_56, vecD3K_57, vecD4_12C, vecD4_185, vecD5_2, vecD5_31, vecD5_4, vecD5_53, vecD5_6, vecD5_8, vecD5_ref, vecD6_5, vecD6_7, vecD7_157, vecD7_4, vecD8_8, vecD8_9, vecD9_4, vecD10_3, vecD10_7, vecD10_8, vecD11_1, Fchange)
+
+
+plusminus <- data.frame(underZero=numeric(), total_under=numeric(), overZero=numeric(), total_over=numeric(), median=numeric(), sum=numeric(), stringsAsFactors=FALSE)
+
+plusminus[1,1] <- length(which(vals<0)) 
+plusminus[1,2] <- sum(which(vals<0))
+plusminus[1,3] <- length(which(vals>0)) 
+plusminus[1,4] <- sum(which(vals>0))
+plusminus[1,5] <- median(vals)
+row.names(plusminus)[1] <- "overall"
+
+for (i in vecs) {
+    temp <- get(i)
+    plusminus[i,1] <- length(temp[which(temp<0)]) 
+    plusminus[i,2] <- sum(temp[which(temp<0)])
+    plusminus[i,3] <- length(temp[which(temp>0)]) 
+    plusminus[i,4] <- sum(temp[which(temp>0)])
+    plusminus[i,5] <- median(temp)
+    plusminus[i,6] <- sum(temp)
+}
+
+write.table(plusminus, file="copia.gainloss.tbl", quote=F, sep="\t", row.names=TRUE)
+
+length(which(Fvals<0))
+#[1] 664
+
+length(which(Fvals>0))
+#[1] 740
+
+median(Fvals)
+#[1] 12
+
+
+gainloss <- c(sum(vecD1_2), sum(vecD1_35), sum(vecD2_1_6), sum(vecD2_2), sum(vecD3D_27), sum(vecD3K_56), sum(vecD3K_57), sum(vecD4_12C), sum(vecD4_185), sum(vecD5_2), sum(vecD5_31), sum(vecD5_4), sum(vecD5_53), sum(vecD5_6), sum(vecD5_8), sum(vecD5_ref), sum(vecD6_5), sum(vecD6_7), sum(vecD7_157), sum(vecD7_4), sum(vecD8_8), sum(vecD8_9), sum(vecD9_4), sum(vecD10_3), sum(vecD10_7), sum(vecD10_8), sum(vecD11_1))
+names(gainloss)<- c("D1_2", "D1_35", "D2_1_6", "D2_2", "D3D_27", "D3K_56", "D3K_57", "D4_12C", "D4_185", "D5_2", "D5_31", "D5_4", "D5_53", "D5_6", "D5_8", "D5_ref", "D6_5", "D6_7", "D7_157", "D7_4", "D8_8", "D8_9", "D9_4", "D10_3", "D10_7", "D10_8", "D11_1")
+
+#   D1_2   D1_35  D2_1_6    D2_2  D3D_27  D3K_56  D3K_57  D4_12C  D4_185    D5_2 
+#-3995.5 -4765.0   650.0 -1962.5  1448.0  5694.5  8117.0  1913.5   298.5  3946.5 
+#  D5_31    D5_4   D5_53    D5_6    D5_8  D5_ref    D6_5    D6_7  D7_157    D7_4 
+#-2124.0 -3672.5 -5335.0 40379.0 -4841.0 -4470.5 -1145.5 -5012.0   545.5  1391.0 
+#   D8_8    D8_9    D9_4   D10_3   D10_7   D10_8   D11_1 
+# 3832.5 -3292.5  4070.0  -936.5 -4717.5 -3473.0 -1164.5 
+
+gainloss <- melt(gainloss)
+
+png("Figure.magnitude.gainloss.copia.png", 15000, 7320, pointsize=12, res=600)
+ggplot(gainloss, aes(x=row.names(gainloss),y=value)) + geom_bar(stat="identity")+ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
+dev.off()
+
+png("Figure.number.gainloss.png", 15000, 7320, pointsize=12, res=600)
+gldf <- as.data.frame(cbind(vals, Fvals, Fchange))
+ggplot(gldf, aes(x=vals)) + geom_density(fill="blue",color="blue")+geom_vline(xintercept=0, size=1, linetype="dashed")
+deorv.off()                             
                              
-                             
+
+
 ########### relative aging of transposable elements ###########
+
+# see TE_dating_histogram.pl for table generation
+
+ages <- read.table("TE_dating.txt", header=T, row.names=1, sep="\t")
+ages$age <- ages$Category
+
+allages <- read.table("dating.forR", header =T, row.names=1, sep="\t")
+allages$age <- allages$Category
+
+#Category	age
+#1	young
+#3	old
+#4	young
+#5	old
+#4*	old
+
+ages$age <- sub("3|5|4\\*","old",ages$age)
+ages$age <- sub("1|4","young",ages$age)
+
+allages$age <- sub("3|5|4\\*","old",allages$age)
+allages$age <- sub("1|4","young",allages$age)
+
+Dallages <- allages[(allages$name != "A1-155"),]
+Dallages <- Dallages[(Dallages$name != "A1-97"),]
+Dallages <- Dallages[(Dallages$name != "A2_101"),]
+Dallages <- Dallages[(Dallages$name != "A2_34"),]
+Dallages <- Dallages[(Dallages$name != "all"),]
+Dallages <- Dallages[(Dallages$name != "F1-1"),]
+Dallages <- Dallages[!is.na(Dallages$age),]
+
+
+table(ages$age)
+#  old young 
+#  308    86 
+
+> table(Dallages$age)
+
+    2     6   old young 
+    1    15  7979  2221 
+
+
+table(subset(Dallages, name=="D4-185")$age)
+#  old young 
+#  286    79 
+
+
+yold <- data.frame(old=numeric(), young=numeric(), perc_old=numeric(), stringsAsFactors=FALSE)
+
+for (aname in Dnames) {
+#    temp <- get(i)
+    yold[aname,1] <- nrow(subset(Dallages, name==aname & age=="old")) 
+    yold[aname,2] <- nrow(subset(Dallages, name==aname & age=="young"))
+    yold[aname,3] <- 100*yold[aname,1]/(yold[aname,2] + yold[aname,1])
+}
+
+min(yold$perc_old)
+# 76.5%
+max(yold$perc_old)
+# 79.7%
+
+write.table(yold, file="D.ages.tbl", quote=F, sep="\t", row.names=TRUE)
+
+DsmAge <- Dallages[,c(1,2,8)]
+DsmAge <- recast(DsmAge, cluster~name)
+DsmYoung <- DsmAge[rowSums(DsmAge == "young", na.rm = TRUE)>0,]
+DsmYoung$number <- rowSums(DsmYoung == "young", na.rm = TRUE)
+table(DsmYoung$number)
+#  1  2  3  4  5  6  7  9 10 12 13 14 16 17 18 22 24 25 26 28 
+# 20  5  7  2  3  1  4  1  3  1  1  3  1  1  1  1  2  4  3 61 
+
+nrow(DsmYoung)
+# 125
+
+61/125
+# 0.488
+20/125
+# 0.16
+
+png("Figure.hist.number.young.png", 15000, 7320, pointsize=12, res=600)
+hist(DsmYoung$number)
+dev.off()
+
+youngClusters <- as.character(DsmYoung$cluster)
+
+youngTable <- Kbamount[youngClusters ,-c(1,29:32)]
+names(youngTable)[names(youngTable) == 'D5ref'] <- 'D5_ref'
+names(youngTable)[names(youngTable) == 'D3D_2'] <- 'D3D_27'
+names(youngTable)[names(youngTable) == 'D3K_5'] <- 'D3K_57'
+names(youngTable)[names(youngTable) == 'D4_12'] <- 'D4_12C'
+names(youngTable)[names(youngTable) == 'D2.1_6'] <- 'D2_1_6'
+names(youngTable)[names(youngTable) == 'D2.2'] <- 'D2_2'
+
+for (i in c(1:125)) { assign(paste0("yng",youngClusters[i]), t(subset(youngTable, row.names(youngTable) %in% youngClusters[i]))) }
+
+
+youngNames <- grep("yngCL", ls(), value=TRUE)
+
+
+for (yng in youngNames) {  
+	obj <- get(yng)
+	names(obj) <- row.names(obj)
+	assign(yng, obj, envir=globalenv())
+}
+
+
+name.check(cptree,yngCL0055) # check one table to make sure the names match
+#[1] "OK"
+
+for (name in youngNames) { makeState(cptree, get(name),(paste0("anc",name))) }
+
+youngVals <- vector(mode="numeric", length=0) # compare tips to reconstructed basal D node
+
+for (name in row.names(yngCL0055)) { 
+    youngvec <- vector(mode="numeric", length=0)
+    assign(paste0("young",name),newvec,envir=globalenv()) }
+
+for (i in youngNames) { 
+    
+    temp <- get(i)
+    sub <- get(paste0("fitanc",i))
+
+    # how much did each change compared to the reconstructed D-F root
+    temp <- as.data.frame(temp[c(1:27),])
+    temp$diff <- temp[,1] - sub[[1]]
+    youngVals <-c(youngVals,temp$diff)    
+
+    for (r in c(1:27)) {
+        newr <- temp[r,1]-sub[[1]]
+        assign(paste0("young",row.names(temp)[r]), c(get(paste0("young",row.names(temp)[r])),newr), envir=globalenv()) 
+    }   
+
+    assign(i,temp,envir=globalenv())
+}
+
+youngs <- ls(pattern="youngD")
+
+boxplot(youngVals)
+
+yplusminus <- data.frame(underZero=numeric(), total_under=numeric(), overZero=numeric(), total_over=numeric(), median=numeric(), sum=numeric(), stringsAsFactors=FALSE)
+
+for (i in youngs) {
+    temp <- get(i)
+    yplusminus[i,1] <- length(temp[which(temp<0)]) 
+    yplusminus[i,2] <- sum(temp[which(temp<0)])
+    yplusminus[i,3] <- length(temp[which(temp>0)]) 
+    yplusminus[i,4] <- sum(temp[which(temp>0)])
+    yplusminus[i,5] <- median(temp)
+    yplusminus[i,6] <- sum(temp)
+}
+
+write.table(yplusminus, file="young.gainloss.total.tbl", quote=F, sep="\t", row.names=TRUE)
+
+youngGrow <- DsmYoung[DsmYoung$number==28,]
+growNames <- gsub("CL", "yngCL", youngGrow$cluster)
+
+
+growVals <- vector(mode="numeric", length=0) # compare tips to reconstructed basal D-F node
+
+for (i in growNames) { 
+    
+    temp <- get(i)
+    sub <- get(paste0("fitanc",i))
+
+    # how much did each change compared to the reconstructed D-F root
+    temp <- as.data.frame(temp[c(1:27),])
+    temp$diff <- temp[,1] - sub[[1]]
+    growVals <-c(growVals,temp$diff)    
+
+    for (r in c(1:27)) {
+        newr <- temp[r,1]-sub[[1]]
+        assign(paste0("grow",row.names(temp)[r]), c(get(paste0("young",row.names(temp)[r])),newr), envir=globalenv()) 
+    }   
+
+    assign(i,temp,envir=globalenv())
+}
+
+grows <- ls(pattern="growD")
+
+boxplot(youngVals, growVals)
+
+growplusminus <- data.frame(underZero=numeric(), total_under=numeric(), overZero=numeric(), total_over=numeric(), median=numeric(), sum=numeric(), stringsAsFactors=FALSE)
+
+for (i in grows) {
+    temp <- get(i)
+    growplusminus[i,1] <- length(temp[which(temp<0)]) 
+    growplusminus[i,2] <- sum(temp[which(temp<0)])
+    growplusminus[i,3] <- length(temp[which(temp>0)]) 
+    growplusminus[i,4] <- sum(temp[which(temp>0)])
+    growplusminus[i,5] <- median(temp)
+    growplusminus[i,6] <- sum(temp)
+}
+
+
+OneGrow <- DsmYoung[DsmYoung$number==1,]
+OneNames <- gsub("CL", "yngCL", OneGrow$cluster)
+
+
+Dclust <- annot_clust[,c(2:28)]
+Dclust$sum <- rowSums(Dclust)
+Dclust <- Dclust[Dclust$sum>279,]
+
+
+
+
+makeStateFig <- function (tree, df, name="name")
+{
+    GSgradient <- contMap(tree, df, res=1000, plot=FALSE, lwd=0.5, fsize=1, sig=0)
+    GSgradient$tree$tip.label <- gsub("F1_1",paste0("G.longicalx, ",round(df[["F1_1"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D6_7",paste0("G.gossypioides 7, ",round(df[["D6_7"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D6_5",paste0("G.gossypioides 5, ",round(df[["D6_5"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D1_35",paste0("G.thurberi 35, ",round(df[["D1_35"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D1_2",paste0("G.thurberi 2, ",round(df[["D1_2"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D8_9",paste0("G.trilobum 9, ",round(df[["D8_9"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D8_8",paste0("G.trilobum 8, ",round(df[["D8_8"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D3D_27",paste0("G.davidsonii 27, ",round(df[["D3D_27"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D3K_57",paste0("G.klotzschianum 57, ",round(df[["D3K_57"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D3K_56",paste0("G.klotzschianum 56, ",round(df[["D3K_56"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D5_6",paste0("G.raimondii 6, ",round(df[["D5_6"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D5_53",paste0("G.raimondii 53, ",round(df[["D5_53"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D5_31",paste0("G.raimondii 31, ",round(df[["D5_31"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D5_2",paste0("G.raimondii 2, ",round(df[["D5_2"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D5_4",paste0("G.raimondii 4, ",round(df[["D5_4"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D5_8",paste0("G.raimondii 8, ",round(df[["D5_8"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D5_ref",paste0("G.raimondii ref, ",round(df[["D5_ref"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D10_3",paste0("G.turnerii 3, ",round(df[["D10_3"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D10_7",paste0("G.turnerii 7, ",round(df[["D10_7"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D10_8",paste0("G.turnerii 8, ",round(df[["D10_8"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D2_2",paste0("G.harknessii, ",round(df[["D2_2"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D2_1_6",paste0("G.armourianum 6, ",round(df[["D2_1_6"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D11_1",paste0("G.schwendimanii 1, ",round(df[["D11_1"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D7_157",paste0("G.lobatum 157, ",round(df[["D7_157"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D7_4",paste0("G.lobatum 7, ",round(df[["D7_4"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D4_185",paste0("G.aridum 185, ",round(df[["D4_185"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D9_4",paste0("G.laxum 4, ",round(df[["D9_4"]])),GSgradient$tree$tip.label)
+    GSgradient$tree$tip.label <- gsub("D4_12C",paste0("G.aridum 12C, ",round(df[["D4_12C"]])),GSgradient$tree$tip.label)
+    GSfit <- fastAnc(tree, df, vars=TRUE, CI=TRUE)
+    gfit <- round(GSfit$ace)
+    
+    png(paste0(name,".anc.png"), 5000, 3750, pointsize=12, res=600)
+    plot(GSgradient, legend=FALSE, lwd=c(2,1), outline=FALSE, fsize=0.8) + nodelabels(round(gfit), adj=c(-0.3,0.2), frame="none", cex=0.6)
+    dev.off()
+
+    assign(paste0("G",name), GSgradient, envir=globalenv())
+    assign(paste0("fit",name),gfit,envir=globalenv())
+}
+
+allTable <- Kbamount[,-c(1,29:32)]
+names(allTable)[names(allTable) == 'D5ref'] <- 'D5_ref'
+names(allTable)[names(allTable) == 'D3D_2'] <- 'D3D_27'
+names(allTable)[names(allTable) == 'D3K_5'] <- 'D3K_57'
+names(allTable)[names(allTable) == 'D4_12'] <- 'D4_12C'
+names(allTable)[names(allTable) == 'D2.1_6'] <- 'D2_1_6'
+names(allTable)[names(allTable) == 'D2.2'] <- 'D2_2'
+
+
+for (i in c(1:nrow(allTable))) { assign(paste0("all",row.names(allTable)[i]), t(allTable[i,])) }
+
+allNames <- grep("allCL", ls(), value=TRUE)
+
+for (cop in allNames) {  
+	obj <- get(cop)
+	names(obj) <- row.names(obj)
+	assign(cop, obj, envir=globalenv())
+}
+
+for (name in allNames) { makeState(cptree, get(name),(paste0("anc",name))) }
+
 
 
