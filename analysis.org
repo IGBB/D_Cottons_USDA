@@ -941,6 +941,7 @@ cut -f 4 <<<"$libs" |
     xargs printf "$DIR/analysis/d.align/%s.all.bam\n" |
     parallel -j6 --tag samtools view -F4 -c {} |
     awk '{$2 = $2 * 85 / 880000000; print $0}'
+#+END_SRC
 #+RESULTS:
 
 #+Caption: Estimated Aligned Coverage of D5 (calculated: #mapped_reads * 85 / 880000000)
@@ -1126,41 +1127,41 @@ cat <<<"$libs" | uniq -w 11
 #+RESULTS:
 #+CAPTION: Sampling Rates
 #+NAME: sample_tbl
-| Library            | Sample Name | Genome Size (Mb) | Sampling (Mb) | Number of reads |
-|--------------------+-------------+------------------+---------------+-----------------|
-| D10-8.Gturn1.9     | D10-8o      |              910 |           9.1 |          107059 |
-| D10-3.HG7LFALXX.1  | D10-3_      |              910 |           9.1 |          107059 |
-| D10-7.HGF7YALXX.5  | D10-7_      |              910 |           9.1 |          107059 |
-| D10-8.HG7LFALXX.1  | D10-8_      |              910 |           9.1 |          107059 |
-| D11-1.Gschw1.7     | D11-1_      |              929 |          9.29 |          109295 |
-| D1-2.Gthur1.7      | D1-2__      |              841 |          8.41 |           98942 |
-| D1-35.Gthur2.5     | D1-35_      |              841 |          8.41 |           98942 |
-| D2-1-6.Garmo1.5    | D2-1-6      |              856 |          8.56 |          100706 |
-| D3-D-27.Gdavi1.1   | D3-D-2      |              910 |           9.1 |          107059 |
-| D3-K-57.Gklot1.6   | D3-K-5      |              880 |           8.8 |          103530 |
-| D4-12.Garid1.2     | D4-12_      |              919 |          9.19 |          108118 |
-| D5-6.Graim2.1      | D5-6__      |              880 |           8.8 |          103530 |
-| D5-8.Graim1.7      | D5-8__      |              880 |           8.8 |          103530 |
-| D6-5.Ggoss2.2      | D6-5__      |              841 |          8.41 |           98942 |
-| D6-7.Ggoss1.3      | D6-7__      |              841 |          8.41 |           98942 |
-| D7-4.Globa1.1      | D7-4__      |              934 |          9.34 |          109883 |
-| D8-8.Gtril2.1      | D8-8__      |              851 |          8.51 |          100118 |
-| D8-9.Gtril1.1      | D8-9__      |              851 |          8.51 |          100118 |
-| D9-4.Glaxu1.1      | D9-4__      |              934 |          9.34 |          109883 |
-| A1-97              | A1-97_      |             1667 |         16.67 |          196118 |
-| A1-155             | A1-155      |             1667 |         16.67 |          196118 |
-| A2_1011            | A2_101      |             1698 |         16.98 |          199765 |
-| A2_34              | A2_34_      |             1698 |         16.98 |          199765 |
-| D5_ref             | D5_ref      |              880 |           8.8 |          103530 |
-| F1-1               | F1-1__      |             1311 |         13.11 |          154236 |
-| D2-2.HFJ7YBGXX.1   | D2-2__      |              910 |           9.1 |          107059 |
-| D3K-56.HFJ7YBGXX.1 | D3K-56      |              880 |           8.8 |          103530 |
-| D4-185.HFJ7YBGXX.1 | D4-185      |              919 |          9.19 |          108118 |
-| D7-157.HFJ7YBGXX.1 | D7-157      |              934 |          9.34 |          109883 |
-| D5_2               | D5_2__      |              880 |           8.8 |          103530 |
-| D5_4               | D5_4__      |              880 |           8.8 |          103530 |
-| D5_31              | D5_31_      |              880 |           8.8 |          103530 |
-| D5_53              | D5_53_      |              880 |           8.8 |          103530 |
+| Sample Name | Library            | Genome Size (Mb) | Sampling (Mb) | Number of reads |
+|-------------+--------------------+------------------+---------------+-----------------|
+| D10-8o      | D10-8.Gturn1.9     |              910 |           9.1 |          107059 |
+| D10-3_      | D10-3.HG7LFALXX.1  |              910 |           9.1 |          107059 |
+| D10-7_      | D10-7.HGF7YALXX.5  |              910 |           9.1 |          107059 |
+| D10-8_      | D10-8.HG7LFALXX.1  |              910 |           9.1 |          107059 |
+| D11-1_      | D11-1.Gschw1.7     |              929 |          9.29 |          109295 |
+| D1-2__      | D1-2.Gthur1.7      |              841 |          8.41 |           98942 |
+| D1-35_      | D1-35.Gthur2.5     |              841 |          8.41 |           98942 |
+| D2-1-6      | D2-1-6.Garmo1.5    |              856 |          8.56 |          100706 |
+| D3-D-2      | D3-D-27.Gdavi1.1   |              910 |           9.1 |          107059 |
+| D3-K-5      | D3-K-57.Gklot1.6   |              880 |           8.8 |          103530 |
+| D4-12_      | D4-12.Garid1.2     |              919 |          9.19 |          108118 |
+| D5-6__      | D5-6.Graim2.1      |              880 |           8.8 |          103530 |
+| D5-8__      | D5-8.Graim1.7      |              880 |           8.8 |          103530 |
+| D6-5__      | D6-5.Ggoss2.2      |              841 |          8.41 |           98942 |
+| D6-7__      | D6-7.Ggoss1.3      |              841 |          8.41 |           98942 |
+| D7-4__      | D7-4.Globa1.1      |              934 |          9.34 |          109883 |
+| D8-8__      | D8-8.Gtril2.1      |              851 |          8.51 |          100118 |
+| D8-9__      | D8-9.Gtril1.1      |              851 |          8.51 |          100118 |
+| D9-4__      | D9-4.Glaxu1.1      |              934 |          9.34 |          109883 |
+| A1-97_      | A1-97              |             1667 |         16.67 |          196118 |
+| A1-155      | A1-155             |             1667 |         16.67 |          196118 |
+| A2_101      | A2_1011            |             1698 |         16.98 |          199765 |
+| A2_34_      | A2_34              |             1698 |         16.98 |          199765 |
+| D5_ref      | D5_ref             |              880 |           8.8 |          103530 |
+| F1-1__      | F1-1               |             1311 |         13.11 |          154236 |
+| D2-2__      | D2-2.HFJ7YBGXX.1   |              910 |           9.1 |          107059 |
+| D3K-56      | D3K-56.HFJ7YBGXX.1 |              880 |           8.8 |          103530 |
+| D4-185      | D4-185.HFJ7YBGXX.1 |              919 |          9.19 |          108118 |
+| D7-157      | D7-157.HFJ7YBGXX.1 |              934 |          9.34 |          109883 |
+| D5_2__      | D5_2               |              880 |           8.8 |          103530 |
+| D5_4__      | D5_4               |              880 |           8.8 |          103530 |
+| D5_31_      | D5_31              |              880 |           8.8 |          103530 |
+| D5_53_      | D5_53              |              880 |           8.8 |          103530 |
 #+TBLFM: $4=$3*0.01::$5=ceil($4*1000000/85)
 
 #+BEGIN_SRC sh :var libs=sample_tbl :var DIR=(file-name-directory buffer-file-name)
@@ -1200,11 +1201,12 @@ done <<< "$libs" | paste - - | tr ':' '\t'
 #+BEGIN_SRC sh :var libs=sample_tbl :var DIR=(file-name-directory buffer-file-name)
 PATH=$PATH:$DIR/bin/
 
-parallel -k --colsep '\t' reservoir_sample -l 85 -n {2} -s {5} $DIR/trim/{1}.PE.R1.fq.gz ::: "$libs" >  $DIR/analysis/clustering/sample.fa
+#parallel -k --colsep '\t' reservoir_sample -l 85 -n {2} -s {5} $DIR/trim/{1}.PE.R1.fq.gz ::: "$libs" >  $DIR/analysis/clustering/sample.fa
 
-# while read -a lib; do
-#     reservoir_sample -l 85 -n ${lib[1]} -s ${lib[4]} $DIR/trim/${lib[0]}.PE.R1.fq.gz
-# done <<< "$libs" > $DIR/analysis/clustering/sample.fa
+for name in "${!libs[@]}"; do
+    readarray -t lib <<<"${libs[$name]}"
+    reservoir_sample -l 85 -n $name -s ${lib[3]} $DIR/trim/${lib[0]}.PE.R1.fq.gz
+done > $DIR/analysis/clustering/sample.fa
 #+END_SRC
 
 
