@@ -39,7 +39,7 @@ while(<>){
     next if $prev && $prev eq $hsp;
     $prev = $hsp;
 
-    $id = [map{substr($_, 0, 6)} @$id]; 
+    $id = [map{substr($_, 0, 7)} @$id]; 
     next unless $id->[0] eq $id->[1];
     
     $histo->{$id->[0]}->{$pid}++;
