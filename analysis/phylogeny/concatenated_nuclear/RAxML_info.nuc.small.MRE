@@ -1,0 +1,34 @@
+
+
+WARNING: RAxML is not checking sequences for duplicate seqs and sites with missing data!
+
+
+
+This is RAxML version 8.2.9 released by Alexandros Stamatakis on July 20 2016.
+
+With greatly appreciated code contributions by:
+Andre Aberer      (HITS)
+Simon Berger      (HITS)
+Alexey Kozlov     (HITS)
+Kassian Kobert    (HITS)
+David Dao         (KIT and HITS)
+Sarah Lutteropp   (KIT and HITS)
+Nick Pattengale   (Sandia)
+Wayne Pfeiffer    (SDSC)
+Akifumi S. Tanabe (NRIFS)
+Charlie Taylor    (UF)
+
+
+RAxML consensus tree computation
+
+
+RAxML was called as follows:
+
+raxmlHPC-PTHREADS-AVX -m GTRGAMMA -J MRE -z RAxML_bootstrap.smallmpi.GTRGAMMA.raxml -n nuc.small.MRE -T 10 
+
+
+
+
+Found 10064 trees in File RAxML_bootstrap.smallmpi.GTRGAMMA.raxml
+
+RAxML extended Majority Rule consensus tree written to file: /work/LAS/jfw-lab/corrinne/D_Cottons_USDA/analysis/phylogeny/concatenated_nuclear/RAxML_MajorityRuleExtendedConsensusTree.nuc.small.MRE

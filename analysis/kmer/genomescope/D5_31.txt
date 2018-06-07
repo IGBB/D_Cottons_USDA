@@ -1,0 +1,10 @@
+D5_31	GenomeScope version 1.0
+D5_31	k = 21
+D5_31	
+D5_31	property	min	max	
+D5_31	Heterozygosity	0.120179%	0.122968%	
+D5_31	Genome Haploid Length	778,094,000 bp	778,457,305 bp	
+D5_31	Genome Repeat Length	327,138,946 bp	327,291,693 bp	
+D5_31	Genome Unique Length	450,955,054 bp	451,165,612 bp	
+D5_31	Model Fit	93.528%	98.3991%	
+D5_31	Read Error Rate	0.0406468%	0.0406468%	

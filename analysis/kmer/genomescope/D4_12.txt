@@ -1,0 +1,10 @@
+D4_12	GenomeScope version 1.0
+D4_12	k = 21
+D4_12	
+D4_12	property	min	max	
+D4_12	Heterozygosity	1.17306%	1.17935%	
+D4_12	Genome Haploid Length	670,407,140 bp	671,134,376 bp	
+D4_12	Genome Repeat Length	303,493,170 bp	303,822,389 bp	
+D4_12	Genome Unique Length	366,913,970 bp	367,311,987 bp	
+D4_12	Model Fit	93.7967%	99.1484%	
+D4_12	Read Error Rate	0.148109%	0.148109%	

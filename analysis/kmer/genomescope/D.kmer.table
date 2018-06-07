@@ -1,0 +1,132 @@
+D10_3	Heterozygosity	0.335871%
+D10_3	Genome Haploid Length	767,437,492 bp
+D10_3	Genome Repeat Length	317,720,506 bp
+D10_3	Genome Unique Length	449,716,985 bp
+D10_3	Model Fit	99.3363%
+D10_3	Read Error Rate	0.0647927%
+D10_7	Heterozygosity	0.233015%
+D10_7	Genome Haploid Length	769,731,055 bp
+D10_7	Genome Repeat Length	319,734,937 bp
+D10_7	Genome Unique Length	449,996,117 bp
+D10_7	Model Fit	98.6539%
+D10_7	Read Error Rate	0.0730321%
+D10_8	Heterozygosity	0.211408%
+D10_8	Genome Haploid Length	786,701,491 bp
+D10_8	Genome Repeat Length	336,509,818 bp
+D10_8	Genome Unique Length	450,191,673 bp
+D10_8	Model Fit	99.1992%
+D10_8	Read Error Rate	0.0656989%
+D11_1	Heterozygosity	0.765792%
+D11_1	Genome Haploid Length	660,991,000 bp
+D11_1	Genome Repeat Length	267,141,738 bp
+D11_1	Genome Unique Length	393,849,262 bp
+D11_1	Model Fit	96.8606%
+D11_1	Read Error Rate	0.0872599%
+D1_35	Heterozygosity	0.416168%
+D1_35	Genome Haploid Length	733,890,911 bp
+D1_35	Genome Repeat Length	322,431,282 bp
+D1_35	Genome Unique Length	411,459,629 bp
+D1_35	Model Fit	98.4907%
+D1_35	Read Error Rate	0.0656294%
+D2_1_6	Heterozygosity	1.32953%
+D2_1_6	Genome Haploid Length	695,106,192 bp
+D2_1_6	Genome Repeat Length	335,909,680 bp
+D2_1_6	Genome Unique Length	359,196,512 bp
+D2_1_6	Model Fit	98.9445%
+D2_1_6	Read Error Rate	0.227528%
+D2_2	Heterozygosity	0.427966%
+D2_2	Genome Haploid Length	786,460,976 bp
+D2_2	Genome Repeat Length	344,561,638 bp
+D2_2	Genome Unique Length	441,899,339 bp
+D2_2	Model Fit	98.8319%
+D2_2	Read Error Rate	0.0728445%
+D3D_27	Heterozygosity	0.304223%
+D3D_27	Genome Haploid Length	758,338,446 bp
+D3D_27	Genome Repeat Length	319,762,752 bp
+D3D_27	Genome Unique Length	438,575,695 bp
+D3D_27	Model Fit	98.1206%
+D3D_27	Read Error Rate	0.0289254%
+D3K_56	Heterozygosity	0.107023%
+D3K_56	Genome Haploid Length	816,867,536 bp
+D3K_56	Genome Repeat Length	361,229,889 bp
+D3K_56	Genome Unique Length	455,637,647 bp
+D3K_56	Model Fit	98.9692%
+D3K_56	Read Error Rate	0.0775774%
+D3_K_57	Heterozygosity	0.674892%
+D3_K_57	Genome Haploid Length	697,887,200 bp
+D3_K_57	Genome Repeat Length	310,830,411 bp
+D3_K_57	Genome Unique Length	387,056,788 bp
+D3_K_57	Model Fit	98.6938%
+D3_K_57	Read Error Rate	0.0566119%
+D4_12	Heterozygosity	1.17935%
+D4_12	Genome Haploid Length	671,134,376 bp
+D4_12	Genome Repeat Length	303,822,389 bp
+D4_12	Genome Unique Length	367,311,987 bp
+D4_12	Model Fit	99.1484%
+D4_12	Read Error Rate	0.148109%
+D4_185	Heterozygosity	0.435584%
+D4_185	Genome Haploid Length	826,796,843 bp
+D4_185	Genome Repeat Length	373,478,177 bp
+D4_185	Genome Unique Length	453,318,666 bp
+D4_185	Model Fit	98.9467%
+D4_185	Read Error Rate	0.074164%
+D5_2	Heterozygosity	0.517217%
+D5_2	Genome Haploid Length	699,483,993 bp
+D5_2	Genome Repeat Length	287,283,709 bp
+D5_2	Genome Unique Length	412,200,284 bp
+D5_2	Model Fit	99.1032%
+D5_2	Read Error Rate	0.0395238%
+D5_31	Heterozygosity	0.122968%
+D5_31	Genome Haploid Length	778,457,305 bp
+D5_31	Genome Repeat Length	327,291,693 bp
+D5_31	Genome Unique Length	451,165,612 bp
+D5_31	Model Fit	98.3991%
+D5_31	Read Error Rate	0.0406468%
+D5_53	Heterozygosity	0.246111%
+D5_53	Genome Haploid Length	761,293,738 bp
+D5_53	Genome Repeat Length	321,641,032 bp
+D5_53	Genome Unique Length	439,652,706 bp
+D5_53	Model Fit	98.6806%
+D5_53	Read Error Rate	0.0503892%
+D5_8	Heterozygosity	1.23949%
+D5_8	Genome Haploid Length	575,995,187 bp
+D5_8	Genome Repeat Length	287,210,517 bp
+D5_8	Genome Unique Length	288,784,670 bp
+D5_8	Model Fit	99.4982%
+D5_8	Read Error Rate	0.131098%
+D5_ref	Heterozygosity	0.31619%
+D5_ref	Genome Haploid Length	713,093,625 bp
+D5_ref	Genome Repeat Length	287,823,937 bp
+D5_ref	Genome Unique Length	425,269,689 bp
+D5_ref	Model Fit	98.2535%
+D5_ref	Read Error Rate	0.0865295%
+D6_5	Heterozygosity	0.623966%
+D6_5	Genome Haploid Length	679,014,898 bp
+D6_5	Genome Repeat Length	293,663,208 bp
+D6_5	Genome Unique Length	385,351,690 bp
+D6_5	Model Fit	98.5532%
+D6_5	Read Error Rate	0.0477823%
+D7_157	Heterozygosity	0.474888%
+D7_157	Genome Haploid Length	816,254,015 bp
+D7_157	Genome Repeat Length	357,982,273 bp
+D7_157	Genome Unique Length	458,271,742 bp
+D7_157	Model Fit	98.9728%
+D7_157	Read Error Rate	0.0769447%
+D7_4	Heterozygosity	3.00564%
+D7_4	Genome Haploid Length	674,109,760 bp
+D7_4	Genome Repeat Length	328,601,417 bp
+D7_4	Genome Unique Length	345,508,342 bp
+D7_4	Model Fit	98.2217%
+D7_4	Read Error Rate	0.167245%
+D8_8	Heterozygosity	0.572272%
+D8_8	Genome Haploid Length	743,018,880 bp
+D8_8	Genome Repeat Length	357,980,115 bp
+D8_8	Genome Unique Length	385,038,764 bp
+D8_8	Model Fit	98.4572%
+D8_8	Read Error Rate	0.0560222%
+D9_4	Heterozygosity	1.18356%
+D9_4	Genome Haploid Length	719,237,078 bp
+D9_4	Genome Repeat Length	333,729,517 bp
+D9_4	Genome Unique Length	385,507,561 bp
+D9_4	Model Fit	98.7896%
+D9_4	Read Error Rate	0.218829%

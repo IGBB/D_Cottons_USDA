@@ -1,0 +1,10 @@
+D8_9	GenomeScope version 1.0
+D8_9	k = 21
+D8_9	
+D8_9	property	min	max	
+D8_9	Heterozygosity	-100%	-100%	
+D8_9	Genome Haploid Length	-1 bp	-1 bp	
+D8_9	Genome Repeat Length	-1 bp	-1 bp	
+D8_9	Genome Unique Length	-1 bp	-1 bp	
+D8_9	Model Fit	0%	0%	
+D8_9	Read Error Rate	-100%	-100%	

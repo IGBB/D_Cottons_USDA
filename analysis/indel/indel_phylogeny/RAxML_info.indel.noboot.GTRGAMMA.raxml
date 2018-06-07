@@ -1,0 +1,68 @@
+
+
+This is RAxML version 8.2.9 released by Alexandros Stamatakis on July 20 2016.
+
+With greatly appreciated code contributions by:
+Andre Aberer      (HITS)
+Simon Berger      (HITS)
+Alexey Kozlov     (HITS)
+Kassian Kobert    (HITS)
+David Dao         (KIT and HITS)
+Sarah Lutteropp   (KIT and HITS)
+Nick Pattengale   (Sandia)
+Wayne Pfeiffer    (SDSC)
+Akifumi S. Tanabe (NRIFS)
+Charlie Taylor    (UF)
+
+
+Alignment has 4256 distinct alignment patterns
+
+Proportion of gaps and completely undetermined characters in this alignment: 0.00%
+
+RAxML rapid hill-climbing mode
+
+Using 1 distinct models/data partitions with joint branch length optimization
+
+
+Executing 1 inferences on the original alignment using 1 distinct randomized MP trees
+
+All free model parameters will be estimated by RAxML
+GAMMA model of rate heteorgeneity, ML estimate of alpha-parameter
+
+GAMMA Model parameters will be estimated up to an accuracy of 0.1000000000 Log Likelihood units
+
+Partition: 0
+Alignment Patterns: 4256
+Name: No Name Provided
+DataType: Multi-State with 7 distinct states in use (maximum 32)
+Substitution Matrix: GTR
+
+
+
+
+RAxML was called as follows:
+
+raxmlHPC-PTHREADS-AVX -m MULTIGAMMA -o F1.1 -p 25632 -T 16 -s all.indel.phy -n indel..noboot.GTRGAMMA.raxml 
+
+
+Partition: 0 with name: No Name Provided
+Base frequencies: 0.947 0.047 0.002 0.001 0.001 0.001 0.001 
+
+Inference[0]: Time 150.986387 GAMMA-based likelihood -2709757.596390, best rearrangement setting 5
+alpha[0]: 0.635482 
+
+
+Conducting final model optimizations on all 1 trees under GAMMA-based models ....
+
+Inference[0] final GAMMA-based Likelihood: -2709753.215025 tree written to file /home/corrinne/SNP/RAxML_result.indel..noboot.GTRGAMMA.raxml
+
+
+Starting final GAMMA-based thorough Optimization on tree 0 likelihood -2709753.215025 .... 
+
+Final GAMMA-based Score of best tree -2709753.215025
+
+Program execution info written to /home/corrinne/SNP/RAxML_info.indel..noboot.GTRGAMMA.raxml
+Best-scoring ML tree written to: /home/corrinne/SNP/RAxML_bestTree.indel..noboot.GTRGAMMA.raxml
+
+Overall execution time: 236.213124 secs or 0.065615 hours or 0.002734 days
+

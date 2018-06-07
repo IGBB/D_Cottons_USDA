@@ -1,0 +1,10 @@
+D3_K_57	GenomeScope version 1.0
+D3_K_57	k = 21
+D3_K_57	
+D3_K_57	property	min	max	
+D3_K_57	Heterozygosity	0.669499%	0.674892%	
+D3_K_57	Genome Haploid Length	697,384,199 bp	697,887,200 bp	
+D3_K_57	Genome Repeat Length	310,606,381 bp	310,830,411 bp	
+D3_K_57	Genome Unique Length	386,777,818 bp	387,056,788 bp	
+D3_K_57	Model Fit	93.6828%	98.6938%	
+D3_K_57	Read Error Rate	0.0566119%	0.0566119%	

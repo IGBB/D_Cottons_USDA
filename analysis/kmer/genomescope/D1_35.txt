@@ -1,0 +1,10 @@
+D1_35	GenomeScope version 1.0
+D1_35	k = 21
+D1_35	
+D1_35	property	min	max	
+D1_35	Heterozygosity	0.412904%	0.416168%	
+D1_35	Genome Haploid Length	733,474,401 bp	733,890,911 bp	
+D1_35	Genome Repeat Length	322,248,290 bp	322,431,282 bp	
+D1_35	Genome Unique Length	411,226,111 bp	411,459,629 bp	
+D1_35	Model Fit	93.2941%	98.4907%	
+D1_35	Read Error Rate	0.0656294%	0.0656294%	

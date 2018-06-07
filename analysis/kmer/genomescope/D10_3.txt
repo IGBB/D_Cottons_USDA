@@ -1,0 +1,10 @@
+D10_3	GenomeScope version 1.0
+D10_3	k = 21
+D10_3	
+D10_3	property	min	max	
+D10_3	Heterozygosity	0.333515%	0.335871%	
+D10_3	Genome Haploid Length	767,129,303 bp	767,437,492 bp	
+D10_3	Genome Repeat Length	317,592,916 bp	317,720,506 bp	
+D10_3	Genome Unique Length	449,536,387 bp	449,716,985 bp	
+D10_3	Model Fit	94.4106%	99.3363%	
+D10_3	Read Error Rate	0.0647927%	0.0647927%	

@@ -1,0 +1,10 @@
+D3D_27	GenomeScope version 1.0
+D3D_27	k = 21
+D3D_27	
+D3D_27	property	min	max	
+D3D_27	Heterozygosity	0.301052%	0.304223%	
+D3D_27	Genome Haploid Length	757,925,187 bp	758,338,446 bp	
+D3D_27	Genome Repeat Length	319,588,496 bp	319,762,752 bp	
+D3D_27	Genome Unique Length	438,336,691 bp	438,575,695 bp	
+D3D_27	Model Fit	93.3251%	98.1206%	
+D3D_27	Read Error Rate	0.0289254%	0.0289254%	

@@ -1,0 +1,10 @@
+D4_185	GenomeScope version 1.0
+D4_185	k = 21
+D4_185	
+D4_185	property	min	max	
+D4_185	Heterozygosity	0.430936%	0.435584%	
+D4_185	Genome Haploid Length	826,093,519 bp	826,796,843 bp	
+D4_185	Genome Repeat Length	373,160,474 bp	373,478,177 bp	
+D4_185	Genome Unique Length	452,933,046 bp	453,318,666 bp	
+D4_185	Model Fit	93.6466%	98.9467%	
+D4_185	Read Error Rate	0.074164%	0.074164%	

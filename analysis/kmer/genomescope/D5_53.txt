@@ -1,0 +1,10 @@
+D5_53	GenomeScope version 1.0
+D5_53	k = 21
+D5_53	
+D5_53	property	min	max	
+D5_53	Heterozygosity	0.241418%	0.246111%	
+D5_53	Genome Haploid Length	760,725,675 bp	761,293,738 bp	
+D5_53	Genome Repeat Length	321,401,029 bp	321,641,032 bp	
+D5_53	Genome Unique Length	439,324,645 bp	439,652,706 bp	
+D5_53	Model Fit	93.9563%	98.6806%	
+D5_53	Read Error Rate	0.0503892%	0.0503892%	

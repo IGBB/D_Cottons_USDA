@@ -1,0 +1,10 @@
+D7_157	GenomeScope version 1.0
+D7_157	k = 21
+D7_157	
+D7_157	property	min	max	
+D7_157	Heterozygosity	0.470687%	0.474888%	
+D7_157	Genome Haploid Length	815,616,151 bp	816,254,015 bp	
+D7_157	Genome Repeat Length	357,702,526 bp	357,982,273 bp	
+D7_157	Genome Unique Length	457,913,625 bp	458,271,742 bp	
+D7_157	Model Fit	93.7635%	98.9728%	
+D7_157	Read Error Rate	0.0769447%	0.0769447%	

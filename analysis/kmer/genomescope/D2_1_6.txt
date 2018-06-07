@@ -1,0 +1,10 @@
+D2_1_6	GenomeScope version 1.0
+D2_1_6	k = 21
+D2_1_6	
+D2_1_6	property	min	max	
+D2_1_6	Heterozygosity	1.31363%	1.32953%	
+D2_1_6	Genome Haploid Length	694,174,155 bp	695,106,192 bp	
+D2_1_6	Genome Repeat Length	335,459,274 bp	335,909,680 bp	
+D2_1_6	Genome Unique Length	358,714,881 bp	359,196,512 bp	
+D2_1_6	Model Fit	93.5028%	98.9445%	
+D2_1_6	Read Error Rate	0.227528%	0.227528%	

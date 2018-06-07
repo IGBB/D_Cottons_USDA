@@ -1,0 +1,10 @@
+D5_4	GenomeScope version 1.0
+D5_4	k = 21
+D5_4	
+D5_4	property	min	max	
+D5_4	Heterozygosity	-100%	-100%	
+D5_4	Genome Haploid Length	-1 bp	-1 bp	
+D5_4	Genome Repeat Length	-1 bp	-1 bp	
+D5_4	Genome Unique Length	-1 bp	-1 bp	
+D5_4	Model Fit	0%	0%	
+D5_4	Read Error Rate	-100%	-100%	

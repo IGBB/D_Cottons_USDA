@@ -1,0 +1,10 @@
+D6_7	GenomeScope version 1.0
+D6_7	k = 21
+D6_7	
+D6_7	property	min	max	
+D6_7	Heterozygosity	-100%	-100%	
+D6_7	Genome Haploid Length	-1 bp	-1 bp	
+D6_7	Genome Repeat Length	-1 bp	-1 bp	
+D6_7	Genome Unique Length	-1 bp	-1 bp	
+D6_7	Model Fit	0%	0%	
+D6_7	Read Error Rate	-100%	-100%	

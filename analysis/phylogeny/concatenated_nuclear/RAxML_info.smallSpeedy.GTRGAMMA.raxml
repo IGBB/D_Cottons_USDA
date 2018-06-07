@@ -1,0 +1,58 @@
+
+
+Using BFGS method to optimize GTR rate parameters, to disable this specify "--no-bfgs" 
+
+
+
+This is RAxML version 8.2.9 released by Alexandros Stamatakis on July 20 2016.
+
+With greatly appreciated code contributions by:
+Andre Aberer      (HITS)
+Simon Berger      (HITS)
+Alexey Kozlov     (HITS)
+Kassian Kobert    (HITS)
+David Dao         (KIT and HITS)
+Sarah Lutteropp   (KIT and HITS)
+Nick Pattengale   (Sandia)
+Wayne Pfeiffer    (SDSC)
+Akifumi S. Tanabe (NRIFS)
+Charlie Taylor    (UF)
+
+
+Alignment has 55413 distinct alignment patterns
+
+Proportion of gaps and completely undetermined characters in this alignment: 7.60%
+
+RAxML rapid bootstrapping and subsequent ML search
+
+Using 1 distinct models/data partitions with joint branch length optimization
+
+
+
+Executing 10000 rapid bootstrap inferences and thereafter a thorough ML search 
+
+All free model parameters will be estimated by RAxML
+GAMMA model of rate heteorgeneity, ML estimate of alpha-parameter
+
+GAMMA Model parameters will be estimated up to an accuracy of 0.1000000000 Log Likelihood units
+
+Partition: 0
+Alignment Patterns: 55413
+Name: No Name Provided
+DataType: DNA
+Substitution Matrix: GTR
+
+
+
+
+RAxML was called as follows:
+
+raxmlHPC-PTHREADS-SSE3 -f a -k -m GTRGAMMA -o F1_1 -p 25632 -T 96 -s small.fasta -x 451842 -n smallSpeedy.GTRGAMMA.raxml -N 10000 
+
+
+
+Time for BS model parameter optimization 170.383005
+Bootstrap[0]: Time 551.813075 seconds, bootstrap likelihood -37282744.939800, best rearrangement setting 6
+Bootstrap[1]: Time 349.656228 seconds, bootstrap likelihood -37294269.115848, best rearrangement setting 13
+Bootstrap[2]: Time 347.218762 seconds, bootstrap likelihood -37274366.696179, best rearrangement setting 15
+Bootstrap[3]: Time 398.215669 seconds, bootstrap likelihood -37285300.616281, best rearrangement setting 11

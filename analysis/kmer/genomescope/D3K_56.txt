@@ -1,0 +1,10 @@
+D3K_56	GenomeScope version 1.0
+D3K_56	k = 21
+D3K_56	
+D3K_56	property	min	max	
+D3K_56	Heterozygosity	0.100559%	0.107023%	
+D3K_56	Genome Haploid Length	816,276,399 bp	816,867,536 bp	
+D3K_56	Genome Repeat Length	360,968,480 bp	361,229,889 bp	
+D3K_56	Genome Unique Length	455,307,919 bp	455,637,647 bp	
+D3K_56	Model Fit	93.8839%	98.9692%	
+D3K_56	Read Error Rate	0.0775774%	0.0775774%	

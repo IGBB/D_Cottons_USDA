@@ -19,11 +19,31 @@ for (row in c(1:nrow(df))) {
 }
 
 
+###### violin plot ###### 
+
+
+#df$node<- as.factor(df$node)
+#
+#a <- ggplot(df, aes(x=node, y=std_gain)) + geom_violin()+ geom_boxplot(width=0.1, fill="blue")+ ylim(0,0.35)+coord_flip()+geom_point(data=real, aes(x=node, y=std_loss), size=2)
+#b <- ggplot(df, aes(x=node, y=std_gain)) + geom_violin()+ geom_boxplot(width=0.1, fill="blue")+ ylim(2,4.25)+coord_flip()+geom_point(data=real, aes(x=node, y=std_loss), size=2)
+#c <- ggplot(df, aes(x=node, y=std_loss)) + geom_violin()+ geom_boxplot(width=0.1, fill="blue")+ ylim(0,1)+ coord_flip()+geom_point(data=real, aes(x=node, y=std_loss), size=2)
+#d <- ggplot(df, aes(x=node, y=std_loss)) + geom_violin()+ geom_boxplot(width=0.1, fill="blue")+ ylim(1,6.5)+ coord_flip()+geom_point(data=real, aes(x=node, y=std_loss), size=2)
+
+#png("gain.loss.violin.png", 10000, 7500, pointsize=12, res=600)
+#
+#grid.arrange(a,b,c,d,ncol=2)
+
+#dev.off()
+
+
+
 
 ###### losses ######
-boxplot(std_loss~node, data=df, ylim=c(0,0.3))
 
-points(factor(real$node), real$std_loss, col=2)
+png("loss.boxplot.png", 10000, 7500, pointsize=12, res=600)
+boxplot(std_loss~node, data=df, ylim=c(0,6.1), boxwex=0.2)
+points(factor(real$node), real$std_loss, col=51, pch=24)
+dev.off()
 
 
 vals <- c("min", "max", "mean", "within")
@@ -42,9 +62,10 @@ for (node in (row.names(real))) {
 }
 
 ###### gains ######
-boxplot(std_gain~node, data=df)
-
-points(factor(real$node), real$std_gain, col=2)
+png("gain.boxplot.png", 10000, 7500, pointsize=12, res=600)
+boxplot(std_gain~node, data=df, ylim=c(0,4.2), boxwex=0.2)
+points(factor(real$node), real$std_gain, col=51, pch=24)
+dev.off()
 
 ###### duplications ######
 boxplot(std_dup~node, data=df)
