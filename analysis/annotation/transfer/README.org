@@ -1,68 +1,180 @@
-et-mark-command
-#+TITLE: Transferring Annotations with MAKER
+#+TITLE: Annotation
 #+DRAWERS: HIDDEN
 #+OPTIONS: d:RESULTS ^:nil
 #+STARTUP: hideblocks align
-#+PROPERTY:  header-args :exports results :eval never-export :mkdirp yes :var DIR=(file-name-directory buffer-file-name)
+#+PROPERTY:  header-args :exports results :eval never-export :mkdirp yes  :var DIR=(file-name-directory buffer-file-name) 
 
-#+NAME:genomes
-| Offset | Species | Path                                       |
-|--------+---------+--------------------------------------------|
-|      1 | D1-35   | analysis/assemble/D1-35/70/70-scaffolds.fa |
+#+BEGIN_SRC conf :tangle .gitignore
+.gitignore
+*.filtered.fa
+*.map
 
-|  2 | D10-8      | analysis/assemble/D10-8/40/40-scaffolds.fa                |
-|  3 | D11-1      | analysis/assemble/D11-1/70/70-scaffolds.fa                |
-|  4 | D2-1-6     | analysis/assemble/D2-1-6/70/70-scaffolds.fa               |
-|  5 | D2-2       | analysis/assemble/D2-2/65/65-scaffolds.fa                 |
-|  6 | D3-D-27    | analysis/assemble/D3-D-27/70/70-scaffolds.fa              |
-|  7 | D3-K-57    | analysis/assemble/D3-K-57/70/70-scaffolds.fa              |
-|  8 | D3K-56     | analysis/assemble/D3K-56/60/60-scaffolds.fa               |
-|  9 | D4-12      | analysis/assemble/D4-12/70/70-scaffolds.fa                |
-| 10 | D4-185     | analysis/assemble/D4-185/60/60-scaffolds.fa               |
-| 11 | D5-8       | analysis/assemble/D5-8/55/55-scaffolds.fa                 |
-| 12 | D6-5       | analysis/assemble/D6-5/70/70-scaffolds.fa                 |
-| 13 | D6-7       | analysis/assemble/D6-7/45/45-scaffolds.fa                 |
-| 14 | D7-157     | analysis/assemble/D7-157/60/60-scaffolds.fa               |
-| 15 | D7-4       | analysis/assemble/D7-4/50/50-scaffolds.fa                 |
-| 16 | D8-8       | analysis/assemble/D8-8/70/70-scaffolds.fa                 |
-| 17 | D8-9       | analysis/assemble/D8-9/40/40-scaffolds.fa                 |
-| 18 | D9-4       | analysis/assemble/D9-4/70/70-scaffolds.fa                 |
-| 19 | D10-7.k115 | analysis/assemble/D10-7/scaffolds/D10-7.k115.scaffolds.fa |
+autoAug
+busco
+genemark
+maker
+snap
 
-#+COMMENT: Split a genome into pieces for annotation by MAKER
-#+HEADER: :shebang #!/bin/bash :tangle split/run.sh :mkdirp yes
-#+BEGIN_SRC sh :var genomes=genomes[,1]
-cd $DIR/split
-ROOT=$(git rev-parse --show-toplevel)
-
-while read species; do
-  mkdir $species
-  pushd $species
-  /home/maa146/bin/fasta-splitter.pl --n-parts 100 --measure all $ROOT/analysis/assemble/chromosomer/$species/$species.complete.fa
-  popd
-done <<<"$genomes"
+filter.sh
 #+END_SRC
 
-#+COMMENT: Set up MAKER for a genome
-#+HEADER: :shebang #!/bin/bash :tangle maker/setup.sh :mkdirp yes
-#+BEGIN_SRC sh :var genomes=genomes
-cd $DIR/maker/
+
+#+NAME: genomes
+| Name    | Path                                                      | Filter Length |
+|---------+-----------------------------------------------------------+---------------|
+| D10-7   | analysis/assemble/chromosomer/D10-7/D10-7.complete.fa     |          1000 |
+| D10-8   | analysis/assemble/chromosomer/D10-8/D10-8.complete.fa     |          1000 |
+| D11-1   | analysis/assemble/chromosomer/D11-1/D11-1.complete.fa     |          1000 |
+| D1-35   | analysis/assemble/chromosomer/D1-35/D1-35.complete.fa     |          1000 |
+| D2-1-6  | analysis/assemble/chromosomer/D2-1-6/D2-1-6.complete.fa   |          1000 |
+| D2-2    | analysis/assemble/chromosomer/D2-2/D2-2.complete.fa       |          1000 |
+| D3-D-27 | analysis/assemble/chromosomer/D3-D-27/D3-D-27.complete.fa |          1000 |
+| D3K-56  | analysis/assemble/chromosomer/D3K-56/D3K-56.complete.fa   |          1000 |
+| D3-K-57 | analysis/assemble/chromosomer/D3-K-57/D3-K-57.complete.fa |          1000 |
+| D4-12   | analysis/assemble/chromosomer/D4-12/D4-12.complete.fa     |          1000 |
+| D4-185  | analysis/assemble/chromosomer/D4-185/D4-185.complete.fa   |          1000 |
+| D5-8    | analysis/assemble/chromosomer/D5-8/D5-8.complete.fa       |          1000 |
+| D6-5    | analysis/assemble/chromosomer/D6-5/D6-5.complete.fa       |          1000 |
+| D6-7    | analysis/assemble/chromosomer/D6-7/D6-7.complete.fa       |          1000 |
+| D7-157  | analysis/assemble/chromosomer/D7-157/D7-157.complete.fa   |          1000 |
+| D7-4    | analysis/assemble/chromosomer/D7-4/D7-4.complete.fa       |          1000 |
+| D8-8    | analysis/assemble/chromosomer/D8-8/D8-8.complete.fa       |          1000 |
+| D8-9    | analysis/assemble/chromosomer/D8-9/D8-9.complete.fa       |          1000 |
+| D9-4    | analysis/assemble/chromosomer/D9-4/D9-4.complete.fa       |          1000 |
+
+#+BEGIN_SRC sh :var genomes=genomes :tangle filter.sh
+
+cd $DIR
+ROOT=$(git rev-parse --show-toplevel)
+PATH=$PATH:/home/thrash/bin
+
+mkdir split
+
+for name in "${!genomes[@]}"; do
+    readarray -t lib <<< "${genomes[$name]}"
+    pv "$ROOT/${lib[0]}" | 
+      awk 'BEGIN {count=1}
+            /^>/ {printf ">%s_%d\n", name, count++}
+           !/^>/ {print}' name="${name}"  > "$DIR/$name.fa"
+    /home/maa146/bin/fasta_filter.pl "$DIR/${name}.fa" --length=${lib[1]} > "$DIR/${name}.filtered.fa"
+
+
+  mkdir split/$name
+  pushd split/$name
+  /home/maa146/bin/fasta-splitter.pl --n-parts 20 --measure all $DIR/$name.filtered.fa
+  popd
+
+done
+
+#+END_SRC
+
+
+- Mask warning peptide
+#+BEGIN_SRC sh 
+cd $DIR
 ROOT=$(git rev-parse --show-toplevel)
 
-swsetup () { eval `/usr/local/swsetup/swsetup.pl $*`; }
-swsetup maker
-export PERL5LIB=$PERL5LIB:/usr/local/igbb/maker/lib/perl5/  
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/mpi/x86_64/mpich/lib/
 
-for each in ${!genomes[@]}; do
-  lib=( $(echo "${genomes[$each]}" | tr '\n' ' ') )
+ml igbb
+ml blast
+ml emboss-6.6.0
+
+perl allwarn.pl | 
+  blastn -task blastn \
+         -outfmt '6 sstart send' \
+         -subject $DIR/split/Kirkii.v3/Kirkii.v3.filtered.part-08.fa \
+         -ungapped \
+         -perc_identity 100 \
+         -qcov_hsp_perc 100 
+
+#31201366        31201346
+maskseq -auto \
+        -regions 31201346-31201366  \
+        -sequence $DIR/split/Kirkii.v3/Kirkii.v3.filtered.part-08.fa \
+        -outseq $DIR/split/Kirkii.v3/Kirkii.v3.filtered.part-08.fa.out
+
+#+END_SRC
+
+#+END_SRC
+
+* RepeatMasker
+
+#+HEADER: :prologue #PBS -N repeatmasker -l walltime=48:00:00 -t 1
+#+BEGIN_SRC sh :var genomes=genomes[,0] :tangle repeatmasker/run.sh
+cd $DIR
+ROOT=$(git rev-parse --show-toplevel)
+
+species="${genomes[$species]}"
+file=$(printf "$DIR/split/$species/$species.filtered.part-%02d.fa" $PBS_ARRAYID)
+
+ml igbb
+ml repeatmasker/4.0.7
+
+mkdir -p $DIR/repeatmasker/$species/$PBS_ARRAYID/
+
+RepeatMasker -pa $PBS_NUM_PPN \
+             -e ncbi \
+             -lib $DIR/repeatmasker/cottonRB23.04.fa \
+             -dir $DIR/repeatmasker/$species/$PBS_ARRAYID/ \
+             $file
+
+#+END_SRC
+
+#+BEGIN_SRC sh :var genomes=genomes[,0] :tangle repeatmasker/combine.sh
+cd $DIR
+ROOT=$(git rev-parse --show-toplevel)
+
+ml igbb
+ml repeatmasker/4.0.7
+
+for species  in "${genomes[@]}"; do
+
+    for i in {1..20}; do
+        file=$(printf "$DIR/repeatmasker/$species/%d/$species.filtered.part-%02d.fa.out" $i $i)
+        [ -f $file ] && echo $file
+    done | 
+        xargs rmOutToGFF3.pl |
+        grep -v -e "Satellite" -e ")n" -e "-rich" |
+        perl -ane '$id; 
+                   if(!/^\#/){
+                       @F = split(/\t/, $_); 
+                       chomp $F[-1];
+                       $id++; 
+                       $F[-1] .= "\;ID=$id"; 
+                       $_ = join("\t", @F)."\n"
+                   } 
+                   print $_' > $DIR/repeatmasker/$species.gff3
+done
+
+#+END_SRC
+
+* MAKER
+:PROPERTIES:
+:ID:       996947a8-68a6-4d07-bd38-0ea21535616c
+:END:
+
+
+#+COMMENT: Set up MAKER for a genome
+#+HEADER: :shebang #!/bin/bash :tangle maker1/setup.sh :mkdirp yes
+#+BEGIN_SRC sh :var genomes=genomes[,0]
+cd $DIR/maker1/
+ROOT=$(git rev-parse --show-toplevel)
+
+ml igbb
+ml maker/2.31.9
+
+for lib in "${genomes[@]}"; do
+  GENOME=$DIR/${lib}.filtered.fa
   ESTs=$ROOT/analysis/annotation/annotations/${lib[0]}.transcripts.fasta
-  mkdir $DIR/maker/${lib[0]}
-  cd $DIR/maker/${lib[0]}
+  echo $GENOME
+  mkdir $DIR/maker1/${lib}
+  cd $DIR/maker1/${lib}
   pwd
   maker -CTL
   sed -i -e "s|gmhmme3= #location|gmhmme3=\/usr\/local\/igbb\/genemark-es-et_4.30\/gmhmme3 #location|g" maker_exe.ctl
   sed -i -e "s|probuild= #location|probuild=\/usr\/local\/igbb\/genemark-es-et_4.30\/probuild #location|g" maker_exe.ctl
+  sed -i -e "s|model_org=all|model_org=simple|" \
+         -e "s|rm_gff=|rm_gff=$DIR/repeatmasker/$lib.gff3|" maker_opts.ctl
   sed -i -e "s|est= #set|est=$ESTs #set|g" maker_opts.ctl
   sed -i -i "s|est2genome=0 #infer|est2genome=1 #infer|g" maker_opts.ctl
   sed -i -i "s|single_exon=0 #consider|single_exon=1 #consider|g" maker_opts.ctl
@@ -72,37 +184,34 @@ for each in ${!genomes[@]}; do
 done
 #+END_SRC
 
-#+HEADER: :shebang #!/bin/bash :tangle maker/run.pbs :mkdirp yes
-#+HEADER: :prologue #PBS -N maker -l walltime=48:00:00 -t 1-100
-#+BEGIN_SRC sh :var genomes=genomes[,1]
-  species=${genomes[` expr $species-1 `]}
-  cd $DIR/maker/$species || exit
-  ROOT=$(git rev-parse --show-toplevel)
-  pwd
-  swsetup () { eval `/usr/local/swsetup/swsetup.pl $*`; }
-  swsetup maker 
-  export PERL5LIB=$PERL5LIB:/usr/local/igbb/maker/lib/perl5/  
-  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/mpi/x86_64/mpich/lib/
+#+HEADER: :shebang #!/bin/bash :tangle maker1/run.sh :mkdirp yes
+#+HEADER: :prologue #PBS -N maker -l walltime=48:00:00 -t 1-20
+#+BEGIN_SRC sh :var genomes=genomes[,0]
+species="${genomes[$species]}"
 
-  file=$(printf "$species.complete.part-%03d" $PBS_ARRAYID)
+cd $DIR/maker1/$species || exit
+ROOT=$(git rev-parse --show-toplevel)
 
-  mkdir -p $DIR/maker/$species/tmp/$PBS_ARRAYID
+ml igbb
+ml maker/2.31.9
 
-  df -h | tee -a df.$PBS_ARRAYID
+file=$(printf "$DIR/split/$species/$species.filtered.part-%02d.fa" $PBS_ARRAYID)
 
-  maker -fix_nucleotides \
-        -b maker1.$PBS_ARRAYID \
-        -g "$DIR/split/$species/$file.fa" \
-        -c $PBS_NUM_PPN \
-        -TMP $DIR/maker/$species/tmp/$PBS_ARRAYID/ \
-        --ignore_nfs_tmp \
-        -R \
-        &> maker1.${PBS_ARRAYID}.log
+mkdir -p $DIR/maker1/$species/tmp/$PBS_ARRAYID
 
-  rm -R $DIR/maker/$species/tmp/$PBS_ARRAYID
+maker -fix_nucleotides \
+      -b $PBS_ARRAYID \
+      -g $file \
+      -c $PBS_NUM_PPN \
+      -t 2 \
+      -TMP $DIR/maker1/$species/tmp/$PBS_ARRAYID/ \
+      --ignore_nfs_tmp \
+    &> ${PBS_ARRAYID}.log
+
+rm -R $DIR/maker1/$species/tmp/$PBS_ARRAYID
 #+END_SRC
 
-#+BEGIN_SRC perl :shebang "#! /usr/bin/perl" :tangle maker/progress.sh :var genomes=genomes[,1]
+#+BEGIN_SRC perl :shebang "#! /usr/bin/perl" :tangle maker1/progress.sh :var genomes=genomes[,0]
 use strict;
 use warnings;
 use Data::Dumper;
@@ -114,19 +223,20 @@ local $, = ",";
 # my $DIR ="";
 
 foreach my $species (@$genomes){
-    print $species;
     my $fasta = [];
     my $complete = [];
 
     my $total_fasta = 0;
     my $total_complete = 0;
     
-    for( my $i = 1; $i <= 100; $i++ ){
-        open(my $fh, "$DIR/split/$species/$species.complete.part-" . sprintf( '%03d', $i) . ".fa");
+    for( my $i = 1; $i <= 20; $i++ ){
+        open(my $fh, "$DIR/split/$species/$species.filtered.part-" . sprintf( '%02d', $i) . ".fa") || next;
         $total_fasta += ($fasta->[$i] = scalar grep {/>/} <$fh>);
         close $fh;
-        if(-e "$DIR/maker/$species/maker1.$i.maker.output/maker1.${i}_master_datastore_index.log"){
-          open($fh, "$DIR/maker/$species/maker1.$i.maker.output/maker1.${i}_master_datastore_index.log");
+       
+        
+        if(-e "$DIR/maker1/$species/$i.maker.output/${i}_master_datastore_index.log"){
+          open($fh, "$DIR/maker1/$species/$i.maker.output/${i}_master_datastore_index.log");
           $total_complete += ($complete->[$i] = scalar grep {/FINISHED/} <$fh>);
           close $fh;
         }
@@ -134,40 +244,49 @@ foreach my $species (@$genomes){
 
 
     print $species;
-    printf("\tTotal: %d of %d [%-100s] %0.2f \n", $total_complete, $total_fasta, '#' x int($total_complete/$total_fasta*100), $total_complete/$total_fasta*100);
+    printf("\tTotal: %d of %d [%-50s] %0.2f \n", $total_complete, $total_fasta, '#' x int($total_complete/$total_fasta*50), $total_complete/$total_fasta*100);
 
     print "\tIncomplete";
     foreach my $i (grep {defined($complete->[$_]) && $complete->[$_] < $fasta->[$_]} (1..100)){
-      printf("\t% 5d: % 4d of % 4d [%-100s] %3.0f%%\n", $i, $complete->[$i], $fasta->[$i], '#' x int($complete->[$i]/$fasta->[$i]*100), $complete->[$i]/$fasta->[$i]*100);
+      printf("\t% 5d: % 4d of % 4d [%-50s] %3.0f%%\n", $i, $complete->[$i], $fasta->[$i], '#' x int($complete->[$i]/$fasta->[$i]*50), $complete->[$i]/$fasta->[$i]*100);
     }
     
 }
 
 #+END_SRC
 
-#+HEADER: :shebang #!/bin/bash :tangle maker/clean.pbs :mkdirp yes
-#+BEGIN_SRC sh :var genomes=genomes[,1]
-  species=${genomes[ ` expr $species - 1 `]}
+#+HEADER: :shebang #!/bin/bash :tangle maker1/clean.sh :mkdirp yes
+#+HEADER: :prologue #PBS -N maker -l walltime=48:00:00
+#+BEGIN_SRC sh :var genomes=genomes[,0]
+species="${genomes[$species]}"
 
-  cd $DIR/maker/$species || exit
-  ROOT=$(git rev-parse --show-toplevel)
+cd $DIR/maker1/$species || exit
+ROOT=$(git rev-parse --show-toplevel)
 
-  swsetup () { eval `/usr/local/swsetup/swsetup.pl $*`; }
-  swsetup maker 
-  export PERL5LIB=$PERL5LIB:/usr/local/igbb/maker/lib/perl5/  
-  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/mpi/x86_64/mpich/lib/
+ml igbb
+ml maker/2.31.9
 
-  mkdir $DIR/maker/$species/maker1
-  rm $DIR/maker/$species/maker1/master_datastore_index.log
-  for i in {1..100}; do
-    ln -s $DIR/maker/$species/maker1.$i.maker.output/maker1.${i}_datastore $DIR/maker/$species/maker1/
-    cat $DIR/maker/$species/maker1.$i.maker.output/maker1.${i}_master_datastore_index.log >> $DIR/maker/$species/maker1/master_datastore_index.log
-  done
+ mkdir $DIR/maker1/$species/all
+ rm $DIR/maker1/$species/all/master_datastore_index.log
+ for i in {1..20}; do
+     ln -s $DIR/maker1/$species/$i.maker.output/${i}_datastore $DIR/maker1/$species/all/
+     cat $DIR/maker1/$species/$i.maker.output/${i}_master_datastore_index.log \
+         >> $DIR/maker1/$species/all/master_datastore_index.log
+ done
 
-  fasta_merge -d maker1/master_datastore_index.log
-  gff_merge -d maker1/master_datastore_index.log
-  #maker2zff -d maker1/master_datastore_index.log
-  
+gff3_merge -s -n -d $DIR/maker1/$species/all/master_datastore_index.log > $DIR/maker1/$species/all.gff
+
+# transcript alignments
+awk '$2 == "est2genome"' $DIR/maker1/$species/all.gff \
+    > $DIR/maker1/$species/est2genome.gff
+awk '$2 == "cdna2genome"' $DIR/maker1/$species/all.gff \
+    > $DIR/maker1/$species/cdna2genome.gff
+# protein alignments
+awk '$2 == "protein2genome"' $DIR/maker1/$species/all.gff \
+    > $DIR/maker1/$species/protein2genome.gff
+# repeat alignments
+awk '$2 ~ "repeat"' $DIR/maker1/$species/all.gff \
+    > $DIR/maker1/$species/repeat.gff
 #+END_SRC
 
 * IPRScan
@@ -176,29 +295,26 @@ foreach my $species (@$genomes){
 :END:
 
 #+HEADER: :shebang #!/bin/bash :tangle iprscan/run.pbs :mkdirp yes
-#+HEADER: :prologue #PBS -N ipr_scan -l walltime=48:00:00 -t 1-100
-#+BEGIN_SRC sh :var genomes=genomes[,1]
-species=${genomes[ ` expr $species - 1 `]}
+#+HEADER: :prologue #PBS -N iprscan -l walltime=48:00:00 -t 1-20
+#+BEGIN_SRC sh :var genomes=genomes[,0]
+species="${genomes[$species]}"
 
 cd $DIR
 ROOT=$(git rev-parse --show-toplevel)
 
-swsetup () { eval `/usr/local/swsetup/swsetup.pl $*`; }
-swsetup maker
-swsetup blast
-export PERL5LIB=$PERL5LIB:/usr/local/igbb/maker/lib/perl5/
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/mpi/x86_64/mpich/lib/
-PATH=/usr/local/java/jdk1.8.0_92/bin/:$PATH
+ml igbb
+ml maker/2.31.9
+ml java
+ml python
 
-cd $DIR/maker/$species/maker1.$PBS_ARRAYID.maker.output
-#fasta_merge -d maker1.${PBS_ARRAYID}_master_datastore_index.log -o $PBS_ARRAYID
+cd $DIR/maker1/$species/$PBS_ARRAYID.maker.output
+fasta_merge -d ${PBS_ARRAYID}_master_datastore_index.log -o $PBS_ARRAYID
 
-mkdir $DIR/iprscan/$PBS_ARRAYID
-cd $DIR/iprscan/$PBS_ARRAYID
-file=$(printf "$species.complete.part-%03d" $PBS_ARRAYID)
+mkdir -p $DIR/iprscan/$species/$PBS_ARRAYID
+cd $DIR/iprscan/$species/$PBS_ARRAYID
 
-$DIR/interproscan-5.27-66.0/interproscan.sh \
-   -i $DIR/iprscan/split/D1-35.sorted.proteins.part-$(printf "%03d" $PBS_ARRAYID).fa \
+$DIR/interproscan-5.30-69.0/interproscan.sh \
+   -i $DIR/maker1/$species/$PBS_ARRAYID.maker.output/$PBS_ARRAYID.all.maker.proteins.fasta \
    -f xml,tsv \
    -pathways \
    -iprlookup \
@@ -216,61 +332,94 @@ $DIR/interproscan-5.27-66.0/interproscan.sh \
 :END:
 
 #+BEGIN_SRC sh :tangle blastp/db.pbs :mkdirp yes
+cd $DIR
+
+ml igbb
+ml blast 
 makeblastdb -in /work/datasets/igbb/uniprot_sprot.20171122.fasta -out $DIR/blastp/uniprot -dbtype prot
 #+END_SRC
 
 #+HEADER: :shebang #!/bin/bash :tangle blastp/run.pbs :mkdirp yes
-#+HEADER: :prologue #PBS -N blastp -l walltime=48:00:00
-#+BEGIN_SRC sh :var genomes=genomes[,1]
-species=${genomes[ ` expr $species - 1 `]}
+#+HEADER: :prologue #PBS -N blastp -l walltime=48:00:00 -t 1-20
+#+BEGIN_SRC sh :var genomes=genomes[,0]
+species="${genomes[$species]}"
 
 cd $DIR
 ROOT=$(git rev-parse --show-toplevel)
 
-swsetup () { eval `/usr/local/swsetup/swsetup.pl $*`; }
-swsetup maker
-swsetup blast
-export PERL5LIB=$PERL5LIB:/usr/local/igbb/maker/lib/perl5/
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/mpi/x86_64/mpich/lib/
-PATH=/usr/local/java/jdk1.8.0_92/bin/:$PATH
+ml igbb
+ml blast
 
-cd $DIR/maker/$species/maker1/
-# fasta_merge -d maker1.${PBS_ARRAYID}_master_datastore_index.log -o $PBS_ARRAYID
-
-blastp -query $DIR/maker/$species/maker1/proteins.fasta \
+#cd $DIR/maker/$species/maker1/$PBS_ARRAYID.maker.output
+#fasta_merge -d ${PBS_ARRAYID}_master_datastore_index.log -o $PBS_ARRAYID
+mkdir $DIR/blastp/$species
+blastp -query $DIR/maker1/$species/$PBS_ARRAYID.maker.output/$PBS_ARRAYID.all.maker.proteins.fasta \
        -db $DIR/blastp/uniprot \
        -outfmt 6 \
-       -out $DIR/blastp/$species.out \
+       -out $DIR/blastp/$species/$PBS_ARRAYID.out \
        -num_threads $PBS_NUM_PPN
 
 #+END_SRC
 
 * Finish
 
+#+NAME: names
+| Name    | Species |
+|---------+---------|
+| D10-7   | Gotur   |
+| D10-8   | Gotur   |
+| D11-1   | Goshw   |
+| D1-35   | Gothu   |
+| D2-1-6  | Goarm   |
+| D2-2    | Gohar   |
+| D3-D-27 | Godav   |
+| D3K-56  | Goklo   |
+| D3-K-57 | Goklo   |
+| D4-12   | Goari   |
+| D4-185  | Goari   |
+| D5-8    | Gorai   |
+| D6-5    | Gogos   |
+| D6-7    | Gogos   |
+| D7-157  | Golob   |
+| D7-4    | Golob   |
+| D8-8    | Gotri   |
+| D8-9    | Gotri   |
+| D9-4    | Golax   |
+
 #+HEADER: :shebang #!/bin/bash :tangle functional/run.pbs :mkdirp yes
 #+HEADER: :prologue #PBS -N blastp -l walltime=48:00:00
-#+BEGIN_SRC sh :var genomes=genomes[,1]
-species=${genomes[ ` expr $species - 1 `]}
+#+BEGIN_SRC sh :var genomes=names
+KEYS=( $(printf "%s\n" "${!genomes[@]}" | sort -n ) )
+accession="${KEYS[$species]}"
+name="${genomes[$accession]}"
+species=$accession
 
-cd $DIR
+mkdir -p $DIR/functional/$species/
+
+cd $DIR/functional/$species/
 ROOT=$(git rev-parse --show-toplevel)
 
-swsetup () { eval `/usr/local/swsetup/swsetup.pl $*`; }
-swsetup maker
-export PERL5LIB=$PERL5LIB:/usr/local/igbb/maker/lib/perl5/
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/mpi/x86_64/mpich/lib/
+ml igbb
+ml maker/2.31.9
 
-
-maker_map_ids --prefix Gothu. --justify 8 $species.gff3 > $species.map
+awk '$2=="maker"' $DIR/maker1/$species/all.gff > $species.gff3
+maker_map_ids --prefix $name.v1_ --justify 8 $species.gff3 > $species.map
 map_gff_ids $species.map $species.gff3
+awk -F $'\t' '$3 == "mRNA" {print $NF}' $species.gff3 | \
+    cut -f1,3 -d';' | \
+    awk -F';' '{print $2"\t"$1}' | \
+    sed -e 's/ID=//' -e 's/Name=//' > data.map
 
-cat $DIR/iprscan/*/iprscan.*.tsv                               > $species.iprscan
 
+cat $DIR/maker1/$species/*/*.all.maker.proteins.fasta    > $species.proteins.fa
+cat $DIR/maker1/$species/*/*.all.maker.transcripts.fasta > $species.transcripts.fa
+cat $DIR/iprscan/$species/*/iprscan.*.tsv                               > $species.iprscan
+cat $DIR/blastp/$species/*.out                                          > $species.blastp
 
-map_fasta_ids $species.map   $species.proteins.fa
-map_fasta_ids $species.map   $species.transcripts.fa
-map_data_ids  $species.map   $species.iprscan
-map_data_ids  $species.map   $species.blastp
+map_fasta_ids data.map   $species.proteins.fa
+map_fasta_ids data.map   $species.transcripts.fa
+map_data_ids  data.map   $species.iprscan
+map_data_ids  data.map   $species.blastp
 
 uniprot=/work/datasets/igbb/uniprot_sprot.20171122.fasta
 maker_functional_gff    $uniprot  $species.blastp  $species.gff3            > $species.putative_function.gff3
@@ -282,6 +431,5 @@ ipr_update_gff $species.putative_function.gff3 $species.iprscan > $species.putat
 mv $species.putative_function.domain_added.gff3 $species.gff3
 mv $species.proteins.putative_function.fa $species.proteins.fa
 mv $species.transcripts.putative_function.fa $species.transcripts.fa
-
-
 #+END_SRC
+
