@@ -1,0 +1,42 @@
+grep "^#CHROM/|Chr" all.PASS_indel.vcf > all.PASS_indel.noHeader.vcf 
+head -n1 all.PASS_indel.noHeader.vcf | cut -f 1,2,3,4,5,6,7,8,9,$(seq -s, 140 13 900) > Indel.header.snpeff.final
+ grep '^Chr01' all.PASS_indel.noHeader.vcf | cut -f 1,2,3,4,5,6,7,8,9,$(seq -s, 140 13 900) >> Indel.header.snpeff.final
+ grep '^Chr02' all.PASS_indel.noHeader.vcf | cut -f 1,2,3,4,5,6,7,8,9,$(seq -s, 145 13 900) >> Indel.header.snpeff.final
+ grep '^Chr03' all.PASS_indel.noHeader.vcf | cut -f 1,2,3,4,5,6,7,8,9,$(seq -s, 146 13 900) >> Indel.header.snpeff.final
+ grep '^Chr04' all.PASS_indel.noHeader.vcf | cut -f 1,2,3,4,5,6,7,8,9,$(seq -s, 147 13 900) >> Indel.header.snpeff.final
+ grep '^Chr05' all.PASS_indel.noHeader.vcf | cut -f 1,2,3,4,5,6,7,8,9,$(seq -s, 148 13 900) >> Indel.header.snpeff.final
+ grep '^Chr06' all.PASS_indel.noHeader.vcf | cut -f 1,2,3,4,5,6,7,8,9,$(seq -s, 149 13 900) >> Indel.header.snpeff.final
+ grep '^Chr07' all.PASS_indel.noHeader.vcf | cut -f 1,2,3,4,5,6,7,8,9,$(seq -s, 150 13 900) >> Indel.header.snpeff.final
+ grep '^Chr08' all.PASS_indel.noHeader.vcf | cut -f 1,2,3,4,5,6,7,8,9,$(seq -s, 151 13 900) >> Indel.header.snpeff.final
+ grep '^Chr09' all.PASS_indel.noHeader.vcf | cut -f 1,2,3,4,5,6,7,8,9,$(seq -s, 152 13 900) >> Indel.header.snpeff.final
+ grep '^Chr10' all.PASS_indel.noHeader.vcf | cut -f 1,2,3,4,5,6,7,8,9,$(seq -s, 141 13 900) >> Indel.header.snpeff.final
+ grep '^Chr11' all.PASS_indel.noHeader.vcf | cut -f 1,2,3,4,5,6,7,8,9,$(seq -s, 142 13 900) >> Indel.header.snpeff.final
+ grep '^Chr12' all.PASS_indel.noHeader.vcf | cut -f 1,2,3,4,5,6,7,8,9,$(seq -s, 143 13 900) >> Indel.header.snpeff.final
+ grep '^Chr13' all.PASS_indel.noHeader.vcf | cut -f 1,2,3,4,5,6,7,8,9,$(seq -s, 144 13 900) >> Indel.header.snpeff.final
+cut -f 1,2,3,4,5,6,7,8,9,11,13,16,17,19,20,21,24,26,32,34,36,38 Indel.header.snpeff.final > D.indel.vcf
+
+module load snpeff/2017-11-24-63ofrhz
+snpEff ann -t -no-intergenic -no-intron -no-upstream -no-utr -lof -c snpEff.config D5 D.indel.vcf > D.indel.snpeff.vcf
+
+# filter so that only homozygotes are retained, at least one D genome is variant, and each variant has at least 10 reads. the indel must have an effect, and the primary effect 
+# cannot be the below listed effects
+SnpSift filter "(countHom() > 12) & (countVariant() > 0) & ( GEN[0].GQ > 10 ) & ( GEN[1].GQ > 10 ) & ( GEN[2].GQ > 10 ) & ( GEN[3].GQ > 10 ) & ( GEN[4].GQ > 10 ) & ( GEN[5].GQ > 10 ) & ( GEN[6].GQ > 10 ) & ( GEN[7].GQ > 10 ) & ( GEN[8].GQ > 10 ) & ( GEN[9].GQ > 10 ) & ( GEN[10].GQ > 10 ) & ( GEN[11].GQ > 10 ) & ( GEN[12].GQ > 10 ) & ( exists EFF[*].EFFECT ) & !( ANN[0].EFFECT has 'downstream_gene_variant' ) & !( ANN[0].EFFECT has 'intron_variant' ) & !( ANN[0].EFFECT has 'intragenic_variant' ) & !( ANN[0].EFFECT has 'upstream_gene_variant' ) & !( ANN[0].EFFECT has 'conserved_intergenic_variant' ) & !( ANN[0].EFFECT has 'non_coding_transcript_variant') & !( ANN[0].EFFECT has 'splice_region_variant') " D.snpeff.indel.vcf > D.snpeff.indel.filtered.vcf
+
+# also filter out conservative indels
+SnpSift filter " !( ANN[0].EFFECT has 'conservative_inframe_deletion' ) & !( ANN[0].EFFECT has 'conservative_inframe_insertion' )  " D.snpeff.indel.filtered.vcf > D.snpeff.indel.disruptive.vcf
+
+# how many indels are affecting genes
+grep "^Chr" D.snpeff.indel.filtered.vcf | wc -l
+#####15786
+
+# how many indels are disrupting genes by more than one aa
+grep "^Chr" D.snpeff.indel.disruptive.vcf | wc -l
+#####12679
+
+# how many indels have more than 2 alternate states; these become more low confidence -- may not good gene predictions in the first place?
+grep "[3456]\/[3456]:" D.snpeff.indel.disruptive.vcf | wc -l
+#####154
+# note all are uniq genes, dispersed among chromosomes
+
+# extract a mega table for later parsing
+SnpSift extractFields D.snpeff.indel.filtered.vcf CHROM POS REF ALT ANN[0].GENE GEN[0].GT GEN[1].GT GEN[2].GT GEN[3].GT GEN[4].GT GEN[5].GT GEN[6].GT GEN[7].GT GEN[8].GT GEN[9].GT GEN[10].GT GEN[11].GT GEN[12].GT ANN[0].EFFECT ANN[1].EFFECT ANN[2].EFFECT ANN[3].EFFECT ANN[4].EFFECT ANN[5].EFFECT | sed 's/1\/1/1/g' | sed 's/2\/2/2/g' | sed 's/3\/3/3/g' | sed 's/4\/4/4/g' | sed 's/5\/5/5/g' | sed 's/6\/6/6/g' | sed 's/0\/0/0/g' > D.snpeff.indel.filtered.annotations
