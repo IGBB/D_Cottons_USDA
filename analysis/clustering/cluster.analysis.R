@@ -25,7 +25,9 @@ sessionInfo()
 # [1] stats     graphics  grDevices utils     datasets  methods   base     
 # 
 # other attached packages:
-# [1] reshape2_1.4.2       gridExtra_2.2.1      factoextra_1.0.4     ggrepel_0.6.5        plotrix_3.6-4        BiocInstaller_1.22.3 scales_0.4.1         ggplot2_2.2.1       
+# [1] matrixStats_0.52.2 phytools_0.6-20    maps_3.2.0         dplyr_0.7.4        geiger_2.0.6      
+# [6] testit_0.7         gridExtra_2.3      reshape2_1.4.2     factoextra_1.0.5   ggrepel_0.7.0     
+# [11] scales_0.5.0       ggplot2_2.2.1      geomorph_3.0.5     ape_4.1            rgl_0.98.1       factoextra_1.0.4     ggrepel_0.6.5        plotrix_3.6-4        BiocInstaller_1.22.3 scales_0.4.1         ggplot2_2.2.1       
 # 
 # loaded via a namespace (and not attached):
 #  [1] Rcpp_0.12.10     digest_0.6.12    ggpubr_0.1.2     grid_3.3.3       plyr_1.8.4       gtable_0.2.0     magrittr_1.5     stringi_1.1.5    lazyeval_0.2.0   labeling_0.3     tools_3.3.3     
