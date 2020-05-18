@@ -1,0 +1,185 @@
+#+TITLE: sqn creation
+#+DRAWERS: HIDDEN
+#+OPTIONS: d:RESULTS ^:nil
+#+STARTUP: hideblocks align
+#+PROPERTY:  header-args :exports results :eval never-export :mkdirp yes  :var DIR=(file-name-directory buffer-file-name) 
+
+#+NAME: genomes
+| library_ID | title                   |
+|------------+-------------------------|
+| D11-1      | Gossypium schwendemanii |
+| D4-185     | Gossypium aridum        |
+| D10-7      | Gossypium turnerii      |
+| D2-1-6     | Gossypium armourianum   |
+| D2-2       | Gossypium harknessii    |
+| D3-D-27    | Gossypium davidsonii    |
+| D3-K-57    | Gossypium klotzschianum |
+| D5-8       | Gossypium raimondii     |
+| D6-5       | Gossypium gossypioides  |
+| D7-157     | Gossypium lobatum       |
+| D8-8       | Gossypium trilobum      |
+| D9-4       | Gossypium laxum         |
+
+#+HEADER: :shebang #!/bin/bash
+#+HEADER: :prologue #PBS -N setup -l walltime=48:00:00
+#+BEGIN_SRC sh :var genomes=genomes :tangle setup.sh
+ml gcc/8.3.0
+ml python/2.7.15
+
+cd $DIR
+
+KEYS=("${!genomes[@]}")                                                                                                                                                                                            
+SAMPLE="${KEYS[$PBS_ARRAYID]}"                                                                                                                                                                                     
+SPECIES="${genomes[$SAMPLE]}"                                                                                                                                                                                      
+LABEL=$(echo $SPECIES | awk '{print substr($1, 0, 2) substr($2,0,3)}') 
+
+GENOME=$DIR/$SAMPLE/$SAMPLE.fa
+ANNOTATIONS=$DIR/$SAMPLE/$SAMPLE
+
+PATH=$DIR/bin/:$PATH
+
+# Process GFF
+sed -e 's/\.v1//g' $ANNOTATIONS.gff > $ANNOTATIONS.renamed.gff
+gffread $ANNOTATIONS.renamed.gff -g $GENOME -M -K -Q -Z -V -J -o $ANNOTATIONS.read.gff; python $DIR/bin/db_clean.py $ANNOTATIONS.read.gff > $ANNOTATIONS.cleaned.gff; python $DIR/bin/fix_IDs.py $ANNOTATIONS.cleaned.gff > $ANNOTATIONS.fixed.gff
+
+# GAG
+python $DIR/bin/genomeannotation-GAG-997e384/gag.py --fasta $GENOME --gff $ANNOTATIONS.fixed.gff -rcs 50 -res 50 -ris 50 -rgs 50 --fix_start_stop --fix_terminal_ns --out $DIR/$SAMPLE/gag
+cd $DIR/$SAMPLE/gag
+
+# Filter Genome
+mv genome.fasta genome.fasta.bak
+fasta_filter.pl --length=200 genome.fasta.bak > genome.fasta
+
+
+# Set up error files
+rm errors.txt; echo "dummy" > errors.txt
+rm weird_errors.txt
+
+# Get species tag
+prefix=$(head -n3 genome.gff | grep -v "#" | tail -n1 | cut -f9 | cut -f2 -d'=' | cut -f1 -d'_')
+cp genome.gff genome.gff.orig
+#+END_SRC
+
+#+BEGIN_SRC python :tangle remove-dups.py
+import sys
+import string
+
+data = {}
+features = {}
+mappings = {}
+letters = list(string.ascii_lowercase)
+
+def get_key(counts, value):
+    keys = list()
+    items = counts.items()
+    for item in items:
+        if item[1] >= value and "mRNA" in item[0]:
+            keys.append(item[0])
+    return(keys)
+
+with open(sys.argv[1]) as gff_file:
+	for line in gff_file:
+		if line[0] != "#":
+			data = line.strip("\n").split("\t")
+			feature = data[0]+"-"+data[3]+"-"+data[4]
+			unique_id = data[0]+"-"+data[2]+"-"+data[3]+"-"+data[4]
+			feature_type = data[2]
+			if feature_type == "locus":
+				parent = feature
+				if feature not in features:
+					features[feature] = {"data": [], "counts": {}}
+			else:
+				if unique_id not in features[parent]["counts"]:
+					features[parent]["counts"][unique_id] = 1
+				else:
+					features[parent]["counts"][unique_id] += 1
+			features[parent]["data"].append(data)
+print("##gff-version 3")
+for feature in features:
+	duplicates = get_key(features[feature]["counts"], 2)
+	if len(duplicates) > 0:
+		data = features[feature]["data"]
+		mRNA = 0
+		old_feature_id = ""
+		new_feature_id = ""
+		for line in data:
+			if line[2] == "mRNA":
+				old_feature_id = line[8].split(";")[0].split("=")[1]
+				if mRNA != 0:
+					new_feature_id = old_feature_id+letters[mRNA]
+				else:
+					new_feature_id = old_feature_id
+				mRNA += 1
+			print("\t".join(line).replace(old_feature_id, new_feature_id))
+	else:
+		data = features[feature]["data"]
+		for line in data:
+			print("\t".join(line))
+
+#+END_SRC
+
+#+HEADER: :shebang #!/bin/bash
+#+HEADER: :prologue #PBS -N table2asn -l walltime=160:00:00 -q q48p160h
+#+BEGIN_SRC sh :var genomes=genomes :tangle sqn.sh
+ml gcc/8.3.0
+ml python/2.7.15
+
+cd $DIR
+
+KEYS=("${!genomes[@]}")                                                                                                                                                                                            
+SAMPLE="${KEYS[$PBS_ARRAYID]}"                                                                                                                                                                                     
+SPECIES="${genomes[$SAMPLE]}"                                                                                                                                                                                      
+LABEL=$(echo $SPECIES | awk '{print substr($1, 0, 2) substr($2,0,3)}') 
+
+GENOME=$DIR/$SAMPLE/$SAMPLE.fa
+ANNOTATIONS=$DIR/$SAMPLE/$SAMPLE
+
+cd $SAMPLE/gag
+PREFIX=$(head -n3 genome.gff | grep -v "#" | tail -n1 | cut -f9 | cut -f2 -d'=' | cut -f1 -d'_')
+
+# Run tbl2asn_gff and collect errors
+$DIR/bin/table2asn_GFF -M n -J -c wex -t $DIR/bin/template.sbt -gaps-min 1 -gaps-unknown 100 -l paired-ends -l align-genus -i genome.fasta -f genome.gff -X E -euk -locus-tag-prefix $PREFIX -n "$SPECIES" -V v -Z genome.dr
+grep -v Warning genome.val | grep -v Info | grep gnl | sed -e "s/.*$PREFIX|//" -e 's/cds.*/cds/' -e 's/stop.*//' -e 's/start.*/start/' -e 's/:*$//' | sort | uniq > errors.txt
+grep -v Warning genome.val | grep -v Info | grep -v gnl > weird_errors.txt
+cp genome.gff genome.gff.bak
+grep -w -v -f errors.txt genome.gff.bak > genome.gff
+#+END_SRC
+
+#+BEGIN_SRC sh :var genomes=genomes :tangle rename.sh
+ml gcc/8.3.0
+ml python/2.7.15
+
+cd $DIR
+
+KEYS=("${!genomes[@]}")
+SAMPLE="${KEYS[$PBS_ARRAYID]}"
+SPECIES="${genomes[$SAMPLE]}"
+LABEL=$(echo $SPECIES | awk '{print substr($1, 0, 2) substr($2,0,3)}')
+
+GENOME=$DIR/$SAMPLE/$SAMPLE.fa
+ANNOTATIONS=$DIR/$SAMPLE/$SAMPLE
+
+cd $SAMPLE/gag
+PREFIX=$(head -n4 genome.gff | grep -v "#" | tail -n1 | cut -f9 | cut -f3 -d'=' | cut -f1 -d'_')
+cp genome.gff genome.2020-01-14.gff.bak
+echo $PREFIX
+sed -i "s/RLOC/$PREFIX/g" genome.gff
+#+END_SRC
+
+#+BEGIN_SRC sh :var genomes=genomes :tangle remove-dups.sh
+ml python
+
+cd $DIR
+
+KEYS=("${!genomes[@]}")
+SAMPLE="${KEYS[$PBS_ARRAYID]}"
+SPECIES="${genomes[$SAMPLE]}"
+LABEL=$(echo $SPECIES | awk '{print substr($1, 0, 2) substr($2,0,3)}')
+
+GENOME=$DIR/$SAMPLE/$SAMPLE.fa
+ANNOTATIONS=$DIR/$SAMPLE/$SAMPLE
+echo $SAMPLE
+cd $SAMPLE/gag
+cp genome.gff genome.2020-04-07.gff.bak
+python $DIR/remove-dups.py genome.2020-04-07.gff.bak > genome.gff
+#+END_SRC
